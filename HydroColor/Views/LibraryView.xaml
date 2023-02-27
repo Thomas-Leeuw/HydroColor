@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewmodels="clr-namespace:HydroColor.ViewModels"
+             x:Class="HydroColor.Views.LibraryView"
+             Shell.NavBarIsVisible="False"
+             Title="">
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior
+        EventName="Appearing"
+        Command="{Binding ViewAppearingCommand}" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="auto,*" BackgroundColor="Black">
+
+        <Button Grid.Row="0" 
+                Text="{Binding EditListButtonText}" 
+                HorizontalOptions="Start" 
+                FontSize="12"
+                Margin="5"
+                Command="{Binding EditListCommand}"/>
+
+        <Button Grid.Row="0" 
+                Text="Email Data File..." 
+                HorizontalOptions="End" 
+                FontSize="12"
+                Margin="5"
+                Command="{Binding EmailDataFileCommand}"
+                IsVisible="{Binding ShowDeleteMeasurementsButtons, Converter={StaticResource InvertedBoolConverter}}"/>
+
+        <ListView Grid.Row="2" 
+                  ItemsSource="{Binding DataLibraryItems}" 
+                  SeparatorColor="White"
+                  BackgroundColor="Black" 
+                  SelectionMode="None" 
+                  RowHeight="75" 
+                  CachingStrategy="RecycleElement">
+            <ListView.Behaviors>
+                <toolkit:EventToCommandBehavior
+                EventName="ItemTapped"
+                Command="{Binding ItemTappedCommand}"
+                x:TypeArguments="ItemTappedEventArgs"/>
+            </ListView.Behaviors>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+
+                        <Grid RowDefinitions="*,*" ColumnDefinitions="75,*" Padding="5">
+                            <Image Grid.Column="0" Grid.RowSpan="2" Source="{Binding WaterImageURI}"/>
+                            <Label Grid.Column="1" Grid.Row="0" Text="{Binding MeasurementName}" TextColor="White" FontSize="18"/>
+                            <Label Grid.Column="1" Grid.Row="1" Text="{Binding LocalTimestamp}" TextColor="White" FontSize="16"/>
+                            <Button Text="Delete" 
+                                    FontSize="18"
+                                    FontAttributes="Bold"
+                                    Grid.Column="1" 
+                                    Grid.RowSpan="2" 
+                                    Background="Red" 
+                                    TextColor="White" 
+                                    HorizontalOptions="End" 
+                                    CornerRadius="0"
+                                    Command="{Binding Source={RelativeSource FindAncestor, AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteItemCommand}"
+                                    CommandParameter="{Binding}"
+                                    IsVisible="{Binding Source={RelativeSource FindAncestor, AncestorType={x:Type ContentPage}}, Path=BindingContext.ShowDeleteMeasurementsButtons}"/>
+                            <Image 
+                                    Source="right_arrow.png"
+                                    Grid.Column="1" 
+                                    Grid.RowSpan="2"
+                                    VerticalOptions="Center"
+                                    HorizontalOptions="End"
+                                    Aspect="AspectFit"
+                                    HeightRequest="15"
+                                    IsVisible="{Binding Source={RelativeSource FindAncestor, AncestorType={x:Type ContentPage}}, Path=BindingContext.ShowDeleteMeasurementsButtons, Converter={StaticResource InvertedBoolConverter}}" />
+                        </Grid>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <Label Text="No Measurements to Display" 
+               Grid.Row="2"
+               HorizontalOptions="Center"
+               Margin="20"
+               FontSize="16"
+               IsVisible="{Binding MeasurementsExist, Converter={StaticResource InvertedBoolConverter}}"/>
+
+    </Grid>
+
+</ContentPage>

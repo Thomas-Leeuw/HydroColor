@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="HydroColor.Views.WelcomeView"
+             Background="Black"
+             Shell.NavBarIsVisible="false"
+             Shell.TabBarIsVisible="false">
+
+    <Grid RowDefinitions="*,Auto">
+        <CarouselView HorizontalOptions="FillAndExpand"
+                      VerticalOptions="FillAndExpand"
+                      IsBounceEnabled="False"
+                      Loop="True" 
+                      IsSwipeEnabled="False"
+                      ItemsSource="{Binding WelcomePages}"
+                      PositionChangedCommand="{Binding CarouselPositionChangedCommand}"
+                      IndicatorView="CarouselIndicator"
+                      Position="{Binding CarouselPosition, Mode=TwoWay}">
+            <CarouselView.ItemTemplate>
+                <DataTemplate>
+                    <ScrollView Orientation="Vertical">
+                        <Grid RowDefinitions="auto,*">
+                            <Image Grid.Row="0" Source="{Binding IntroImage}" MaximumHeightRequest="200" Margin="0,25,0,10"/>
+                            <VerticalStackLayout Grid.Row="1">
+                                <Label Text="{Binding IntroTitle}"
+                                   FontSize="25"
+                                   Margin="0,0,0,20"
+                                   HorizontalOptions="Center"/>
+                                <ScrollView Orientation="Vertical" Margin="5,0">
+                                    <Label Text="{Binding IntroBody}"
+                                   
+                                   FontSize="17"
+                                   HorizontalTextAlignment="Center"/>
+                                </ScrollView>
+
+                                <VerticalStackLayout IsVisible="{Binding Source={RelativeSource FindAncestor, AncestorType={x:Type ContentPage}}, Path=BindingContext.LearnMoreLinksVisible, Mode=TwoWay}" 
+                                                 Margin="0,10,0,0">
+                                    <Label Text="MISC-Lab Overview"
+                                    Margin="10"
+                                    FontSize="16"
+                                    TextColor="LightGray"
+                                    TextDecorations="Underline">
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer  Command="{Binding Source={RelativeSource FindAncestor, AncestorType={x:Type ContentPage}}, Path=BindingContext.LinkClickedCommand}"
+                                                               CommandParameter="https://misclab.umeoce.maine.edu/research/HydroColor.php"/>
+                                        </Label.GestureRecognizers>
+                                    </Label>
+                                    <Label Text="Leeuw, T.; Boss, E. The HydroColor App: Above Water Measurements of Remote Sensing Reflectance and Turbidity Using a Smartphone Camera. Sensors 2018, 18, 256."
+                                    Margin="10"
+                                    FontSize="16"
+                                    TextColor="LightGray"
+                                    TextDecorations="Underline">
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer  Command="{Binding Source={RelativeSource FindAncestor, AncestorType={x:Type ContentPage}}, Path=BindingContext.LinkClickedCommand}"
+                                                               CommandParameter="https://www.mdpi.com/1424-8220/18/1/256"/>
+                                        </Label.GestureRecognizers>
+                                    </Label>
+                                    <Label Text="HydroColor GitHub"
+                                    Margin="10"
+                                    FontSize="16"
+                                    TextColor="LightGray"
+                                    TextDecorations="Underline">
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer  Command="{Binding Source={RelativeSource FindAncestor, AncestorType={x:Type ContentPage}}, Path=BindingContext.LinkClickedCommand}"
+                                                               CommandParameter="https://github.com/"/>
+                                        </Label.GestureRecognizers>
+                                    </Label>
+
+                                </VerticalStackLayout>
+
+
+                            </VerticalStackLayout>
+                        </Grid>
+                    </ScrollView>
+                </DataTemplate>
+            </CarouselView.ItemTemplate>
+        </CarouselView>
+        <Grid Grid.Row="1" Padding="5">
+
+            <Button Text="Back"
+                    Command="{Binding BackButtonClickCommand}"
+                    IsVisible="{Binding BackButtonVisible}"
+                    HorizontalOptions="Start"
+                    WidthRequest="75"/>
+
+            <Button Text="{Binding NextButtonText}" 
+                    Command="{Binding NextButtonClickCommand}"
+                    HorizontalOptions="End"
+                    WidthRequest="75"/>
+
+            <VerticalStackLayout HorizontalOptions="Center">
+                <IndicatorView x:Name="CarouselIndicator" 
+                           IndicatorsShape="Circle"
+                           IndicatorSize="12"
+                           IndicatorColor="LightSlateGray"
+                           SelectedIndicatorColor="White"
+                           HorizontalOptions="Center"/>
+
+                <HorizontalStackLayout HorizontalOptions="Center">
+                    <CheckBox VerticalOptions="Center" 
+                              IsChecked="{Binding HideWelcomeScreenChecked, Mode=TwoWay}" 
+                              Color="White"/>
+                    <Label Text="Don't Show Intro Again" 
+                           FontSize="12" 
+                           VerticalOptions="Center"/>
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+
+
+        </Grid>
+    </Grid>
+</ContentPage>

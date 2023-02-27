@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="HydroColor.Views.AboutView"
+             Shell.NavBarIsVisible="false"
+             Title="">
+    <Grid RowDefinitions="auto, *" BackgroundColor="Black">
+        <HorizontalStackLayout Grid.Row="0">
+            <Image Source="appicon_image.png"
+                   HeightRequest="100"
+                   WidthRequest="100"
+                   Aspect="AspectFit"
+                   Margin="10"/>
+
+            <VerticalStackLayout VerticalOptions="Center">
+                <Label Text="HydroColor:"
+                   FontSize="30"
+                   VerticalOptions="Center"
+                   VerticalTextAlignment="Center"/>
+                <Label Text="A Water Quality App"
+                   FontSize="20"
+                   VerticalOptions="Center"
+                   VerticalTextAlignment="Center"/>
+            </VerticalStackLayout>
+
+        </HorizontalStackLayout>
+
+        <ScrollView Grid.Row="1" VerticalOptions="Fill">
+            <VerticalStackLayout>
+                <Label Text="How to Use HydroColor" 
+                       FontSize="18"
+                       Margin="0,5"/>
+                <Label Text="HydroColor requires that you have a photographers 18% reflectance gray card and access to deep unshaded water. HydroColor will guide you through the collection of three images. The images are processed onboard the phone to provide values of reflectance and water turbidity. The data can be viewed in the app or emailed via the Library tab." 
+                       Margin="20,5,5,5"/>
+                <Label Text="Click here to view the introduction screen again, which explains the basics of the measurement."
+                        TextColor="LightGray"
+                        TextDecorations="Underline"
+                        Margin="20,5,5,5">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ShowWelcomeScreenCommand}"/>
+                    </Label.GestureRecognizers>
+                </Label>
+                <Label Text="How Does HydroColor Work?" 
+                       FontSize="18"
+                       Margin="0,5"/>
+                <Label Text="The methodology used by HydroColor is similar to that used with precision radiometers. HydroColor uses three images collected by the user to: (1) measure how much light is emanating from the water's surface, (2) correct that value for sun/sky glint off the surface, and (3) normalize it by the total incoming radiation. This provides a nearly illumination independent measure of the amount light reflected out of the water." 
+                       Margin="20,5,5,5"/>
+                <Label Text="HydroColor was developed by Thomas Leeuw and Emmanuel Boss at the University of Maine. To learn more about HydroColor, see the following links. HydroColor has been improved to use RAW camera data since the 2018 publication below." 
+                       Margin="20,5,5,5"/>
+                <Label Text="MISC-Lab Overview"
+                                    Margin="20,5,5,5"
+                                    TextColor="LightGray"
+                                    TextDecorations="Underline">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding LinkClickedCommand}"
+                                             CommandParameter="https://misclab.umeoce.maine.edu/research/HydroColor.php"/>
+                    </Label.GestureRecognizers>
+                </Label>
+                <Label Text="Leeuw, T.; Boss, E. The HydroColor App: Above Water Measurements of Remote Sensing Reflectance and Turbidity Using a Smartphone Camera. Sensors 2018, 18, 256."
+                                    Margin="20,5,5,5"
+                                    TextColor="LightGray"
+                                    TextDecorations="Underline">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer  Command="{Binding LinkClickedCommand}"
+                                            CommandParameter="https://www.mdpi.com/1424-8220/18/1/256"/>
+                    </Label.GestureRecognizers>
+                </Label>
+                <Label Text="HydroColor GitHub"
+                                    Margin="20,5,5,5"
+                                    TextColor="LightGray"
+                                    TextDecorations="Underline">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer  Command="{Binding LinkClickedCommand}"
+                                            CommandParameter="https://github.com/"/>
+                    </Label.GestureRecognizers>
+                </Label>
+
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+
+    </Grid>
+</ContentPage>

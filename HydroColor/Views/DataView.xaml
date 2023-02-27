@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:HydroColor.ViewModels"
+             xmlns:converters="clr-namespace:HydroColor.Converters"
+             x:DataType="viewmodels:DataViewModel"
+             x:Class="HydroColor.Views.DataView"
+             Shell.TabBarIsVisible="false"
+             Shell.NavBarIsVisible="true"
+             Title="{Binding ProcMeas.MeasurementName}">
+
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior Command="{Binding BackButtonCommand}"/>
+    </Shell.BackButtonBehavior>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:CameraBoxOverlayWidthConverter x:Key="CameraBoxOverlayWidthConverter"/>
+            <converters:ProductStringWithUncertainityConverter x:Key="ProductStringWithUncertainity"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid BackgroundColor="Black">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <BoxView             
+            Grid.Row="0"
+            Grid.ColumnSpan="3"
+            Color="DarkGray"
+            HeightRequest="1"
+            VerticalOptions="End"
+            />
+
+        <Grid Grid.Row="1" Grid.ColumnSpan="3" ColumnDefinitions="auto,*,*,*" RowDefinitions="*, auto" HeightRequest="{Binding BarChartHeight}" Margin="0,10,10,0">
+            <Label Grid.Row="0" 
+                   Grid.Column="0" 
+                   Text="Reflectance" 
+                   Rotation="270" 
+                   FontSize="18" 
+                   VerticalTextAlignment="Center" 
+                   HorizontalOptions="Center"
+                   Margin="-20"/>
+
+            <BoxView CornerRadius="5" 
+                    Grid.Row="0" 
+                    Grid.Column="1" 
+                    Color="RoyalBlue" 
+                    HeightRequest="{Binding BlueBarChartHeight}" 
+                    WidthRequest="75" 
+                    Margin="5,0,5,0" 
+                    VerticalOptions="End"/>
+            <BoxView CornerRadius="5" 
+                     Grid.Row="0" 
+                     Grid.Column="2" 
+                     Color="Green" 
+                     HeightRequest="{Binding GreenBarChartHeight}" 
+                     WidthRequest="75" 
+                     Margin="5,0,5,0" 
+                     VerticalOptions="End"/>
+            <BoxView CornerRadius="5" 
+                     Grid.Row="0" 
+                     Grid.Column="3" 
+                     Color="DarkRed" 
+                     HeightRequest="{Binding RedBarChartHeight}"
+                     WidthRequest="75" 
+                     Margin="5,0,5,0" 
+                     VerticalOptions="End"/>
+
+            <BoxView             
+            Grid.Row="0"
+            Grid.Column="1"
+            Grid.ColumnSpan="3"
+            Color="DarkGray"
+            HeightRequest="1"
+            VerticalOptions="End"/>
+
+            <BoxView             
+            Grid.Row="0"
+            Grid.Column="0"
+            Color="DarkGray"
+            WidthRequest="1"
+            HorizontalOptions="End"/>
+
+            <Label Grid.Row="1" 
+                   Grid.Column="1" 
+                   Text="Blue" 
+                   HorizontalOptions="Center" 
+                   FontSize="18" />
+            <Label Grid.Row="1" 
+                       Grid.Column="2"
+                       Text="Green"
+                       HorizontalOptions="Center"
+                       FontSize="18"/>
+            <Label Grid.Row="1"
+                       Grid.Column="3"
+                       Text="Red"
+                       HorizontalOptions="Center"
+                       FontSize="18" />
+        </Grid>
+
+        <Frame Grid.Row="3" Grid.ColumnSpan="3" BackgroundColor="Black" Margin="10" CornerRadius="5" BorderColor="DarkGray">
+            <ScrollView BackgroundColor="Black" HorizontalOptions="CenterAndExpand" VerticalScrollBarVisibility="Always" Orientation="Vertical">
+                <Grid ColumnSpacing="8" RowSpacing="2" RowDefinitions="auto,auto,auto,auto,auto,auto,auto,auto,auto,auto" ColumnDefinitions="auto,auto,auto" HorizontalOptions="Center">
+
+                    <Grid.Resources>
+                        <Style TargetType="Label">
+                            <Setter Property="FontSize" Value="18"/>
+                        </Style>
+                    </Grid.Resources>
+
+                    <Label Text="Date:" Grid.Row="0" Grid.Column="0"/>
+                    <Label Text="{Binding ProcMeas.WaterImageData.LocalTimeStamp, StringFormat='{}{0:d}'}" Grid.Row="0" Grid.Column="1" />
+
+                    <Label Text="Time:" Grid.Row="1" Grid.Column="0"/>
+                    <Label Text="{Binding ProcMeas.WaterImageData.LocalTimeStamp, StringFormat='{}{0:T}'}" Grid.Row="1" Grid.Column="1"/>
+                    <Label Text="Local" Grid.Row="1" Grid.Column="2"/>
+
+                    <Label Text="Lat:" Grid.Row="2" Grid.Column="0"/>
+                    <Label Text="{Binding ProcMeas.WaterImageData.ImageLocation.Latitude, StringFormat='{}{0:#,0.00000}'}" Grid.Row="2" Grid.Column="1"/>
+                    <Label Text="Deg." Grid.Row="2" Grid.Column="2"/>
+
+                    <Label Text="Lon:" Grid.Row="3" Grid.Column="0"/>
+                    <Label Text="{Binding ProcMeas.WaterImageData.ImageLocation.Longitude, StringFormat='{}{0:#,0.00000}'}" Grid.Row="3" Grid.Column="1"/>
+                    <Label Text="Deg." Grid.Row="3" Grid.Column="2"/>
+
+                    <Label Text="Turbidity:" Grid.Row="4" Grid.Column="0"/>
+                    <Label Text="{Binding ProcMeas.MeasurementProducts.WaterTurbidity, Converter={StaticResource ProductStringWithUncertainity}, ConverterParameter={x:Static converters:ProductDisplayParameter.TURBIDTY}}" Grid.Row="4" Grid.Column="1"/>
+                    <Label Text="NTU" Grid.Row="4" Grid.Column="2"/>
+
+                    <Label Text="SPM:" Grid.Row="5" Grid.Column="0"/>
+                    <Label Text="{Binding ProcMeas.MeasurementProducts.SPM, Converter={StaticResource ProductStringWithUncertainity}, ConverterParameter={x:Static converters:ProductDisplayParameter.SPM}}" Grid.Row="5" Grid.Column="1"/>
+                    <Label Text="mg/L" Grid.Row="5" Grid.Column="2"/>
+
+                    <Label Grid.Row="6" Grid.Column="0">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="b"/>
+                                <Span Text="b" FontSize="10"/>
+                                <Span Text=" Red:"/>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                    <Label Text="{Binding ProcMeas.MeasurementProducts.Backscatter_red, Converter={StaticResource ProductStringWithUncertainity}, ConverterParameter={x:Static converters:ProductDisplayParameter.BACKSCATTER}}" Grid.Row="6" Grid.Column="1"/>
+                    <Label Text="1/m" Grid.Row="6" Grid.Column="2"/>
+
+                    <Label Text="Reflec Red:" Grid.Row="7" Grid.Column="0"/>
+                    <Label Text="{Binding ProcMeas.MeasurementProducts.Reflectance.Red, Converter={StaticResource ProductStringWithUncertainity}, ConverterParameter={x:Static converters:ProductDisplayParameter.REFLECTANCE}}" Grid.Row="7" Grid.Column="1"/>
+                    <Label Text="1/sr" Grid.Row="7" Grid.Column="2"/>
+
+                    <Label Text="Reflec Green:" Grid.Row="8" Grid.Column="0"/>
+                    <Label Text="{Binding ProcMeas.MeasurementProducts.Reflectance.Green, Converter={StaticResource ProductStringWithUncertainity}, ConverterParameter={x:Static converters:ProductDisplayParameter.REFLECTANCE}}" Grid.Row="8" Grid.Column="1"/>
+                    <Label Text="1/sr" Grid.Row="8" Grid.Column="2"/>
+
+                    <Label Text="Reflec Blue:" Grid.Row="9" Grid.Column="0"/>
+                    <Label Text="{Binding ProcMeas.MeasurementProducts.Reflectance.Blue, Converter={StaticResource ProductStringWithUncertainity}, ConverterParameter={x:Static converters:ProductDisplayParameter.REFLECTANCE}}" Grid.Row="9" Grid.Column="1"/>
+                    <Label Text="1/sr" Grid.Row="9" Grid.Column="2"/>
+
+                </Grid>
+            </ScrollView>
+        </Frame>
+
+
+
+        <Label Grid.Row="4"
+               Grid.Column="0"
+               Text="Gray Card"
+               HorizontalOptions="Center"
+               FontSize="14" />
+        <Label Grid.Row="4"
+               Grid.Column="1"
+               Text="Water"
+               HorizontalOptions="Center"
+               FontSize="14" />
+        <Label Grid.Row="4"
+               Grid.Column="3"
+               Text="Sky"
+               HorizontalOptions="Center" 
+               FontSize="14" />
+
+
+
+        <Image
+            x:Name="GrayCardImage"
+            Grid.Column="0"
+            Grid.Row="5"
+            Margin="4"
+            HeightRequest="160"
+            Aspect="AspectFit"
+            Source="{Binding GrayCardThumbnailImage}"/>
+
+        <Border Grid.Row="5" Grid.Column="0" 
+                StrokeThickness="{OnPlatform 5, iOS=5, Android=3}" 
+                VerticalOptions="Center" 
+                HorizontalOptions="Center"
+                WidthRequest="{Binding Source={x:Reference GrayCardImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}}"
+                HeightRequest="{Binding Source={x:Reference GrayCardImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}}"
+                Stroke="{Binding GrayCardImageSquareColor}"
+                BackgroundColor="Transparent">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="5" />
+            </Border.StrokeShape>
+        </Border>
+
+        <Image
+            x:Name="WaterImage"
+            Grid.Column="1"
+            Grid.Row="5"
+            Margin="4"
+            MinimumHeightRequest="150"
+            HeightRequest="160"
+            Aspect="AspectFit"
+            Source="{Binding WaterThumbnailImage}"/>
+
+        <Border Grid.Row="5" Grid.Column="1" 
+                StrokeThickness="{OnPlatform 5, iOS=5, Android=3}" 
+                VerticalOptions="Center" 
+                HorizontalOptions="Center"
+                WidthRequest="{Binding Source={x:Reference WaterImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}}"
+                HeightRequest="{Binding Source={x:Reference WaterImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}}"
+                Stroke="{Binding WaterImageSquareColor}"
+                BackgroundColor="Transparent">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="5" />
+            </Border.StrokeShape>
+        </Border>
+
+        <Image
+            x:Name="SkyImage"
+            Grid.Column="2"
+            Grid.Row="5"
+            Margin="4"
+            HeightRequest="160"
+            Aspect="AspectFit"
+            Source="{Binding SkyThumbnailImage}"/>
+
+        <Border Grid.Row="5" Grid.Column="2" 
+                StrokeThickness="{OnPlatform 5, iOS=5, Android=3}" 
+                VerticalOptions="Center" 
+                HorizontalOptions="Center"
+                WidthRequest="{Binding Source={x:Reference SkyImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}}"
+                HeightRequest="{Binding Source={x:Reference SkyImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}}"
+                Stroke="{Binding SkyImageSquareColor}"
+                BackgroundColor="Transparent">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="5" />
+            </Border.StrokeShape>
+        </Border>
+
+    </Grid>
+</ContentPage>

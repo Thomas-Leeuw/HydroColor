@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:HydroColor.ViewModels"
+             xmlns:models="clr-namespace:HydroColor.Models"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:maps="clr-namespace:Microsoft.Maui.Controls.Maps;assembly=Microsoft.Maui.Controls.Maps"
+             xmlns:sensors="clr-namespace:Microsoft.Maui.Devices.Sensors;assembly=Microsoft.Maui.Essentials"
+             xmlns:converters="clr-namespace:HydroColor.Converters"
+             x:Class="HydroColor.Views.CollectDataView"
+             Shell.NavBarIsVisible="false"
+             Title="">
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior
+        EventName="Loaded"
+        Command="{Binding ViewLoadedCommand}" />
+        <toolkit:EventToCommandBehavior
+            EventName="Appearing"
+            Command="{Binding ViewAppearingCommand}"/>
+        <toolkit:StatusBarBehavior StatusBarColor="Black" StatusBarStyle="LightContent"/>
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+            <converters:CameraBoxOverlayWidthConverter x:Key="CameraBoxOverlayWidthConverter"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <!-- The popup displayed by DisplayPromptAysnc on Android pushes the controls up instead of overlaying ontop of them-->
+    <!-- If there isn't room for the controls to be pushed out the way, it causes a huge memory leak. Seems to be a bug in .NET MAUI :( -->
+    <!-- The only solution was to wrap everything in a scroll view, presumably this allows the controls to be pushed up and out of the way-->
+    <ScrollView>
+
+        <Grid BackgroundColor="Black" x:Name="MainGrid">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+
+            <Label 
+            Text="Gray Card"
+            TextColor="{Binding GrayCardImageSquareColor}"
+            FontSize="16"
+            Grid.Row="0"
+            Grid.Column="0"
+            VerticalOptions="Center" 
+            HorizontalOptions="Center" />
+
+            <Label 
+            Text="Water"
+            TextColor="{Binding WaterImageSquareColor}"
+            FontSize="16"
+            Grid.Row="0"
+            Grid.Column="1"
+            VerticalOptions="Center" 
+            HorizontalOptions="Center" />
+
+            <Label 
+            Text="Sky"
+            TextColor="{Binding SkyImageSquareColor}"
+            FontSize="16"
+            Grid.Row="0"
+            Grid.Column="2"
+            VerticalOptions="Center" 
+            HorizontalOptions="Center" />
+
+            <Border Grid.Row="1"
+                Grid.Column="0"
+                Margin="1"
+                Background="Transparent"
+                StrokeThickness="3"
+                Stroke="{Binding GrayCardImageSquareColor}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8" />
+                </Border.StrokeShape>
+
+                <!-- Binding to border color of Image Button is not working, so wrapping in a seperate border -->
+                <ImageButton
+                    x:Name="GrayCardImageButton"
+                    Source="{Binding GrayCardThumbnailImage}"
+                    BorderWidth="0"
+                    Margin="4,0"
+                    HeightRequest="170"
+                    Command="{Binding CaptureImageTappedCommand}"
+                    CommandParameter="{Binding GrayCardImageType}"/>
+            </Border>
+
+            <Border Grid.Row="1" Grid.Column="0" 
+                StrokeThickness="{OnPlatform 5, iOS=5, Android=3}" 
+                VerticalOptions="Center" 
+                HorizontalOptions="Center"
+                WidthRequest="{Binding Source={x:Reference GrayCardImageButton}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}}"
+                HeightRequest="{Binding Source={x:Reference GrayCardImageButton}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}}"
+                BackgroundColor="Transparent"
+                Stroke="{Binding GrayCardImageSquareColor}"
+                IsVisible="{Binding HaveGrayCardData}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="5" />
+                </Border.StrokeShape>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer 
+                        Command="{Binding CaptureImageTappedCommand}"
+                        CommandParameter="{Binding GrayCardImageType}"/>
+                </Border.GestureRecognizers>
+            </Border>
+
+            <Border Grid.Row="1"
+                Grid.Column="1"
+                Margin="1"
+                Background="Transparent"
+                StrokeThickness="3"
+                Stroke="{Binding WaterImageSquareColor}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8" />
+                </Border.StrokeShape>
+
+                <!-- Binding to border color of Image Button is not working, so wrapping in a seperate border -->
+                <ImageButton
+                    x:Name="WaterImageButton"
+                    Source="{Binding WaterThumbnailImage}"
+                    BorderWidth="0"
+                    Margin="4,0"
+                    HeightRequest="170"
+                    Command="{Binding CaptureImageTappedCommand}"
+                    CommandParameter="{Binding WaterImageType}"/>
+            </Border>
+
+            <Border Grid.Row="1" Grid.Column="1" 
+                StrokeThickness="{OnPlatform 5, iOS=5, Android=3}" 
+                VerticalOptions="Center" 
+                HorizontalOptions="Center"
+                WidthRequest="{Binding Source={x:Reference WaterImageButton}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}}"
+                HeightRequest="{Binding Source={x:Reference WaterImageButton}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}}"
+                BackgroundColor="Transparent"
+                Stroke="{Binding WaterImageSquareColor}"
+                IsVisible="{Binding HaveWaterData}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="5" />
+                </Border.StrokeShape>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer 
+                        Command="{Binding CaptureImageTappedCommand}"
+                        CommandParameter="{Binding WaterImageType}"/>
+                </Border.GestureRecognizers>
+            </Border>
+
+            <Border Grid.Row="1"
+                Grid.Column="2"
+                Margin="1"
+                Background="Transparent"
+                StrokeThickness="3"
+                Stroke="{Binding SkyImageSquareColor}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8" />
+                </Border.StrokeShape>
+
+                <!-- Binding to border color of Image Button is not working, so wrapping in a seperate border -->
+                <ImageButton
+                    x:Name="SkyImageButton"
+                    Source="{Binding SkyThumbnailImage}"
+                    BorderWidth="0"
+                    Margin="4,0"
+                    HeightRequest="170"
+                    Command="{Binding CaptureImageTappedCommand}"
+                    CommandParameter="{Binding SkyImageType}"/>
+            </Border>
+
+            <Border Grid.Row="1" Grid.Column="2" 
+                StrokeThickness="{OnPlatform 5, iOS=5, Android=3}" 
+                VerticalOptions="Center" 
+                HorizontalOptions="Center"
+                WidthRequest="{Binding Source={x:Reference SkyImageButton}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}}"
+                HeightRequest="{Binding Source={x:Reference SkyImageButton}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}}"
+                BackgroundColor="Transparent"
+                Stroke="{Binding SkyImageSquareColor}"
+                IsVisible="{Binding HaveSkyData}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="5" />
+                </Border.StrokeShape>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer 
+                        Command="{Binding CaptureImageTappedCommand}"
+                        CommandParameter="{Binding SkyImageType}"/>
+                </Border.GestureRecognizers>
+            </Border>
+
+            <Grid ColumnDefinitions="auto,*" 
+                  Grid.Row="2" 
+                  Grid.ColumnSpan="3" 
+                  Background="yellow"
+                  IsVisible="{Binding SunElevationAngleWarningVisible}">
+                <Image Grid.Column="0" 
+                           Source="warning_icon.png" 
+                           HeightRequest="30" 
+                           WidthRequest="30" 
+                           Margin="5"/>
+                <Label Grid.Column="1" 
+                           Text="Now is not an ideal time for HydroColor measurments. Tap here to see why." 
+                           FontSize="11" 
+                           Margin="5"
+                           TextColor="Black"/>
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer 
+                        Command="{Binding SunElevationAngleWarningTappedCommand}"/>
+                </Grid.GestureRecognizers>
+            </Grid>
+
+            <Button
+            Text="Analyze Images"
+            WidthRequest="150"
+            Grid.Row="3"
+            Grid.ColumnSpan="3"
+            Margin="5"
+            Command="{Binding AnalyzeImagesCommand}"/>
+
+            <Grid Grid.Row="4" Grid.ColumnSpan="3">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Label Text="Lat:" 
+                       Margin="5" 
+                       Grid.Row="0" 
+                       Grid.Column="0" 
+                       FontSize="Medium" 
+                       VerticalOptions="Center"/>
+
+                <Button Text="{Binding CurrentLocation.Latitude, StringFormat='{}{0:#,0.00000}'}" 
+                        Command="{Binding UserInputLatitudeCommand}" 
+                        HorizontalOptions="Start"
+                        WidthRequest="125" 
+                        Grid.Row="0" 
+                        Grid.Column="1"
+                        FontSize="Medium"
+                        Margin="5"/>
+
+                <Label Text="Lon:" 
+                       Margin="5" 
+                       Grid.Row="1" 
+                       Grid.Column="0" 
+                       FontSize="Medium" 
+                       VerticalOptions="Center"/>
+
+                <Button Text="{Binding CurrentLocation.Longitude, StringFormat='{}{0:#,0.00000}'}" 
+                        Command="{Binding UserInputLongitudeCommand}" 
+                        HorizontalOptions="Start" 
+                        WidthRequest="125" 
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        FontSize="Medium"
+                        Margin="5"/>
+                
+                <VerticalStackLayout Grid.Row="0"
+                        Grid.RowSpan="2"
+                        Grid.Column="2"
+                        Margin="5">
+                    
+                        <Button Text="Refresh Location"
+                            WidthRequest="150"
+                            Margin="5"
+                            HorizontalOptions="Center"
+                            Command="{Binding GetCurrentLocationCommand}"
+                            IsVisible="{Binding CanCheckLocation}"/>
+
+                    <Label Text="Location Accuracy:"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            HorizontalTextAlignment="Center"
+                            IsVisible="{Binding CanCheckLocation}"/>
+
+                    <Label Text="{Binding CurrentLocation.Accuracy, StringFormat='{0:F0} meters'}"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            HorizontalTextAlignment="Center"
+                            IsVisible="{Binding CanCheckLocation}"/>
+                </VerticalStackLayout>
+
+                <Label 
+                    Grid.Row="0"
+                    Grid.Column="2"
+                    Text="Aquiring Location ..."
+                    FontAttributes="Italic"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    IsVisible="{Binding CanCheckLocation, Converter={StaticResource InvertedBoolConverter}}"/>
+
+                <ActivityIndicator
+                    Grid.Row="1"
+                    Grid.Column="2"
+                    Margin="5"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"
+                    Color="White"
+                    IsRunning="{Binding CanCheckLocation, Converter={StaticResource InvertedBoolConverter}}"/>
+            </Grid>
+
+            <maps:Map
+                Margin="5"
+                Grid.Row="5"
+                Grid.ColumnSpan="3"
+                x:Name="UserLocationMap" 
+                MapType="Satellite"
+                ItemsSource="{Binding MapPins}">
+                <maps:Map.ItemTemplate>
+                    <DataTemplate>
+                        <maps:Pin 
+                            Location="{Binding location}"
+                            Label=" "/>
+                    </DataTemplate>
+                </maps:Map.ItemTemplate>
+            </maps:Map>
+        </Grid>
+    </ScrollView>
+</ContentPage>

@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:HydroColor.ViewModels"
+             xmlns:converters="clr-namespace:HydroColor.Converters"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:DataType="viewmodels:CaptureImageViewModel"
+             x:Class="HydroColor.Views.CaptureImageView"
+             Title="{Binding ImageType.DisplayName}"
+             Shell.TabBarIsVisible="false"
+             Shell.NavBarIsVisible="true">
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior
+        EventName="Appearing"
+        Command="{Binding ViewAppearingCommand}" />
+        <toolkit:EventToCommandBehavior
+        EventName="Unloaded"
+        Command="{Binding ViewUnloadedCommand}" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+            <converters:CameraBoxOverlayWidthConverter x:Key="CameraBoxOverlayWidthConverter"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+
+    <Grid BackgroundColor="Black">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="4*" />
+        </Grid.ColumnDefinitions>
+
+
+        <!-- The 'Image' control does not clip to bounds, so the inclinometer
+              image needs to be wrapped in a grid that does clip the image.-->
+        <Grid
+            Grid.Row="0"
+            Grid.Column="0" 
+            BackgroundColor="Black"
+            IsEnabled="False"
+            IsClippedToBounds="True">
+
+            <Image 
+            Source="inclinometer_arrows.png"
+            Aspect="AspectFit"
+            VerticalOptions="Center"/>
+
+            <Image 
+            Source="inclinometer_icon.png"
+            VerticalOptions="Center"
+            Aspect="Center"
+            TranslationY="{Binding InclinometerYPosition}"/>
+        </Grid>
+
+
+
+        <Label
+            Grid.Row="0"
+            Grid.Column="0"
+            Margin="10"
+            Text="{Binding DeviceOffNadirAngle, StringFormat='{}{0:#,0.000}'}"
+            FontSize="22"
+            IsVisible="{Binding ShowNumericTiltAndHeading}"/>
+
+        <viewmodels:CameraPreview
+            x:Name="cameraPreview"
+            Grid.Row="0" 
+            Grid.Column="1" 
+            Margin="20"
+            CapturedImageData="{Binding ImageData, Mode=TwoWay}">
+            <viewmodels:CameraPreview.Behaviors>
+                <toolkit:EventToCommandBehavior
+                    EventName="CameraDidNotOpen"
+                    Command="{Binding CameraDidNotOpenCommand}"/>
+            </viewmodels:CameraPreview.Behaviors>
+        </viewmodels:CameraPreview>
+
+        <Border Grid.Row="0" Grid.Column="1" 
+                StrokeThickness="{OnPlatform 8, iOS=8, Android=4}" 
+                VerticalOptions="Center" 
+                HorizontalOptions="Center"
+                WidthRequest="{Binding Source={x:Reference cameraPreview}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}}"
+                HeightRequest="{Binding Source={x:Reference cameraPreview}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}}"
+                BackgroundColor="Transparent"
+                Stroke="{Binding CaptureButtonColor}">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="20"/>
+            </Border.StrokeShape>
+        </Border>
+
+        <VerticalStackLayout
+            Grid.Row="1"
+            Grid.Column="1"
+            Margin="50,5,0,0"
+            VerticalOptions="Center"
+            HorizontalOptions="Center"
+            IsVisible="{Binding WaitingForImageResults}">
+
+            <Label Text="Processing Image..."
+                   FontAttributes="Italic"
+                   FontSize="20"
+                   Margin="0,20"
+                   WidthRequest="120"
+                   HorizontalTextAlignment="Center"
+                   HorizontalOptions="Center"/>
+
+            <ActivityIndicator IsRunning="{Binding WaitingForImageResults}"
+                HorizontalOptions="Center"
+                Color="White"/>
+
+        </VerticalStackLayout>
+
+        <Image 
+            Source="compass.png"
+            Grid.Row="1"
+            Grid.ColumnSpan="2"
+            HeightRequest="180"
+            WidthRequest="180"
+            VerticalOptions="Center"
+            HorizontalOptions="Start"
+            Aspect="Fill"
+            AnchorX="0.5"
+            AnchorY="0.5"
+            Rotation="{Binding CompassDisplayRotation}"
+            IsVisible="{Binding CompassVisible}"
+            />
+
+        <Image 
+            Source="compassarrows.png"
+            Grid.Row="1"
+            Grid.ColumnSpan="2"
+            HeightRequest="180"
+            WidthRequest="180"
+            VerticalOptions="Center"
+            HorizontalOptions="Start"
+            Aspect="Fill"
+            Rotation="{Binding TargetAzimuthArrowRotation}"
+            IsVisible="{Binding CompassVisible}"
+            />
+
+        <Label             
+            Grid.Row="1"
+            Grid.RowSpan="2"
+            Grid.ColumnSpan="2"
+            FontSize="12"
+            WidthRequest="200"
+            HeightRequest="120"
+            Text="{Binding ImageCollectionHelpText}"
+            VerticalOptions="CenterAndExpand"
+            HorizontalOptions="Start"
+            IsVisible="{Binding CompassVisible, Converter={StaticResource InvertedBoolConverter}}"
+            />
+
+        <Label
+            Grid.Row="1"
+            Grid.ColumnSpan="2"
+            Margin="10"
+            Text="{Binding TrueNorthHeading, StringFormat='{}{0:#,0.00}'}"
+            FontSize="22"
+            IsVisible="{Binding ShowNumericTiltAndHeading}"
+            />
+
+        <Label
+            Grid.Row="1"
+            Grid.ColumnSpan="2"
+            Margin="10"
+            Text="{Binding SunAzimuth, StringFormat='{}{0:#,0.00}'}"
+            FontSize="20"
+            VerticalOptions="End"
+            IsVisible="{Binding ShowNumericTiltAndHeading}"
+            />
+
+        <Label
+            Grid.Row="1"
+            Grid.ColumnSpan="2"
+            Margin="10"
+            Text="{Binding SunElevationAngle, StringFormat='{}{0:#,0.00}'}"
+            FontSize="20"
+            VerticalOptions="End"
+            HorizontalOptions="Center"
+            IsVisible="{Binding ShowNumericTiltAndHeading}"
+            />
+
+        <Button
+            Text="Capture"
+            BackgroundColor="{Binding CaptureButtonColor}"
+            Grid.Row="1"
+            FontSize="20"
+            Grid.Column="1"
+            HeightRequest="140"
+            WidthRequest="140"
+            HorizontalOptions="End"
+            VerticalOptions="Center"
+            Margin="0,0,15,0"
+            IsVisible="{Binding WaitingForImageResults, Converter={StaticResource InvertedBoolConverter}}"
+            Command="{Binding CaptureButtonCommand}"/>
+
+        <Label 
+            Text="Compass Not Working?"
+            VerticalOptions="Center" 
+            HorizontalOptions="Start" 
+            Grid.Row="2"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            TextColor="LightGray"
+            TextDecorations="Underline"
+            Margin="5"
+            IsVisible="{Binding CompassVisible}">
+            <Label.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding CompassHelpCommand}"/>
+            </Label.GestureRecognizers>
+        </Label>
+
+    </Grid>
+
+</ContentPage>
