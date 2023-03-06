@@ -7,7 +7,6 @@
 	<key>UIDeviceFamily</key>
 	<array>
 		<integer>1</integer>
-		<integer>2</integer>
 	</array>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
@@ -36,5 +35,11 @@
 	<string>This app uses the camera to take pictures of a gray card, sky, and water. The camera data is the basis for the measurement.</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>CFBundleIdentifier</key>
+	<string>com.H2Optics.HydroColor</string>
+	<key>CFBundleShortVersionString</key>
+	<string>2.0</string>
+	<key>MinimumOSVersion</key>
+	<string>14.2</string>
 </dict>
 </plist>

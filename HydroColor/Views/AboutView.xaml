@@ -71,11 +71,13 @@
                                     TextDecorations="Underline">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer  Command="{Binding LinkClickedCommand}"
-                                            CommandParameter="https://github.com/"/>
+                                            CommandParameter="https://github.com/Thomas-Leeuw/HydroColor"/>
                     </Label.GestureRecognizers>
                 </Label>
 
-
+                <Label Text="{Binding AppVersionNumber, StringFormat='HydroColor v{0}'}" 
+                       Margin="5,5"
+                       HorizontalOptions="End"/>
             </VerticalStackLayout>
         </ScrollView>
 

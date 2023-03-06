@@ -435,7 +435,7 @@ Your HydroColor data file is attached. Do not reply to this email.";
             message.Subject = EmailSubject;
 
             var builder = new BodyBuilder();
-            builder.TextBody = EmailBody;
+            builder.TextBody = EmailBody + "\n\n(Sent With MailKit)";
             string DataFilePath = Path.Combine(DataFolderPath, DataFileName);
             builder.Attachments.Add(DataFilePath);
             message.Body = builder.ToMessageBody();
@@ -455,7 +455,7 @@ Your HydroColor data file is attached. Do not reply to this email.";
             {
                 From = new EmailAddress(GmailCredentials.Email, EmailSenderName),
                 Subject = EmailSubject,
-                PlainTextContent = EmailBody
+                PlainTextContent = EmailBody + "\n\n(Sent With SendGrid)"
             };
             msg.AddTo(new EmailAddress(address, EmailReceiverName));
             string DataFilePath = Path.Combine(DataFolderPath, DataFileName);

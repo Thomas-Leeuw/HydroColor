@@ -56,16 +56,19 @@ namespace HydroColor.ViewModels
                 WaterThumbnailImage = ImageSource.FromStream(() => new MemoryStream(ProcMeas.WaterImageData.JpegImage));
             }
 
-            
-            
-            double maxReflec = new[] {  ProcMeas.MeasurementProducts.Reflectance.Blue,
-                                        ProcMeas.MeasurementProducts.Reflectance.Green,
-                                        ProcMeas.MeasurementProducts.Reflectance.Red
+            double reflecBlue = Math.Round(ProcMeas.MeasurementProducts.Reflectance.Blue, 3);
+            double reflecGreen = Math.Round(ProcMeas.MeasurementProducts.Reflectance.Green, 3);
+            double reflecRed = Math.Round(ProcMeas.MeasurementProducts.Reflectance.Red, 3);
+
+
+            double maxReflec = new[] {  reflecBlue,
+                                        reflecGreen,
+                                        reflecRed
                                         }.Max();
 
-            BlueBarChartHeight = (int) (ProcMeas.MeasurementProducts.Reflectance.Blue / maxReflec * (BarChartHeight - 30));
-            GreenBarChartHeight = (int) (ProcMeas.MeasurementProducts.Reflectance.Green / maxReflec * (BarChartHeight - 30));
-            RedBarChartHeight = (int) (ProcMeas.MeasurementProducts.Reflectance.Red / maxReflec * (BarChartHeight - 30));
+            BlueBarChartHeight = (int) (reflecBlue / maxReflec * (BarChartHeight - 30));
+            GreenBarChartHeight = (int) (reflecGreen / maxReflec * (BarChartHeight - 30));
+            RedBarChartHeight = (int) (reflecRed / maxReflec * (BarChartHeight - 30));
 
             GrayCardImageSquareColor = ProcMeas.GrayCardImageData.ImageCapturedAtCorrectAngles ? Colors.LimeGreen : Colors.White;
             SkyImageSquareColor = ProcMeas.SkyImageData.ImageCapturedAtCorrectAngles ? Colors.LimeGreen : Colors.White;

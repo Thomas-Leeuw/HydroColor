@@ -33,7 +33,7 @@
                                    HorizontalTextAlignment="Center"/>
                                 </ScrollView>
 
-                                <VerticalStackLayout IsVisible="{Binding Source={RelativeSource FindAncestor, AncestorType={x:Type ContentPage}}, Path=BindingContext.LearnMoreLinksVisible, Mode=TwoWay}" 
+                                <VerticalStackLayout IsVisible="{Binding Source={RelativeSource FindAncestor, AncestorType={x:Type ContentPage}}, Path=BindingContext.LearnMoreLinksVisible}" 
                                                  Margin="0,10,0,0">
                                     <Label Text="MISC-Lab Overview"
                                     Margin="10"
@@ -62,7 +62,7 @@
                                     TextDecorations="Underline">
                                         <Label.GestureRecognizers>
                                             <TapGestureRecognizer  Command="{Binding Source={RelativeSource FindAncestor, AncestorType={x:Type ContentPage}}, Path=BindingContext.LinkClickedCommand}"
-                                                               CommandParameter="https://github.com/"/>
+                                                               CommandParameter="https://github.com/Thomas-Leeuw/HydroColor"/>
                                         </Label.GestureRecognizers>
                                     </Label>
 

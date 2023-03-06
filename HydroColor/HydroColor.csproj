@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net7.0-ios;net7.0-android33.0</TargetFrameworks>
+		<TargetFrameworks>net7.0-ios;net7.0-android</TargetFrameworks>
 
 		<OutputType>Exe</OutputType>
 		<RootNamespace>HydroColor</RootNamespace>
@@ -13,20 +13,26 @@
 		<ApplicationTitle>HydroColor</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.h2optics.hydrocolor</ApplicationId>
+		<ApplicationId>com.H2Optics.HydroColor</ApplicationId>
 		<ApplicationIdGuid>40AF2490-DBFC-4C69-83AF-7F0E312CDDE2</ApplicationIdGuid>
 
 		<!-- Versions -->
-		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+		<ApplicationDisplayVersion>2.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.2</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(TargetFramework)'=='net7.0-ios'">
+	<PropertyGroup Condition="'$(TargetFramework)'=='net7.0-ios' and '$(Configuration)' == 'Debug'">
 	  <CodesignKey>Apple Development: Created via API (S4222GC659)</CodesignKey>
 	  <CodesignProvision>VS: WildCard Development</CodesignProvision>
+	</PropertyGroup>
+  
+  <PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Release'">
+		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+		<CodesignKey>Apple Distribution: Thomas Leeuw (QYE35RULW5)</CodesignKey>
+		<CodesignProvision>HydroColorProvProfile</CodesignProvision>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-android|AnyCPU'">
@@ -37,11 +43,10 @@
 	<ItemGroup>
 		<!-- App Icon -->
 				<!-- App icon must be scaled down to 80% size on Android, otherwise it is cut off-->
-    <MauiIcon Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'" 
-              Include="Resources\AppIcon\appicon.svg" ForegroundScale="0.8" BaseSize="456,456" />
+    <MauiIcon Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'" Include="Resources\AppIcon\appicon.svg" ForegroundScale="0.8" BaseSize="456,456" Color="#000000" />
 
     <!-- App icon for all other platforms -->
-    <MauiIcon Include="Resources\AppIcon\appicon.svg" BaseSize="456,456" />
+    <MauiIcon Include="Resources\AppIcon\appicon.svg" BaseSize="456,456" Color="#000000"/>
 
 		<!-- Splash Screen -->
     <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#000000" BaseSize="128,128" />

@@ -7,6 +7,9 @@ namespace HydroColor.ViewModels
     public partial class AboutViewModel : ObservableObject
     {
 
+        [ObservableProperty]
+        string appVersionNumber = AppInfo.Current.VersionString;
+
         [RelayCommand]
         void ShowWelcomeScreen()
         {

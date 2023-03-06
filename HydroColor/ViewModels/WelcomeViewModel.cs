@@ -96,15 +96,8 @@ namespace HydroColor.ViewModels
         {
             BackButtonVisible = CarouselPosition != 0;
             NextButtonText = CarouselPosition == WelcomePages.Count - 1 ? "Start" : "Next";
-            MainThread.BeginInvokeOnMainThread(async () => 
-            {
-                if (CarouselPosition == 4)
-                {
-                    await Task.Delay(150);
-                }
-                LearnMoreLinksVisible = CarouselPosition == 4; 
-            });
-            
+            LearnMoreLinksVisible = CarouselPosition == 4;
+
         }
 
         [RelayCommand]

@@ -22,3 +22,6 @@ The HydroColor code can be compiled and run using Visual Studio. The Community v
 All of the code for calculating the optical products (e.g. reflectance, turbidity) is located in /Services/OpticalPropertiesCalculator.cs. 
 
 You may want to also look into the platform specific CameraController.cs files to see how the camera data is collected and processed.
+
+## License
+This code is released under the GNU GPLv3 license. See the LICENSE file for more information.
