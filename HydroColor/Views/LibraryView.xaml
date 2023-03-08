@@ -19,7 +19,7 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <Grid RowDefinitions="auto,*" BackgroundColor="Black">
+    <Grid RowDefinitions="auto,*,auto" BackgroundColor="Black">
 
         <Button Grid.Row="0" 
                 Text="{Binding EditListButtonText}" 
@@ -36,7 +36,7 @@
                 Command="{Binding EmailDataFileCommand}"
                 IsVisible="{Binding ShowDeleteMeasurementsButtons, Converter={StaticResource InvertedBoolConverter}}"/>
 
-        <ListView Grid.Row="2" 
+        <ListView Grid.Row="1" 
                   ItemsSource="{Binding DataLibraryItems}" 
                   SeparatorColor="White"
                   BackgroundColor="Black" 
@@ -85,11 +85,24 @@
         </ListView>
 
         <Label Text="No Measurements to Display" 
-               Grid.Row="2"
+               Grid.Row="1"
                HorizontalOptions="Center"
                Margin="20"
                FontSize="16"
                IsVisible="{Binding MeasurementsExist, Converter={StaticResource InvertedBoolConverter}}"/>
+
+        <Label 
+            Text="Missing Measurements?"
+            VerticalOptions="End" 
+            HorizontalOptions="Center" 
+            Grid.Row="2"
+            TextColor="LightGray"
+            TextDecorations="Underline"
+            Margin="5">
+            <Label.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding MissingMeasurementsCommand}"/>
+            </Label.GestureRecognizers>
+        </Label>
 
     </Grid>
 

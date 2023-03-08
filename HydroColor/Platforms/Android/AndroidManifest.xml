@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.h2optics.hydrocolor" android:versionCode="10" android:versionName="2.0">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.h2optics.hydrocolor" android:versionCode="11" android:versionName="2.0">
 	<application android:allowBackup="true" android:icon="@mipmap/appicon" android:roundIcon="@mipmap/appicon_round" android:supportsRtl="false" android:label="HydroColor">
-		<meta-data android:name="com.google.android.geo.API_KEY" android:value="<Enter Google Maps API Key Here" />
+		<meta-data android:name="com.google.android.geo.API_KEY" android:value="<google maps api key here" />
 		<meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
 	</application>
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />

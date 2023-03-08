@@ -87,5 +87,23 @@ namespace HydroColor.ViewModels
             EditListButtonText = ShowDeleteMeasurementsButtons ? "Edit List" : "Done";
             ShowDeleteMeasurementsButtons = !ShowDeleteMeasurementsButtons;
         }
+
+        [RelayCommand]
+        async void MissingMeasurements()
+        {
+
+            string messageBody;
+
+#if ANDROID
+                messageBody = "HydroColor version 2.0 was a major update to how the app collects and stores data. Measurements collected with HydroColor versions before 2.0 are no longer viewable in the app. Don’t panic! The data file containing all your measurements is still available on your device. \n\nYou can download the datafile containing your past measurements by connecting your Android phone to a computer. The HydroColor data files are available under <your phone>\\Android\\data\\com.h2optics.hydrocolor\\files\\.";
+#endif
+
+#if IOS
+            messageBody = "HydroColor version 2.0 was a major update to how the app collects and stores data. Measurements collected with HydroColor versions before 2.0 are no longer viewable in the app. Don’t panic! The data file containing all your measurements is still available on your device. \n\nYou can download the datafile containing your past measurements by connecting your iPhone to a computer. On Mac, the HydroColor data files are available under the ‘Files’ tab. On a PC, you must connect the iPhone with iTunes, then the data file is available under ‘File Sharing’.";
+#endif
+
+            await Shell.Current.CurrentPage.DisplayAlert("Missing Data", messageBody , "OK");
+
+        }
     }
 }
