@@ -14,6 +14,7 @@ namespace HydroColor.Models
         public string DeviceManufacturer { get; set; }
         public string DeviceModel { get; set; }
         public string DeviceOSVersion { get; set; }
+        public string HydroColorVersion { get; set; }
 
     }
 }

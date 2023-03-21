@@ -97,6 +97,8 @@ namespace HydroColor.ViewModels
         {
             ResetImageCapture();
             Shell.Current.Window.Resumed += Window_Resumed;
+
+            VersionCorrections.UpdateTo2p1DataFileFormatIfNeeded();
         }
 
         private void Window_Resumed(object sender, EventArgs e)
@@ -108,13 +110,14 @@ namespace HydroColor.ViewModels
         }
 
         [RelayCommand]
-        void ViewLoaded()
+        async void ViewLoaded()
         {
             CurrentLocation = new Location();
             CurrentLocation.Accuracy = 0;
             OnPropertyChanged(nameof(CurrentLocation));
             MoveMapLocationAction(new MapSpan(new Location { Longitude = 0, Latitude = 0 }, 180, 180));
             GetCurrentLocation();
+
         }
 
         [RelayCommand]
@@ -328,6 +331,7 @@ namespace HydroColor.ViewModels
                 ProcMeas.SkyImageData = SkyImageData;
                 ProcMeas.WaterImageData = WaterImageData;
                 ProcMeas.MeasurementName = measurementName;
+                ProcMeas.HydroColorVersion = AppInfo.Current.VersionString;
 
                 ProcMeas.MeasurementProducts = OpticalPropertiesCalculator.ComputeOpticalProperties(GrayCardImageData, SkyImageData, WaterImageData);
 

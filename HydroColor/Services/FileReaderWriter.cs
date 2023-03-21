@@ -13,7 +13,7 @@ namespace HydroColor.Services
 
         const string DataFileName = "HydroColor_Datafile.txt";
 
-        string DataFolderPath
+        public string DataFolderPath
         {
 #if ANDROID
             get { return Android.App.Application.Context.GetExternalFilesDir(null).AbsolutePath; }      
@@ -31,6 +31,11 @@ namespace HydroColor.Services
 
 Your HydroColor data file is attached. Do not reply to this email.";
 
+        public string GetDataFileName()
+        {
+            return Path.Combine(DataFolderPath, DataFileName);
+        }
+
         public void WriteDataRecord(HydroColorProcessedMeasurement ProcMeas)
         {
 
@@ -44,6 +49,12 @@ Your HydroColor data file is attached. Do not reply to this email.";
             imageFileName = Path.Combine(DataFolderPath, $"{ProcMeas.WaterImageData.LocalTimeStamp.ToString("yyyyMMdd_HHmmss")}_Water.jpg");
             File.WriteAllBytes(imageFileName, ProcMeas.WaterImageData.JpegImage);
 
+            WriteTextDataRecord(ProcMeas, DataFileName);
+        }
+
+        public void WriteTextDataRecord(HydroColorProcessedMeasurement ProcMeas, string filename)
+        {
+
             string measurementName = ProcMeas.MeasurementName.Replace(" ", "_");
             if (measurementName.Length == 0)
             {
@@ -56,6 +67,7 @@ Your HydroColor data file is attached. Do not reply to this email.";
                 { "Time",                        ProcMeas.WaterImageData.LocalTimeStamp.ToString("HH:mm:ss") },
                 { "UTC_Offset",                  ProcMeas.WaterImageData.UTCOffset.ToString("F1") },
                 { "Name",                        measurementName },    // data file is space delimted, replace spacing in measurement name with underscore
+                { "HydroColor_Version",          ProcMeas.HydroColorVersion },
 
                 { "Latitude",                    ProcMeas.WaterImageData.ImageLocation.Latitude.ToString("F5") },
                 { "Longitude",                   ProcMeas.WaterImageData.ImageLocation.Longitude.ToString("F5") },
@@ -105,10 +117,10 @@ Your HydroColor data file is attached. Do not reply to this email.";
                 { "Water_Blue_Light_Level",      ProcMeas.MeasurementProducts.WaterRelativeLightLevel.Blue.ToString("F5") }
             };
 
-        
+
             string CompleteDataRecord = string.Join(" ", DataRecord.Values.ToList()); // space delimited data record
 
-            string DataFilePath = Path.Combine(DataFolderPath, DataFileName);
+            string DataFilePath = Path.Combine(DataFolderPath, filename);
 
             bool WriteHeader = false;
             if (!File.Exists(DataFilePath))
@@ -117,7 +129,7 @@ Your HydroColor data file is attached. Do not reply to this email.";
             }
 
             using (StreamWriter w = File.AppendText(DataFilePath))
-            {            
+            {
                 if (WriteHeader)
                 {
                     w.WriteLine(string.Join(" ", DataRecord.Keys.ToList()));
@@ -126,11 +138,24 @@ Your HydroColor data file is attached. Do not reply to this email.";
             }
         }
 
+        public void DeleteDataFile()
+        {
+            if (DataFileExists())
+            {
+                File.Delete(GetDataFileName());
+            }
+        }
+
+        public bool DataFileExists()
+        {
+            return File.Exists(GetDataFileName());
+        }
+
         public List<DataLibraryItem> LoadDataSummary()
         {
             List<DataLibraryItem> LibraryList = new();
 
-            string DataFilePath = Path.Combine(DataFolderPath, DataFileName);
+            string DataFilePath = GetDataFileName();
 
             if (!File.Exists(DataFilePath))
             {
@@ -163,9 +188,10 @@ Your HydroColor data file is attached. Do not reply to this email.";
 
         }
 
+
         public HydroColorProcessedMeasurement GetDataRecord(DateTime timestamp)
         {
-            string DataFilePath = Path.Combine(DataFolderPath, DataFileName);
+            string DataFilePath = GetDataFileName();
 
             string[] DataRecordLine = File.ReadLines(DataFilePath).Where(line => line.Contains(timestamp.ToString("yyyy/MM/dd HH:mm:ss"))).ToArray();
 
@@ -175,6 +201,85 @@ Your HydroColor data file is attached. Do not reply to this email.";
             }
 
             string[] Data = DataRecordLine[0].Split(' ');
+
+            HydroColorProcessedMeasurement DataRecord = new();
+
+            DataRecord.WaterImageData.LocalTimeStamp = DateTime.ParseExact($"{Data[0]}{Data[1]}", "yyyy/MM/ddHH:mm:ss", CultureInfo.InvariantCulture);
+            DataRecord.WaterImageData.UTCOffset = double.Parse(Data[2]);
+
+            DataRecord.MeasurementName = Data[3].Replace('_', ' ');
+            DataRecord.HydroColorVersion = Data[4];
+            DataRecord.WaterImageData.ImageLocation.Latitude = double.Parse(Data[5]);
+            DataRecord.WaterImageData.ImageLocation.Longitude = double.Parse(Data[6]);
+            DataRecord.WaterImageData.ImageLocation.Accuracy = double.Parse(Data[7]);
+
+            DataRecord.MeasurementProducts.Reflectance.Red = double.Parse(Data[8]);
+            DataRecord.MeasurementProducts.Reflectance.Green = double.Parse(Data[9]);
+            DataRecord.MeasurementProducts.Reflectance.Blue = double.Parse(Data[10]);
+            DataRecord.MeasurementProducts.WaterTurbidity = double.Parse(Data[11]);
+            DataRecord.MeasurementProducts.SPM = double.Parse(Data[12]);
+            DataRecord.MeasurementProducts.Backscatter_red = double.Parse(Data[13]);
+
+            DataRecord.WaterImageData.SunElevationAngle = double.Parse(Data[14]);
+            DataRecord.WaterImageData.SunAzimuthAngle = double.Parse(Data[15]);
+            DataRecord.WaterImageData.MagneticDeclination = double.Parse(Data[16]);
+
+            DataRecord.DeviceManufacturer = Data[17];
+            DataRecord.DeviceModel = Data[18];
+            DataRecord.DeviceOSVersion = Data[19];
+            DataRecord.WaterImageData.BayerFilterPattern = (BayerFilterType)Enum.Parse(typeof(BayerFilterType), Data[20]);
+
+            DataRecord.GrayCardImageData.ImageCapturedAtCorrectAngles = bool.Parse(Data[21]);
+            DataRecord.GrayCardImageData.ImageAzimuthAngle = double.Parse(Data[22]);
+            DataRecord.GrayCardImageData.ImageOffNadirAngle = double.Parse(Data[23]);
+            DataRecord.GrayCardImageData.ExposureTime = double.Parse(Data[24]);
+            DataRecord.GrayCardImageData.SensorSensitivity = double.Parse(Data[25]);
+            DataRecord.MeasurementProducts.GrayCardRelativeLightLevel.Red = double.Parse(Data[26]);
+            DataRecord.MeasurementProducts.GrayCardRelativeLightLevel.Green = double.Parse(Data[27]);
+            DataRecord.MeasurementProducts.GrayCardRelativeLightLevel.Blue = double.Parse(Data[28]);
+
+            DataRecord.SkyImageData.ImageCapturedAtCorrectAngles = bool.Parse(Data[29]);
+            DataRecord.SkyImageData.ImageAzimuthAngle = double.Parse(Data[30]);
+            DataRecord.SkyImageData.ImageOffNadirAngle = double.Parse(Data[31]);
+            DataRecord.SkyImageData.ExposureTime = double.Parse(Data[32]);
+            DataRecord.SkyImageData.SensorSensitivity = double.Parse(Data[33]);
+            DataRecord.MeasurementProducts.SkyRelativeLightLevel.Red = double.Parse(Data[34]);
+            DataRecord.MeasurementProducts.SkyRelativeLightLevel.Green = double.Parse(Data[35]);
+            DataRecord.MeasurementProducts.SkyRelativeLightLevel.Blue = double.Parse(Data[36]);
+
+            DataRecord.WaterImageData.ImageCapturedAtCorrectAngles = bool.Parse(Data[37]);
+            DataRecord.WaterImageData.ImageAzimuthAngle = double.Parse(Data[38]);
+            DataRecord.WaterImageData.ImageOffNadirAngle = double.Parse(Data[39]);
+            DataRecord.WaterImageData.ExposureTime = double.Parse(Data[40]);
+            DataRecord.WaterImageData.SensorSensitivity = double.Parse(Data[41]);
+            DataRecord.MeasurementProducts.WaterRelativeLightLevel.Red = double.Parse(Data[42]);
+            DataRecord.MeasurementProducts.WaterRelativeLightLevel.Green = double.Parse(Data[43]);
+            DataRecord.MeasurementProducts.WaterRelativeLightLevel.Blue = double.Parse(Data[44]);
+
+            DataRecord.GrayCardImageData.JpegImage = File.ReadAllBytes(Path.Combine(DataFolderPath, $"{timestamp.ToString("yyyyMMdd_HHmmss")}_GrayCard.jpg"));
+            DataRecord.SkyImageData.JpegImage = File.ReadAllBytes(Path.Combine(DataFolderPath, $"{timestamp.ToString("yyyyMMdd_HHmmss")}_Sky.jpg"));
+            DataRecord.WaterImageData.JpegImage = File.ReadAllBytes(Path.Combine(DataFolderPath, $"{timestamp.ToString("yyyyMMdd_HHmmss")}_Water.jpg"));
+
+            return DataRecord;
+        }
+
+        public HydroColorProcessedMeasurement GetDataRecord_v2p0(DateTime timestamp)
+        {
+            string DataFilePath = GetDataFileName();
+
+            string[] DataRecordLine = File.ReadLines(DataFilePath).Where(line => line.Contains(timestamp.ToString("yyyy/MM/dd HH:mm:ss"))).ToArray();
+
+            if (DataRecordLine.Count() == 0)
+            {
+                return null;
+            }
+
+            string[] Data = DataRecordLine[0].Split(' ');
+
+            if (Data.Length != 44)
+            {
+                throw new FormatException();
+            }
 
             HydroColorProcessedMeasurement DataRecord = new();
 
@@ -238,11 +343,11 @@ Your HydroColor data file is attached. Do not reply to this email.";
 
         public void DeleteDataRecord(DateTime timestamp)
         {
-            string DataFilePath = Path.Combine(DataFolderPath, DataFileName);
+            string DataFilePath = GetDataFileName();
             var linesToKeep = File.ReadLines(DataFilePath).Where(line => !line.Contains(timestamp.ToString("yyyy/MM/dd HH:mm:ss")));
             string TempFilePath = Path.Combine(DataFolderPath, "HydroColor_Temp_Datafile.txt");
             File.WriteAllLines(TempFilePath, linesToKeep);
-            File.Delete(DataFilePath);
+            DeleteDataFile();
             File.Move(TempFilePath, DataFilePath);
             File.Delete(Path.Combine(DataFolderPath, $"{timestamp.ToString("yyyyMMdd_HHmmss")}_GrayCard.jpg"));
             File.Delete(Path.Combine(DataFolderPath, $"{timestamp.ToString("yyyyMMdd_HHmmss")}_Sky.jpg"));
@@ -381,10 +486,23 @@ Your HydroColor data file is attached. Do not reply to this email.";
                 }
             }
 
-            bool confirm = await Shell.Current.CurrentPage.DisplayAlert("Confirm Email", $"Send HydroColor Data File To:\n\n{address}", "Send", "Cancel");
-            if (!confirm)
+            string savedName = Preferences.Default.Get(PreferenceKeys.UserEnteredDataFileSuffix, "");
+            string customFilenameSuffix = await Shell.Current.CurrentPage.DisplayPromptAsync("Confirm Email", $"Send HydroColor Data File To:\n\n{address}\n\n Enter custom data file suffix (optional):", "Send", "Cancel", initialValue: savedName);
+            if (customFilenameSuffix == null)
             {
                 return;
+            }
+
+            Preferences.Default.Set(PreferenceKeys.UserEnteredDataFileSuffix, customFilenameSuffix);
+
+            string attachmentName;
+            if (string.IsNullOrEmpty(customFilenameSuffix))
+            {
+                attachmentName = DataFileName;
+            }
+            else
+            {
+                attachmentName = $"HydroColor_{customFilenameSuffix}.txt";
             }
 
             bool EmailSent = false;
@@ -392,14 +510,14 @@ Your HydroColor data file is attached. Do not reply to this email.";
             {
                 // MailKit is not working on older Android devices, ssl handshake exeception always occurs
                 // try MailKit first, then fall back on SendGrid Mail service
-                MailKitSendEmail(address);
+                MailKitSendEmail(address, attachmentName);
                 EmailSent = true;
             }
             catch
             {
                 try
                 {
-                    SendGridSendEmail(address);
+                    SendGridSendEmail(address, attachmentName);
                     EmailSent = true;
                 }
                 catch
@@ -427,7 +545,7 @@ Your HydroColor data file is attached. Do not reply to this email.";
 
         }
 
-        public void MailKitSendEmail(string address)
+        public void MailKitSendEmail(string address, string attachmentName)
         {
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress(EmailSenderName, GmailCredentials.Email));
@@ -436,8 +554,9 @@ Your HydroColor data file is attached. Do not reply to this email.";
 
             var builder = new BodyBuilder();
             builder.TextBody = EmailBody + "\n\n(Sent With MailKit)";
-            string DataFilePath = Path.Combine(DataFolderPath, DataFileName);
-            builder.Attachments.Add(DataFilePath);
+            string DataFilePath = GetDataFileName();
+            byte[] byteData = File.ReadAllBytes(DataFilePath);
+            builder.Attachments.Add(attachmentName, byteData);
             message.Body = builder.ToMessageBody();
 
             SmtpClient client = new SmtpClient();
@@ -448,7 +567,7 @@ Your HydroColor data file is attached. Do not reply to this email.";
             client.Disconnect(true);
         }
 
-        public void SendGridSendEmail(string address)
+        public void SendGridSendEmail(string address, string attachmentName)
         {
             var sendGridClient = new SendGrid.SendGridClient(GmailCredentials.SendGridAPIKey);
             var msg = new SendGridMessage()
@@ -458,9 +577,9 @@ Your HydroColor data file is attached. Do not reply to this email.";
                 PlainTextContent = EmailBody + "\n\n(Sent With SendGrid)"
             };
             msg.AddTo(new EmailAddress(address, EmailReceiverName));
-            string DataFilePath = Path.Combine(DataFolderPath, DataFileName);
+            string DataFilePath = GetDataFileName();
             byte[] byteData = File.ReadAllBytes(DataFilePath);
-            msg.AddAttachment(DataFileName, Convert.ToBase64String(byteData));
+            msg.AddAttachment(attachmentName, Convert.ToBase64String(byteData));
             var response = sendGridClient.SendEmailAsync(msg).Result;
             if (response.IsSuccessStatusCode == false)
             {
