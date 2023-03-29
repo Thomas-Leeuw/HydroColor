@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:HydroColor.ViewModels"
              xmlns:converters="clr-namespace:HydroColor.Converters"
+             xmlns:strings="clr-namespace:HydroColor.Resources.Strings"
              x:DataType="viewmodels:DataViewModel"
              x:Class="HydroColor.Views.DataView"
              Shell.TabBarIsVisible="false"
@@ -47,7 +48,7 @@
         <Grid Grid.Row="1" Grid.ColumnSpan="3" ColumnDefinitions="auto,*,*,*" RowDefinitions="*, auto" HeightRequest="{Binding BarChartHeight}" Margin="0,10,10,0">
             <Label Grid.Row="0" 
                    Grid.Column="0" 
-                   Text="Reflectance" 
+                   Text="{x:Static strings:Strings.Data_ReflectanceGraphYAxisLabel}" 
                    Rotation="270" 
                    FontSize="18" 
                    VerticalTextAlignment="Center" 
@@ -96,17 +97,17 @@
 
             <Label Grid.Row="1" 
                    Grid.Column="1" 
-                   Text="Blue" 
+                   Text="{x:Static strings:Strings.Data_ReflectanceGraphBlueLabel}" 
                    HorizontalOptions="Center" 
                    FontSize="18" />
             <Label Grid.Row="1" 
                        Grid.Column="2"
-                       Text="Green"
+                       Text="{x:Static strings:Strings.Data_ReflectanceGraphGreenLabel}"
                        HorizontalOptions="Center"
                        FontSize="18"/>
             <Label Grid.Row="1"
                        Grid.Column="3"
-                       Text="Red"
+                       Text="{x:Static strings:Strings.Data_ReflectanceGraphRedLabel}"
                        HorizontalOptions="Center"
                        FontSize="18" />
         </Grid>
@@ -121,52 +122,52 @@
                         </Style>
                     </Grid.Resources>
 
-                    <Label Text="Date:" Grid.Row="0" Grid.Column="0"/>
+                    <Label Text="{x:Static strings:Strings.Data_TableDateLabel}" Grid.Row="0" Grid.Column="0"/>
                     <Label Text="{Binding ProcMeas.WaterImageData.LocalTimeStamp, StringFormat='{}{0:d}'}" Grid.Row="0" Grid.Column="1" />
 
-                    <Label Text="Time:" Grid.Row="1" Grid.Column="0"/>
+                    <Label Text="{x:Static strings:Strings.Data_TableTimeLabel}" Grid.Row="1" Grid.Column="0"/>
                     <Label Text="{Binding ProcMeas.WaterImageData.LocalTimeStamp, StringFormat='{}{0:T}'}" Grid.Row="1" Grid.Column="1"/>
-                    <Label Text="Local" Grid.Row="1" Grid.Column="2"/>
+                    <Label Text="{x:Static strings:Strings.Data_TableTimeUnits}" Grid.Row="1" Grid.Column="2"/>
 
-                    <Label Text="Lat:" Grid.Row="2" Grid.Column="0"/>
+                    <Label Text="{x:Static strings:Strings.Data_TableLatitudeLabel}" Grid.Row="2" Grid.Column="0"/>
                     <Label Text="{Binding ProcMeas.WaterImageData.ImageLocation.Latitude, StringFormat='{}{0:#,0.00000}'}" Grid.Row="2" Grid.Column="1"/>
-                    <Label Text="Deg." Grid.Row="2" Grid.Column="2"/>
+                    <Label Text="{x:Static strings:Strings.Data_TableLatitudeUnits}" Grid.Row="2" Grid.Column="2"/>
 
-                    <Label Text="Lon:" Grid.Row="3" Grid.Column="0"/>
+                    <Label Text="{x:Static strings:Strings.Data_TableLongitudeLabel}" Grid.Row="3" Grid.Column="0"/>
                     <Label Text="{Binding ProcMeas.WaterImageData.ImageLocation.Longitude, StringFormat='{}{0:#,0.00000}'}" Grid.Row="3" Grid.Column="1"/>
-                    <Label Text="Deg." Grid.Row="3" Grid.Column="2"/>
+                    <Label Text="{x:Static strings:Strings.Data_TableLongitudeUnits}" Grid.Row="3" Grid.Column="2"/>
 
-                    <Label Text="Turbidity:" Grid.Row="4" Grid.Column="0"/>
+                    <Label Text="{x:Static strings:Strings.Data_TableTurbidityLabel}" Grid.Row="4" Grid.Column="0"/>
                     <Label Text="{Binding ProcMeas.MeasurementProducts.WaterTurbidity, Converter={StaticResource ProductStringWithUncertainity}, ConverterParameter={x:Static converters:ProductDisplayParameter.TURBIDTY}}" Grid.Row="4" Grid.Column="1"/>
-                    <Label Text="NTU" Grid.Row="4" Grid.Column="2"/>
+                    <Label Text="{x:Static strings:Strings.Data_TableTurbidityUnits}" Grid.Row="4" Grid.Column="2"/>
 
-                    <Label Text="SPM:" Grid.Row="5" Grid.Column="0"/>
+                    <Label Text="{x:Static strings:Strings.Data_TableSuspendedParticulateMatterLabel}" Grid.Row="5" Grid.Column="0"/>
                     <Label Text="{Binding ProcMeas.MeasurementProducts.SPM, Converter={StaticResource ProductStringWithUncertainity}, ConverterParameter={x:Static converters:ProductDisplayParameter.SPM}}" Grid.Row="5" Grid.Column="1"/>
-                    <Label Text="mg/L" Grid.Row="5" Grid.Column="2"/>
+                    <Label Text="{x:Static strings:Strings.Data_TableSuspendedParticulateMatterUnits}" Grid.Row="5" Grid.Column="2"/>
 
                     <Label Grid.Row="6" Grid.Column="0">
                         <Label.FormattedText>
                             <FormattedString>
                                 <Span Text="b"/>
                                 <Span Text="b" FontSize="10"/>
-                                <Span Text=" Red:"/>
+                                <Span Text="{x:Static strings:Strings.Data_TableBackscatterRedLabel}"/>
                             </FormattedString>
                         </Label.FormattedText>
                     </Label>
                     <Label Text="{Binding ProcMeas.MeasurementProducts.Backscatter_red, Converter={StaticResource ProductStringWithUncertainity}, ConverterParameter={x:Static converters:ProductDisplayParameter.BACKSCATTER}}" Grid.Row="6" Grid.Column="1"/>
-                    <Label Text="1/m" Grid.Row="6" Grid.Column="2"/>
+                    <Label Text="{x:Static strings:Strings.Data_TableBackscatterRedUnits}" Grid.Row="6" Grid.Column="2"/>
 
-                    <Label Text="Reflec Red:" Grid.Row="7" Grid.Column="0"/>
+                    <Label Text="{x:Static strings:Strings.Data_TableReflectanceRedLabel}" Grid.Row="7" Grid.Column="0"/>
                     <Label Text="{Binding ProcMeas.MeasurementProducts.Reflectance.Red, Converter={StaticResource ProductStringWithUncertainity}, ConverterParameter={x:Static converters:ProductDisplayParameter.REFLECTANCE}}" Grid.Row="7" Grid.Column="1"/>
-                    <Label Text="1/sr" Grid.Row="7" Grid.Column="2"/>
+                    <Label Text="{x:Static strings:Strings.Data_TableReflectanceUnits}" Grid.Row="7" Grid.Column="2"/>
 
-                    <Label Text="Reflec Green:" Grid.Row="8" Grid.Column="0"/>
+                    <Label Text="{x:Static strings:Strings.Data_TableReflectanceGreenLabel}" Grid.Row="8" Grid.Column="0"/>
                     <Label Text="{Binding ProcMeas.MeasurementProducts.Reflectance.Green, Converter={StaticResource ProductStringWithUncertainity}, ConverterParameter={x:Static converters:ProductDisplayParameter.REFLECTANCE}}" Grid.Row="8" Grid.Column="1"/>
-                    <Label Text="1/sr" Grid.Row="8" Grid.Column="2"/>
+                    <Label Text="{x:Static strings:Strings.Data_TableReflectanceUnits}" Grid.Row="8" Grid.Column="2"/>
 
-                    <Label Text="Reflec Blue:" Grid.Row="9" Grid.Column="0"/>
+                    <Label Text="{x:Static strings:Strings.Data_TableReflectanceBlueLabel}" Grid.Row="9" Grid.Column="0"/>
                     <Label Text="{Binding ProcMeas.MeasurementProducts.Reflectance.Blue, Converter={StaticResource ProductStringWithUncertainity}, ConverterParameter={x:Static converters:ProductDisplayParameter.REFLECTANCE}}" Grid.Row="9" Grid.Column="1"/>
-                    <Label Text="1/sr" Grid.Row="9" Grid.Column="2"/>
+                    <Label Text="{x:Static strings:Strings.Data_TableReflectanceUnits}" Grid.Row="9" Grid.Column="2"/>
 
                 </Grid>
             </ScrollView>
@@ -176,17 +177,17 @@
 
         <Label Grid.Row="4"
                Grid.Column="0"
-               Text="Gray Card"
+               Text="{x:Static strings:Strings.Data_GrayCard}"
                HorizontalOptions="Center"
                FontSize="14" />
         <Label Grid.Row="4"
                Grid.Column="1"
-               Text="Water"
+               Text="{x:Static strings:Strings.Data_Water}"
                HorizontalOptions="Center"
                FontSize="14" />
         <Label Grid.Row="4"
                Grid.Column="3"
-               Text="Sky"
+               Text="{x:Static strings:Strings.Data_Sky}"
                HorizontalOptions="Center" 
                FontSize="14" />
 

@@ -7,6 +7,7 @@
              xmlns:maps="clr-namespace:Microsoft.Maui.Controls.Maps;assembly=Microsoft.Maui.Controls.Maps"
              xmlns:sensors="clr-namespace:Microsoft.Maui.Devices.Sensors;assembly=Microsoft.Maui.Essentials"
              xmlns:converters="clr-namespace:HydroColor.Converters"
+             xmlns:strings="clr-namespace:HydroColor.Resources.Strings"
              x:Class="HydroColor.Views.CollectDataView"
              Shell.NavBarIsVisible="false"
              Title="">
@@ -50,7 +51,7 @@
 
 
             <Label 
-            Text="Gray Card"
+            Text="{x:Static strings:Strings.CollectData_GrayCardDisplayName}"
             TextColor="{Binding GrayCardImageSquareColor}"
             FontSize="16"
             Grid.Row="0"
@@ -59,7 +60,7 @@
             HorizontalOptions="Center" />
 
             <Label 
-            Text="Water"
+            Text="{x:Static strings:Strings.CollectData_WaterDisplayName}"
             TextColor="{Binding WaterImageSquareColor}"
             FontSize="16"
             Grid.Row="0"
@@ -68,7 +69,7 @@
             HorizontalOptions="Center" />
 
             <Label 
-            Text="Sky"
+            Text="{x:Static strings:Strings.CollectData_SkyDisplayName}"
             TextColor="{Binding SkyImageSquareColor}"
             FontSize="16"
             Grid.Row="0"
@@ -207,7 +208,7 @@
                            WidthRequest="30" 
                            Margin="5"/>
                 <Label Grid.Column="1" 
-                           Text="Now is not an ideal time for HydroColor measurments. Tap here to see why." 
+                           Text="{x:Static strings:Strings.CollectData_SunElevationWarningBanner}" 
                            FontSize="11" 
                            Margin="5"
                            TextColor="Black"/>
@@ -218,7 +219,7 @@
             </Grid>
 
             <Button
-            Text="Analyze Images"
+            Text="{x:Static strings:Strings.CollectData_AnalyzeImagesButton}"
             WidthRequest="150"
             Grid.Row="3"
             Grid.ColumnSpan="3"
@@ -236,7 +237,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <Label Text="Lat:" 
+                <Label Text="{x:Static strings:Strings.CollectData_LatitudeAbbreviation}" 
                        Margin="5" 
                        Grid.Row="0" 
                        Grid.Column="0" 
@@ -252,7 +253,7 @@
                         FontSize="Medium"
                         Margin="5"/>
 
-                <Label Text="Lon:" 
+                <Label Text="{x:Static strings:Strings.CollectData_LongitudeAbbreviation}" 
                        Margin="5" 
                        Grid.Row="1" 
                        Grid.Column="0" 
@@ -272,15 +273,15 @@
                         Grid.RowSpan="2"
                         Grid.Column="2"
                         Margin="5">
-                    
-                        <Button Text="Refresh Location"
+
+                    <Button Text="{x:Static strings:Strings.CollectData_RefreshLocationButton}"
                             WidthRequest="150"
                             Margin="5"
                             HorizontalOptions="Center"
                             Command="{Binding GetCurrentLocationCommand}"
                             IsVisible="{Binding CanCheckLocation}"/>
 
-                    <Label Text="Location Accuracy:"
+                    <Label Text="{x:Static strings:Strings.CollectData_LocationAccuracy}"
                             HorizontalOptions="Center"
                             VerticalOptions="Center"
                             HorizontalTextAlignment="Center"
@@ -296,7 +297,7 @@
                 <Label 
                     Grid.Row="0"
                     Grid.Column="2"
-                    Text="Aquiring Location ..."
+                    Text="{x:Static strings:Strings.CollectData_AquiringLocationInProgress}"
                     FontAttributes="Italic"
                     HorizontalOptions="Center"
                     VerticalOptions="Center"

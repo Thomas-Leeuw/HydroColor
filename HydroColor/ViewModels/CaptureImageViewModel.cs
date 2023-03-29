@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using HydroColor.Models;
+using HydroColor.Resources.Strings;
 using HydroColor.Services;
 using HydroColor.Views;
 using System.Numerics;
@@ -84,7 +85,7 @@ namespace HydroColor.ViewModels
         {
             if (CurrentLocation.Latitude == 0 || CurrentLocation.Longitude == 0)
             {
-                ImageCollectionHelpText = "No GPS coordinates, HydroColor cannot determine the correct heading for the images. Either enter GPS coordinates or capture all images approximately 45 degrees from your shadow.";
+                ImageCollectionHelpText = Strings.CaptureImage_NoGPSNoHeadingHelp;
                 CompassVisible = false;
                 CurrentLocation.Accuracy = 0;
             }
@@ -240,7 +241,7 @@ namespace HydroColor.ViewModels
             }
             else if (sensorControl == SensorControl.START) // Attempting to start sensor that is not supported
             {
-                Shell.Current.CurrentPage.DisplayAlert("Compass Not Supported", "The current device does not have a magnetic compass.", "OK");
+                Shell.Current.CurrentPage.DisplayAlert(Strings.CaptureImage_NoCompassTitle, Strings.CaptureImage_NoCompassMessage, Strings.CaptureImage_NoCompassDismissButton);
 
             }
             
@@ -273,7 +274,7 @@ namespace HydroColor.ViewModels
             }
             else if (sensorControl == SensorControl.START) // Attempting to start sensor that is not supported
             {
-                Shell.Current.CurrentPage.DisplayAlert("Orientation Not Supported", "The current device does not have an orientation sensor.", "OK");
+                Shell.Current.CurrentPage.DisplayAlert(Strings.CaptureImage_NoOrientationTitle, Strings.CaptureImage_NoOrientationMessage, Strings.CaptureImage_NoOrientationDismissButton);
 
             }
         }

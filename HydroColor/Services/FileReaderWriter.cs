@@ -4,7 +4,7 @@ using System.Globalization;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using SendGrid.Helpers.Mail;
-
+using HydroColor.Resources.Strings;
 
 namespace HydroColor.Services
 {
@@ -429,10 +429,10 @@ Your HydroColor data file is attached. Do not reply to this email.";
             }
             else if (storedAddresses.Count > 0)
             {
-                storedAddresses.Add("- Delete Email Address");
+                storedAddresses.Add(Strings.FileReaderWriter_DeleteEmail);
             }
-            storedAddresses.Insert(0, "+ Add Email Address");
-            string address = await Shell.Current.CurrentPage.DisplayActionSheet("Select Address to Send Data File", "Cancel", null, storedAddresses.ToArray());
+            storedAddresses.Insert(0, Strings.FileReaderWriter_AddEmail);
+            string address = await Shell.Current.CurrentPage.DisplayActionSheet(Strings.FileReaderWriter_SelectEmailMessage, Strings.FileReaderWriter_SelectEmailCancelButton, null, storedAddresses.ToArray());
 
             return address;
         }
@@ -440,16 +440,16 @@ Your HydroColor data file is attached. Do not reply to this email.";
         public async void EmailDataFile()
         {
             string address = await DisplayEmailAddresses();
-            if (address.Contains("Cancel"))
+            if (address.Contains(Strings.FileReaderWriter_SelectEmailCancelButton))
             {
                 return;
             }
 
-            while (address.Contains("- Delete Email Address") || address.Contains("+ Add Email Address"))
+            while (address.Contains(Strings.FileReaderWriter_DeleteEmail) || address.Contains(Strings.FileReaderWriter_AddEmail))
             {
-                if (address.Contains("+ Add Email Address"))
+                if (address.Contains(Strings.FileReaderWriter_AddEmail))
                 {
-                    string newEmailAddress = await Shell.Current.CurrentPage.DisplayPromptAsync("Enter Email", "Address will be saved.", keyboard: Keyboard.Email);
+                    string newEmailAddress = await Shell.Current.CurrentPage.DisplayPromptAsync(Strings.FileReaderWriter_AddEmailTitle, Strings.FileReaderWriter_AddEmailMessage, keyboard: Keyboard.Email);
                     if (string.IsNullOrEmpty(newEmailAddress)) // cancel pressed
                     {
                         return;
@@ -457,20 +457,20 @@ Your HydroColor data file is attached. Do not reply to this email.";
 
                     SaveNewEmailAddress(newEmailAddress);
                     address = await DisplayEmailAddresses();
-                    if (address.Contains("Cancel"))
+                    if (address.Contains(Strings.FileReaderWriter_SelectEmailCancelButton))
                     {
                         return;
                     }
                 }
-                else if (address.Contains("- Delete Email Address"))
+                else if (address.Contains(Strings.FileReaderWriter_DeleteEmail))
                 {
                     List<string> storedAddresses = GetSavedEmailAddress();
-                    address = await Shell.Current.CurrentPage.DisplayActionSheet("Select Address to DELETE", "Cancel", null, storedAddresses.ToArray());
-                    if (address.Contains("Cancel"))
+                    address = await Shell.Current.CurrentPage.DisplayActionSheet(Strings.FileReaderWriter_DeleteEmailMessage, Strings.FileReaderWriter_DeleteEmailCancelButton, null, storedAddresses.ToArray());
+                    if (address.Contains(Strings.FileReaderWriter_SelectEmailCancelButton))
                     {
                         return;
                     }
-                    bool confirmDelete = await Shell.Current.CurrentPage.DisplayAlert("Confirm Delete", $"Delete The Following Address:\n\n{address}", "Delete", "Cancel");
+                    bool confirmDelete = await Shell.Current.CurrentPage.DisplayAlert(Strings.FileReaderWriter_ConfirmDeleteEmailTitle, $"{Strings.FileReaderWriter_ConfirmDeleteEmailMessage}\n\n{address}", Strings.FileReaderWriter_ConfirmDeleteEmailDeleteButton, Strings.FileReaderWriter_ConfirmDeleteEmailCancelButton);
                     if (!confirmDelete)
                     {
                         return;
@@ -478,7 +478,7 @@ Your HydroColor data file is attached. Do not reply to this email.";
 
                     RemoveEmailAddress(address);
                     address = await DisplayEmailAddresses();
-                    if (address.Contains("Cancel"))
+                    if (address.Contains(Strings.FileReaderWriter_SelectEmailCancelButton))
                     {
                         return;
                     }
@@ -487,7 +487,7 @@ Your HydroColor data file is attached. Do not reply to this email.";
             }
 
             string savedName = Preferences.Default.Get(PreferenceKeys.UserEnteredDataFileSuffix, "");
-            string customFilenameSuffix = await Shell.Current.CurrentPage.DisplayPromptAsync("Confirm Email", $"Send HydroColor Data File To:\n\n{address}\n\n Enter custom data file suffix (optional):", "Send", "Cancel", initialValue: savedName);
+            string customFilenameSuffix = await Shell.Current.CurrentPage.DisplayPromptAsync(Strings.FileReaderWriter_ConfirmSendEmailTitle, $"{Strings.FileReaderWriter_ConfirmSendEmailMessage_1}\n\n{address}\n\n {Strings.FileReaderWriter_ConfirmSendEmailMessage_2}", Strings.FileReaderWriter_ConfirmSendEmailMessageSendButton, Strings.FileReaderWriter_ConfirmSendEmailMessageCancelButton, initialValue: savedName);
             if (customFilenameSuffix == null)
             {
                 return;
@@ -528,19 +528,19 @@ Your HydroColor data file is attached. Do not reply to this email.";
 
             if (EmailSent)
             {
-                await Shell.Current.CurrentPage.DisplayAlert("Email Sent", $"HydroColor Data File Sent To:\n\n{address}\n\nIt may appear in your junk mail folder.", "OK");
+                await Shell.Current.CurrentPage.DisplayAlert(Strings.FileReaderWriter_EmailSentTitle, $"{Strings.FileReaderWriter_EmailSentMessage_1}\n\n{address}\n\n{Strings.FileReaderWriter_EmailSentMessage_2}", Strings.FileReaderWriter_EmailSentDismissButton);
             }
             else
             {
                 string emailFailedMessage;
 #if ANDROID
-                emailFailedMessage = "Failed to send email. The data file can be manually downloaded by connecting the phone to a computer and navigating to: Phone\\Android\\data\\com.h2optics.hydrocolor\\files\\";
+                emailFailedMessage = Strings.FileReaderWriter_EmailFailedMessageAndroid;
 #endif
 
 #if IOS
-                emailFailedMessage = "Failed to send email. The data file can be manually downloaded by connecting the phone to a computer with Itunes, than navigating to the ‘File Sharing’ tab of Itunes.";
+                emailFailedMessage = Strings.FileReaderWriter_EmailFailedMessageIOS;
 #endif
-                await Shell.Current.CurrentPage.DisplayAlert("Email Failed", emailFailedMessage, "OK");
+                await Shell.Current.CurrentPage.DisplayAlert(Strings.FileReaderWriter_EmailFailedTitle, emailFailedMessage, Strings.FileReaderWriter_EmailFailedDismissButton);
             }
 
         }

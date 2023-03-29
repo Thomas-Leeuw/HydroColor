@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using HydroColor.Models;
+using HydroColor.Resources.Strings;
 using HydroColor.Services;
 using HydroColor.Views;
 using Microsoft.Maui.Maps;
@@ -44,7 +45,7 @@ namespace HydroColor.ViewModels
             HCImageTag = HydroColorImageTag.GrayCard,
             TargetOffNadirAngle = 40,
             TargetAzimuthAngleFromSun = 135,
-            DisplayName = "Gray Card"
+            DisplayName = Strings.CollectData_GrayCardDisplayName
         };
         [ObservableProperty]
         HydroColorImageType waterImageType = new()
@@ -52,7 +53,7 @@ namespace HydroColor.ViewModels
             HCImageTag = HydroColorImageTag.Water,
             TargetOffNadirAngle = 40,
             TargetAzimuthAngleFromSun = 135,
-            DisplayName = "Water"
+            DisplayName = Strings.CollectData_WaterDisplayName
         };
         [ObservableProperty]
         HydroColorImageType skyImageType = new()
@@ -60,7 +61,7 @@ namespace HydroColor.ViewModels
             HCImageTag = HydroColorImageTag.Sky,
             TargetOffNadirAngle = 130,
             TargetAzimuthAngleFromSun = 135,
-            DisplayName = "Sky"
+            DisplayName = Strings.CollectData_SkyDisplayName
         };
 
         [ObservableProperty]
@@ -205,7 +206,7 @@ namespace HydroColor.ViewModels
                 {
                     MapPins.Clear();
                     MoveMapLocationAction(new MapSpan(new Location { Longitude = 0, Latitude = 0 }, 180, 180));
-                    await Shell.Current.CurrentPage.DisplayAlert("No GPS", "HydroColor was unable to determine your GPS position. Retry or enter your Lat/Lon coordinates manually.", "OK");
+                    await Shell.Current.CurrentPage.DisplayAlert(Strings.CollectData_NoGPSTitle, Strings.CollectData_NoGPSMessage, Strings.CollectData_NoGPSDismissButton);
                 }
             }
             // Catch one of the following exceptions:
@@ -214,11 +215,11 @@ namespace HydroColor.ViewModels
             //   PermissionException
             catch (PermissionException)
             {
-                await Shell.Current.CurrentPage.DisplayAlert("Location Permission Denied", "The HydroColor app uses GPS location to determine the optimal direction for image capture. Please enable location access for the HydroColor app in the system settings.", "OK");
+                await Shell.Current.CurrentPage.DisplayAlert(Strings.CollectData_LocationPermissionDeniedTitle, Strings.CollectData_LocationPermissionDeniedMessage, Strings.CollectData_LocationPermissionDeniedDismissButton);
             }
             catch
             {
-                await Shell.Current.CurrentPage.DisplayAlert("GPS Not Supported", "The current device does not support GPS location.", "OK");
+                await Shell.Current.CurrentPage.DisplayAlert(Strings.CollectData_GPSNotSupportedTitle, Strings.CollectData_GPSNotSupportedMessage, Strings.CollectData_GPSNotSupportedDismissButton);
             }
             finally
             {
@@ -230,7 +231,7 @@ namespace HydroColor.ViewModels
         async void UserInputLatitude()
         {
 
-            string lat = await Shell.Current.CurrentPage.DisplayPromptAsync("Enter Latitude", "Enter in decimal degrees, negative is South.", initialValue: CurrentLocation.Latitude.ToString("F5"));
+            string lat = await Shell.Current.CurrentPage.DisplayPromptAsync(Strings.CollectData_EnterLatitudeTitle, Strings.CollectData_EnterLatitudeMessage, initialValue: CurrentLocation.Latitude.ToString("F5"));
             if (lat == null) // cancel pressed
             {
                 return;
@@ -252,7 +253,7 @@ namespace HydroColor.ViewModels
         [RelayCommand(CanExecute = nameof(CanCheckLocation))]
         async void UserInputLongitude()
         {
-            string lon = await Shell.Current.CurrentPage.DisplayPromptAsync("Enter Longitude", "Enter in decimal degrees, negative is West.", initialValue: CurrentLocation.Longitude.ToString("F5"));
+            string lon = await Shell.Current.CurrentPage.DisplayPromptAsync(Strings.CollectData_EnterLongitudeTitle, Strings.CollectData_EnterLongitudeMessage, initialValue: CurrentLocation.Longitude.ToString("F5"));
             if (lon == null) // cancel pressed
             {
                 return;
@@ -307,7 +308,7 @@ namespace HydroColor.ViewModels
         void SunElevationAngleWarningTapped()
         {
             double SunElevationAngle = CheckSunElevationAngle();
-            Shell.Current.CurrentPage.DisplayAlert("Sun Elevation", $"The best time for HydroColor measurements is when the sun is between 20 and 85 degrees above the horizon.\n\nThe sun elevation based on the phones current location and time is {SunElevationAngle.ToString("F0")} degrees.", "OK");
+            Shell.Current.CurrentPage.DisplayAlert(Strings.CollectData_SunElevationWarningTitle, $"{Strings.CollectData_SunElevationWarningMessage_1} {SunElevationAngle.ToString("F0")} {Strings.CollectData_SunElevationWarningMessage_2}", Strings.CollectData_SunElevationWarningDismissButton);
         }
 
         [RelayCommand] // using CanExecute here causes crash on LGE Nexus 5, Android 6.0
@@ -316,7 +317,7 @@ namespace HydroColor.ViewModels
             if (GrayCardImageData != null && WaterImageData != null && SkyImageData != null)
             {
 
-                string measurementName = await Shell.Current.CurrentPage.DisplayPromptAsync("Measurement Name", "Leave blank to continue without naming.");
+                string measurementName = await Shell.Current.CurrentPage.DisplayPromptAsync(Strings.CollectData_MeasurementNameTitle, Strings.CollectData_MeasurementNameMessage);
                 if (measurementName == null) // cancel pressed
                 {
                     return;
@@ -347,7 +348,7 @@ namespace HydroColor.ViewModels
             }
             else
             {
-                await Shell.Current.CurrentPage.DisplayAlert("Incomplete Images", "You must collect a Gray Card, Sky, and Water image before continuing.", "OK");
+                await Shell.Current.CurrentPage.DisplayAlert(Strings.CollectData_IncompleteImagesTitle, Strings.CollectData_IncompleteImagesMessage, Strings.CollectData_IncompleteImagesDismissButton);
             }
 
         }

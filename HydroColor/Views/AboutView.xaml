@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:strings="clr-namespace:HydroColor.Resources.Strings"
              x:Class="HydroColor.Views.AboutView"
              Shell.NavBarIsVisible="false"
              Title="">
@@ -13,11 +14,11 @@
                    Margin="10"/>
 
             <VerticalStackLayout VerticalOptions="Center">
-                <Label Text="HydroColor:"
+                <Label Text="{x:Static strings:Strings.About_HydroColorTitle}"
                    FontSize="30"
                    VerticalOptions="Center"
                    VerticalTextAlignment="Center"/>
-                <Label Text="A Water Quality App"
+                <Label Text="{x:Static strings:Strings.About_HydroColorTitle}"
                    FontSize="20"
                    VerticalOptions="Center"
                    VerticalTextAlignment="Center"/>
@@ -27,12 +28,12 @@
 
         <ScrollView Grid.Row="1" VerticalOptions="Fill">
             <VerticalStackLayout>
-                <Label Text="How to Use HydroColor" 
+                <Label Text="{x:Static strings:Strings.About_HydroColorTitle}" 
                        FontSize="18"
                        Margin="0,5"/>
-                <Label Text="HydroColor requires that you have a photographers 18% reflectance gray card and access to deep unshaded water. HydroColor will guide you through the collection of three images. The images are processed onboard the phone to provide values of reflectance and water turbidity. The data can be viewed in the app or emailed via the Library tab." 
+                <Label Text="{x:Static strings:Strings.About_HowToUseHydroColorBody}" 
                        Margin="20,5,5,5"/>
-                <Label Text="Click here to view the introduction screen again, which explains the basics of the measurement."
+                <Label Text="{x:Static strings:Strings.About_IntroScreenLink}"
                         TextColor="LightGray"
                         TextDecorations="Underline"
                         Margin="20,5,5,5">
@@ -40,12 +41,12 @@
                         <TapGestureRecognizer Command="{Binding ShowWelcomeScreenCommand}"/>
                     </Label.GestureRecognizers>
                 </Label>
-                <Label Text="How Does HydroColor Work?" 
+                <Label Text="{x:Static strings:Strings.About_HowDoesHydroColorWorkTitle}" 
                        FontSize="18"
                        Margin="0,5"/>
-                <Label Text="The methodology used by HydroColor is similar to that used with precision radiometers. HydroColor uses three images collected by the user to: (1) measure how much light is emanating from the water's surface, (2) correct that value for sun/sky glint off the surface, and (3) normalize it by the total incoming radiation. This provides a nearly illumination independent measure of the amount light reflected out of the water." 
+                <Label Text="{x:Static strings:Strings.About_HowDoesHydroColorWorkBody}" 
                        Margin="20,5,5,5"/>
-                <Label Text="HydroColor was developed by Thomas Leeuw and Emmanuel Boss at the University of Maine. To learn more about HydroColor, see the following links. HydroColor has been improved to use RAW camera data since the 2018 publication below." 
+                <Label Text="{x:Static strings:Strings.About_LearnMore}" 
                        Margin="20,5,5,5"/>
                 <Label Text="MISC-Lab Overview"
                                     Margin="20,5,5,5"

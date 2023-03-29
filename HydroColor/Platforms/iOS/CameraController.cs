@@ -5,6 +5,7 @@ using CoreImage;
 using CoreVideo;
 using Foundation;
 using HydroColor.Models;
+using HydroColor.Resources.Strings;
 using HydroColor.Services;
 using static Microsoft.Maui.ApplicationModel.Permissions;
 
@@ -55,7 +56,7 @@ namespace HydroColor.Platforms.iOS
             mCameraDevice = AVCaptureDevice.GetDefaultDevice(AVCaptureDeviceType.BuiltInWideAngleCamera, AVMediaTypes.Video, AVCaptureDevicePosition.Back);
             if (mCameraDevice == null)
             {
-                await Shell.Current.CurrentPage.DisplayAlert("No Camera", "No compatible cameras were found on the device", "OK");
+                await Shell.Current.CurrentPage.DisplayAlert(Strings.CameraController_NoCameraTitle, Strings.CameraController_NoCameraMessage, Strings.CameraController_NoCameraDismissButton);
                 return false;
             }
 

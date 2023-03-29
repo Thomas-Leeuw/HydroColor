@@ -4,6 +4,7 @@
              xmlns:viewmodels="clr-namespace:HydroColor.ViewModels"
              xmlns:converters="clr-namespace:HydroColor.Converters"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:strings="clr-namespace:HydroColor.Resources.Strings"
              x:DataType="viewmodels:CaptureImageViewModel"
              x:Class="HydroColor.Views.CaptureImageView"
              Title="{Binding ImageType.DisplayName}"
@@ -104,7 +105,7 @@
             HorizontalOptions="Center"
             IsVisible="{Binding WaitingForImageResults}">
 
-            <Label Text="Processing Image..."
+            <Label Text="{x:Static strings:Strings.CaptureImage_ImageProcessingInProgress}"
                    FontAttributes="Italic"
                    FontSize="20"
                    Margin="0,20"
@@ -190,7 +191,7 @@
             />
 
         <Button
-            Text="Capture"
+            Text="{x:Static strings:Strings.CaptureImage_CaptureButton}"
             BackgroundColor="{Binding CaptureButtonColor}"
             Grid.Row="1"
             FontSize="20"
@@ -204,7 +205,7 @@
             Command="{Binding CaptureButtonCommand}"/>
 
         <Label 
-            Text="Compass Not Working?"
+            Text="{x:Static strings:Strings.CaptureImage_CompassNotWorkingLink}"
             VerticalOptions="Center" 
             HorizontalOptions="Start" 
             Grid.Row="2"

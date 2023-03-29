@@ -11,6 +11,7 @@ using Android.Content;
 using HydroColor.Models;
 using HydroColor.Platforms.Android.Callbacks;
 using HydroColor.Services;
+using HydroColor.Resources.Strings;
 
 namespace HydroColor.Platforms.Android
 {
@@ -47,7 +48,7 @@ namespace HydroColor.Platforms.Android
             string cameraID = GetCompatibleCameraID(cameraManager);
             if (string.IsNullOrEmpty(cameraID))
             {
-                await Shell.Current.CurrentPage.DisplayAlert("No Camera", "No compatible cameras were found on the device. If the device has a camera, it may not support raw image capture.", "OK");
+                await Shell.Current.CurrentPage.DisplayAlert(Strings.CameraController_NoCameraTitle, Strings.CameraController_NoCameraMessage, Strings.CameraController_NoCameraDismissButton);
                 return false;
             }
 

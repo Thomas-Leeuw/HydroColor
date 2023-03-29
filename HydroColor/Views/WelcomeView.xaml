@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:strings="clr-namespace:HydroColor.Resources.Strings"
              x:Class="HydroColor.Views.WelcomeView"
              Background="Black"
              Shell.NavBarIsVisible="false"
@@ -77,7 +78,7 @@
         </CarouselView>
         <Grid Grid.Row="1" Padding="5">
 
-            <Button Text="Back"
+            <Button Text="{x:Static strings:Strings.Welcome_BackButton}"
                     Command="{Binding BackButtonClickCommand}"
                     IsVisible="{Binding BackButtonVisible}"
                     HorizontalOptions="Start"
@@ -100,7 +101,7 @@
                     <CheckBox VerticalOptions="Center" 
                               IsChecked="{Binding HideWelcomeScreenChecked, Mode=TwoWay}" 
                               Color="White"/>
-                    <Label Text="Don't Show Intro Again" 
+                    <Label Text="{x:Static strings:Strings.Welcome_DontShowIntroAgainCheckbox}" 
                            FontSize="12" 
                            VerticalOptions="Center"/>
                 </HorizontalStackLayout>

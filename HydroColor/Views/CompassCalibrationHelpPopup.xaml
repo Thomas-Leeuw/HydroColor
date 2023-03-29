@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:strings="clr-namespace:HydroColor.Resources.Strings"
              x:Class="HydroColor.Views.CompassCalibrationHelpPopup"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              Color="White" >
@@ -9,23 +10,17 @@
            BackgroundColor="White">
         <VerticalStackLayout Margin="10">
 
-            <Label Text="Compass Calibration"
+            <Label Text="{x:Static strings:Strings.CompassCalibrationHelp_Title}"
                    HorizontalOptions="Center"
                    FontSize="18"
                    FontAttributes="Bold"
                    Margin="10"
                    TextColor="Black"/>
 
-            <Label Margin="10" TextColor="Black">
-                <Label.Text>
-If the compass is not working as you expect, the phones internal compass sensor may require calibration.
-                
-The calibration procedure is simple. With the compass open on the screen (in HydroColor or Maps app), wave the phone in a figure 8 pattern ensuring you invert the phone as part of the pattern.
-                </Label.Text>
-            </Label>
+            <Label Text="{x:Static strings:Strings.CompassCalibrationHelp_HelpMessage}" Margin="10" TextColor="Black"/>
 
 
-            <Label Text="Tap here to see a video on how to calibrate the compass."
+            <Label Text="{x:Static strings:Strings.CompassCalibrationHelp_HelpVideoLink}"
                    Margin="10"
                   TextColor="Blue"
                   TextDecorations="Underline">
@@ -35,7 +30,7 @@ The calibration procedure is simple. With the compass open on the screen (in Hyd
 
             </Label>
 
-            <Button Text="OK" Background="LightGray" Margin="0,15,0,0" HorizontalOptions="Center" WidthRequest="50" Clicked="OKButton_Clicked"/>
+            <Button Text="{x:Static strings:Strings.CompassCalibrationHelp_DismissButton}" Background="LightGray" Margin="0,15,0,0" HorizontalOptions="Center" WidthRequest="50" Clicked="OKButton_Clicked"/>
         </VerticalStackLayout>
     </ScrollView>
 </toolkit:Popup>

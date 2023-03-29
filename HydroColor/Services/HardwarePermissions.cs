@@ -1,4 +1,6 @@
 ﻿
+using HydroColor.Resources.Strings;
+
 namespace HydroColor.Services
 {
     public class HardwarePermissions
@@ -43,7 +45,7 @@ namespace HydroColor.Services
         {
             if (typeof(T) == typeof(Permissions.Camera))
             {
-                await Shell.Current.CurrentPage.DisplayAlert("Camera Permission", "The HydroColor app requires access to the camera to collect a series of images used in the measurement. Please enable camera access for the HydroColor app in the system settings.", "OK");
+                await Shell.Current.CurrentPage.DisplayAlert(Strings.HardwarePermissions_CameraPermissionTitle, Strings.HardwarePermissions_CameraPermissionMessage, Strings.HardwarePermissions_CameraPermissionDismissButton);
 
             }
         }

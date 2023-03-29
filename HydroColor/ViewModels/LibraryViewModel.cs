@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using HydroColor.Models;
+using HydroColor.Resources.Strings;
 using HydroColor.Services;
 using HydroColor.Views;
 using System.Collections.ObjectModel;
@@ -16,7 +17,7 @@ namespace HydroColor.ViewModels
         bool showDeleteMeasurementsButtons;
 
         [ObservableProperty]
-        string editListButtonText = "Edit List";
+        string editListButtonText = Strings.Library_EditListButton;
 
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(EmailDataFileCommand))]
@@ -28,7 +29,7 @@ namespace HydroColor.ViewModels
         [RelayCommand]
         void ViewAppearing()
         {
-            EditListButtonText = "Edit List";
+            EditListButtonText = Strings.Library_EditListButton;
             ShowDeleteMeasurementsButtons = false;
             RefreshLibraryItemsList();
         }
@@ -40,7 +41,7 @@ namespace HydroColor.ViewModels
             MeasurementsExist = DataItems.Count > 0;
             if (!MeasurementsExist)
             {
-                EditListButtonText = "Edit List";
+                EditListButtonText = Strings.Library_EditListButton;
                 ShowDeleteMeasurementsButtons = false;
             }
 
@@ -65,7 +66,7 @@ namespace HydroColor.ViewModels
         [RelayCommand]
         async void DeleteItem(DataLibraryItem ItemToDelete)
         {
-            bool confirm = await Shell.Current.CurrentPage.DisplayAlert("Confirm Deletion", $"{ItemToDelete.MeasurementName}\n{ItemToDelete.LocalTimestamp}", "Delete", "Cancel");
+            bool confirm = await Shell.Current.CurrentPage.DisplayAlert(Strings.Library_DeleteMeasurementTitle, $"{ItemToDelete.MeasurementName}\n{ItemToDelete.LocalTimestamp}", Strings.Library_DeleteMeasurementDeleteButton, Strings.Library_DeleteMeasurementCancelButton);
             if (!confirm)
             {
                 return;
@@ -84,7 +85,7 @@ namespace HydroColor.ViewModels
         [RelayCommand(CanExecute = nameof(MeasurementsExist))]
         void EditList()
         {
-            EditListButtonText = ShowDeleteMeasurementsButtons ? "Edit List" : "Done";
+            EditListButtonText = ShowDeleteMeasurementsButtons ? Strings.Library_EditListButton : Strings.Library_EditListDoneButton;
             ShowDeleteMeasurementsButtons = !ShowDeleteMeasurementsButtons;
         }
 
@@ -95,14 +96,14 @@ namespace HydroColor.ViewModels
             string messageBody;
 
 #if ANDROID
-                messageBody = "HydroColor version 2.0 was a major update to how the app collects and stores data. Measurements collected with HydroColor versions before 2.0 are no longer viewable in the app. Don’t panic! The data file containing all your measurements is still available on your device. \n\nYou can download the datafile containing your past measurements by connecting your Android phone to a computer. The HydroColor data files are available under <your phone>\\Android\\data\\com.h2optics.hydrocolor\\files\\.";
+                messageBody = Strings.Library_MissingMeasurmentsMessageAndroid;
 #endif
 
 #if IOS
-            messageBody = "HydroColor version 2.0 was a major update to how the app collects and stores data. Measurements collected with HydroColor versions before 2.0 are no longer viewable in the app. Don’t panic! The data file containing all your measurements is still available on your device. \n\nYou can download the datafile containing your past measurements by connecting your iPhone to a computer. On Mac, the HydroColor data files are available under the ‘Files’ tab. On a PC, you must connect the iPhone with iTunes, then the data file is available under ‘File Sharing’.";
+            messageBody = Strings.Library_MissingMeasurmentsMessageIOS;
 #endif
 
-            await Shell.Current.CurrentPage.DisplayAlert("Missing Data", messageBody , "OK");
+            await Shell.Current.CurrentPage.DisplayAlert(Strings.Library_MissingMeasurmentsTitle, messageBody , Strings.Library_MissingMeasurmentsDismissButtion);
 
         }
     }

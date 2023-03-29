@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:HydroColor"
     xmlns:views="clr-namespace:HydroColor.Views"
+    xmlns:strings="clr-namespace:HydroColor.Resources.Strings"
     Shell.FlyoutBehavior="Disabled"
     Shell.NavBarHasShadow="False"
     Shell.BackgroundColor="Black"
@@ -18,13 +19,13 @@
     <ShellContent ContentTemplate="{DataTemplate views:WelcomeView}"/>
 
     <TabBar Route="MainTabView">
-        <Tab Title="Collect Data" Icon="collect_data_icon.png">
+        <Tab Title="{x:Static strings:Strings.AppShell_CollectDataTabTitle}" Icon="collect_data_icon.png">
             <ShellContent ContentTemplate="{DataTemplate views:CollectDataView}"/>
         </Tab>
-        <Tab Title="Library" Icon="library_icon.png">
+        <Tab Title="{x:Static strings:Strings.AppShell_LibraryTabTitle}" Icon="library_icon.png">
             <ShellContent ContentTemplate="{DataTemplate views:LibraryView}"/>
         </Tab>
-        <Tab Title="About" Icon="about_icon.png">
+        <Tab Title="{x:Static strings:Strings.AppShell_AboutTabTitle}" Icon="about_icon.png">
             <ShellContent ContentTemplate="{DataTemplate views:AboutView}"/>
         </Tab>
     </TabBar>

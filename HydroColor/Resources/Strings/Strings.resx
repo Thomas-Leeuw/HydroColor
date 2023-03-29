@@ -1,0 +1,539 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="About_HowDoesHydroColorWorkBody" xml:space="preserve">
+    <value>The methodology used by HydroColor is similar to that used with precision radiometers. HydroColor uses three images collected by the user to: (1) measure how much light is emanating from the water's surface, (2) correct that value for sun/sky glint off the surface, and (3) normalize it by the total incoming radiation. This provides a nearly illumination independent measure of the amount light reflected out of the water.</value>
+  </data>
+  <data name="About_HowDoesHydroColorWorkTitle" xml:space="preserve">
+    <value>How Does HydroColor Work?</value>
+  </data>
+  <data name="About_HowToUseHydroColorBody" xml:space="preserve">
+    <value>HydroColor requires that you have a photographers 18% reflectance gray card and access to deep unshaded water. HydroColor will guide you through the collection of three images. The images are processed onboard the phone to provide values of reflectance and water turbidity. The data can be viewed in the app or emailed via the Library tab.</value>
+  </data>
+  <data name="About_HowToUseHydroColorTitle" xml:space="preserve">
+    <value>How to Use HydroColor</value>
+  </data>
+  <data name="About_HydroColorSubtitle" xml:space="preserve">
+    <value>A Water Quality App</value>
+  </data>
+  <data name="About_HydroColorTitle" xml:space="preserve">
+    <value>HydroColor:</value>
+  </data>
+  <data name="About_IntroScreenLink" xml:space="preserve">
+    <value>Click here to view the introduction screen again, which explains the basics of the measurement.</value>
+  </data>
+  <data name="About_LearnMore" xml:space="preserve">
+    <value>HydroColor was developed by Thomas Leeuw and Emmanuel Boss at the University of Maine. To learn more about HydroColor, see the following links. HydroColor has been improved to use RAW camera data since the 2018 publication below.</value>
+  </data>
+  <data name="AppShell_AboutTabTitle" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="AppShell_CollectDataTabTitle" xml:space="preserve">
+    <value>Collect Data</value>
+  </data>
+  <data name="AppShell_LibraryTabTitle" xml:space="preserve">
+    <value>Library</value>
+  </data>
+  <data name="CameraController_NoCameraDismissButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="CameraController_NoCameraMessage" xml:space="preserve">
+    <value>No compatible cameras were found on the device. If the device has a camera, it may not support raw image capture.</value>
+  </data>
+  <data name="CameraController_NoCameraTitle" xml:space="preserve">
+    <value>No Camera</value>
+  </data>
+  <data name="CaptureImage_CaptureButton" xml:space="preserve">
+    <value>Capture</value>
+  </data>
+  <data name="CaptureImage_CompassNotWorkingLink" xml:space="preserve">
+    <value>Compass Not Working?</value>
+  </data>
+  <data name="CaptureImage_ImageProcessingInProgress" xml:space="preserve">
+    <value>Processing Image...</value>
+  </data>
+  <data name="CaptureImage_NoCompassDismissButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="CaptureImage_NoCompassMessage" xml:space="preserve">
+    <value>The current device does not have a magnetic compass.</value>
+  </data>
+  <data name="CaptureImage_NoCompassTitle" xml:space="preserve">
+    <value>Compass Not Supported</value>
+  </data>
+  <data name="CaptureImage_NoGPSNoHeadingHelp" xml:space="preserve">
+    <value>No GPS coordinates, HydroColor cannot determine the correct heading for the images. Either enter GPS coordinates or capture all images approximately 45 degrees from your shadow.</value>
+  </data>
+  <data name="CaptureImage_NoOrientationDismissButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="CaptureImage_NoOrientationMessage" xml:space="preserve">
+    <value>The current device does not have an orientation sensor.</value>
+  </data>
+  <data name="CaptureImage_NoOrientationTitle" xml:space="preserve">
+    <value>Orientation Not Supported</value>
+  </data>
+  <data name="CollectData_AnalyzeImagesButton" xml:space="preserve">
+    <value>Analyze Images</value>
+  </data>
+  <data name="CollectData_AquiringLocationInProgress" xml:space="preserve">
+    <value>Aquiring Location ...</value>
+  </data>
+  <data name="CollectData_EnterLatitudeMessage" xml:space="preserve">
+    <value>Enter in decimal degrees, negative is South.</value>
+  </data>
+  <data name="CollectData_EnterLatitudeTitle" xml:space="preserve">
+    <value>Enter Latitude</value>
+  </data>
+  <data name="CollectData_EnterLongitudeMessage" xml:space="preserve">
+    <value>Enter in decimal degrees, negative is West.</value>
+  </data>
+  <data name="CollectData_EnterLongitudeTitle" xml:space="preserve">
+    <value>Enter Longitude</value>
+  </data>
+  <data name="CollectData_GPSNotSupportedDismissButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="CollectData_GPSNotSupportedMessage" xml:space="preserve">
+    <value>The current device does not support GPS location.</value>
+  </data>
+  <data name="CollectData_GPSNotSupportedTitle" xml:space="preserve">
+    <value>GPS Not Supported</value>
+  </data>
+  <data name="CollectData_GrayCardDisplayName" xml:space="preserve">
+    <value>Gray Card</value>
+  </data>
+  <data name="CollectData_IncompleteImagesDismissButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="CollectData_IncompleteImagesMessage" xml:space="preserve">
+    <value>You must collect a Gray Card, Sky, and Water image before continuing.</value>
+  </data>
+  <data name="CollectData_IncompleteImagesTitle" xml:space="preserve">
+    <value>Incomplete Images</value>
+  </data>
+  <data name="CollectData_LatitudeAbbreviation" xml:space="preserve">
+    <value>Lat:</value>
+  </data>
+  <data name="CollectData_LocationAccuracy" xml:space="preserve">
+    <value>Location Accuracy:</value>
+  </data>
+  <data name="CollectData_LocationPermissionDeniedDismissButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="CollectData_LocationPermissionDeniedMessage" xml:space="preserve">
+    <value>The HydroColor app uses GPS location to determine the optimal direction for image capture. Please enable location access for the HydroColor app in the system settings.</value>
+  </data>
+  <data name="CollectData_LocationPermissionDeniedTitle" xml:space="preserve">
+    <value>Location Permission Denied</value>
+  </data>
+  <data name="CollectData_LongitudeAbbreviation" xml:space="preserve">
+    <value>Lon:</value>
+  </data>
+  <data name="CollectData_MeasurementNameMessage" xml:space="preserve">
+    <value>Leave blank to continue without naming.</value>
+  </data>
+  <data name="CollectData_MeasurementNameTitle" xml:space="preserve">
+    <value>Measurement Name</value>
+  </data>
+  <data name="CollectData_NoGPSDismissButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="CollectData_NoGPSMessage" xml:space="preserve">
+    <value>HydroColor was unable to determine your GPS position. Retry or enter your Lat/Lon coordinates manually.</value>
+  </data>
+  <data name="CollectData_NoGPSTitle" xml:space="preserve">
+    <value>No GPS</value>
+  </data>
+  <data name="CollectData_RefreshLocationButton" xml:space="preserve">
+    <value>Refresh Location</value>
+  </data>
+  <data name="CollectData_SkyDisplayName" xml:space="preserve">
+    <value>Sky</value>
+  </data>
+  <data name="CollectData_SunElevationWarningBanner" xml:space="preserve">
+    <value>Now is not an ideal time for HydroColor measurments. Tap here to see why.</value>
+  </data>
+  <data name="CollectData_SunElevationWarningDismissButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="CollectData_SunElevationWarningMessage_1" xml:space="preserve">
+    <value>The best time for HydroColor measurements is when the sun is between 20 and 85 degrees above the horizon.\n\nThe sun elevation based on the phones current location and time is</value>
+  </data>
+  <data name="CollectData_SunElevationWarningMessage_2" xml:space="preserve">
+    <value>degrees.</value>
+  </data>
+  <data name="CollectData_SunElevationWarningTitle" xml:space="preserve">
+    <value>Sun Elevation</value>
+  </data>
+  <data name="CollectData_WaterDisplayName" xml:space="preserve">
+    <value>Water</value>
+  </data>
+  <data name="CompassCalibrationHelp_DismissButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="CompassCalibrationHelp_HelpMessage" xml:space="preserve">
+    <value>If the compass is not working as you expect, the phones internal compass sensor may require calibration.
+                
+The calibration procedure is simple. With the compass open on the screen (in HydroColor or Maps app), wave the phone in a figure 8 pattern ensuring you invert the phone as part of the pattern.</value>
+  </data>
+  <data name="CompassCalibrationHelp_HelpVideoLink" xml:space="preserve">
+    <value>Tap here to see a video on how to calibrate the compass.</value>
+  </data>
+  <data name="CompassCalibrationHelp_Title" xml:space="preserve">
+    <value>Compass Calibration</value>
+  </data>
+  <data name="Data_GrayCard" xml:space="preserve">
+    <value>Gray Card</value>
+  </data>
+  <data name="Data_ReflectanceGraphBlueLabel" xml:space="preserve">
+    <value>Blue</value>
+  </data>
+  <data name="Data_ReflectanceGraphGreenLabel" xml:space="preserve">
+    <value>Green</value>
+  </data>
+  <data name="Data_ReflectanceGraphRedLabel" xml:space="preserve">
+    <value>Red</value>
+  </data>
+  <data name="Data_ReflectanceGraphYAxisLabel" xml:space="preserve">
+    <value>Reflectance</value>
+  </data>
+  <data name="Data_Sky" xml:space="preserve">
+    <value>Sky</value>
+  </data>
+  <data name="Data_TableBackscatterRedLabel" xml:space="preserve">
+    <value> Red:</value>
+  </data>
+  <data name="Data_TableBackscatterRedUnits" xml:space="preserve">
+    <value>1/m</value>
+  </data>
+  <data name="Data_TableDateLabel" xml:space="preserve">
+    <value>Date:</value>
+  </data>
+  <data name="Data_TableLatitudeLabel" xml:space="preserve">
+    <value>Lat:</value>
+  </data>
+  <data name="Data_TableLatitudeUnits" xml:space="preserve">
+    <value>Deg.</value>
+  </data>
+  <data name="Data_TableLongitudeLabel" xml:space="preserve">
+    <value>Lon:</value>
+  </data>
+  <data name="Data_TableLongitudeUnits" xml:space="preserve">
+    <value>Deg.</value>
+  </data>
+  <data name="Data_TableReflectanceBlueLabel" xml:space="preserve">
+    <value>Reflec Blue:</value>
+  </data>
+  <data name="Data_TableReflectanceGreenLabel" xml:space="preserve">
+    <value>Reflec Green:</value>
+  </data>
+  <data name="Data_TableReflectanceRedLabel" xml:space="preserve">
+    <value>Reflec Red:</value>
+  </data>
+  <data name="Data_TableReflectanceUnits" xml:space="preserve">
+    <value>1/sr</value>
+  </data>
+  <data name="Data_TableSuspendedParticulateMatterLabel" xml:space="preserve">
+    <value>SPM:</value>
+  </data>
+  <data name="Data_TableSuspendedParticulateMatterUnits" xml:space="preserve">
+    <value>mg/L</value>
+  </data>
+  <data name="Data_TableTimeLabel" xml:space="preserve">
+    <value>Time:</value>
+  </data>
+  <data name="Data_TableTimeUnits" xml:space="preserve">
+    <value>Local</value>
+  </data>
+  <data name="Data_TableTurbidityLabel" xml:space="preserve">
+    <value>Turbidity:</value>
+  </data>
+  <data name="Data_TableTurbidityUnits" xml:space="preserve">
+    <value>NTU</value>
+  </data>
+  <data name="Data_Water" xml:space="preserve">
+    <value>Water</value>
+  </data>
+  <data name="FileReaderWriter_AddEmail" xml:space="preserve">
+    <value>+ Add Email Address</value>
+  </data>
+  <data name="FileReaderWriter_AddEmailMessage" xml:space="preserve">
+    <value>Address will be saved.</value>
+  </data>
+  <data name="FileReaderWriter_AddEmailTitle" xml:space="preserve">
+    <value>Enter Email</value>
+  </data>
+  <data name="FileReaderWriter_ConfirmDeleteEmailCancelButton" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="FileReaderWriter_ConfirmDeleteEmailDeleteButton" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="FileReaderWriter_ConfirmDeleteEmailMessage" xml:space="preserve">
+    <value>Delete The Following Address:</value>
+  </data>
+  <data name="FileReaderWriter_ConfirmDeleteEmailTitle" xml:space="preserve">
+    <value>Confirm Delete</value>
+  </data>
+  <data name="FileReaderWriter_ConfirmSendEmailMessageCancelButton" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="FileReaderWriter_ConfirmSendEmailMessageSendButton" xml:space="preserve">
+    <value>Send</value>
+  </data>
+  <data name="FileReaderWriter_ConfirmSendEmailMessage_1" xml:space="preserve">
+    <value>Send HydroColor Data File To:</value>
+  </data>
+  <data name="FileReaderWriter_ConfirmSendEmailMessage_2" xml:space="preserve">
+    <value>Enter custom data file suffix (optional):</value>
+  </data>
+  <data name="FileReaderWriter_ConfirmSendEmailTitle" xml:space="preserve">
+    <value>Confirm Email</value>
+  </data>
+  <data name="FileReaderWriter_DeleteEmail" xml:space="preserve">
+    <value>- Delete Email Address</value>
+  </data>
+  <data name="FileReaderWriter_DeleteEmailCancelButton" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="FileReaderWriter_DeleteEmailMessage" xml:space="preserve">
+    <value>Select Address to DELETE</value>
+  </data>
+  <data name="FileReaderWriter_EmailFailedDismissButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="FileReaderWriter_EmailFailedMessageAndroid" xml:space="preserve">
+    <value>Failed to send email. The data file can be manually downloaded by connecting the phone to a computer and navigating to: Phone\\Android\\data\\com.h2optics.hydrocolor\\files\\</value>
+  </data>
+  <data name="FileReaderWriter_EmailFailedMessageIOS" xml:space="preserve">
+    <value>Failed to send email. The data file can be manually downloaded by connecting the phone to a computer with Itunes, than navigating to the ‘File Sharing’ tab of Itunes.</value>
+  </data>
+  <data name="FileReaderWriter_EmailFailedTitle" xml:space="preserve">
+    <value>Email Failed</value>
+  </data>
+  <data name="FileReaderWriter_EmailSentDismissButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="FileReaderWriter_EmailSentMessage_1" xml:space="preserve">
+    <value>HydroColor Data File Sent To:</value>
+  </data>
+  <data name="FileReaderWriter_EmailSentMessage_2" xml:space="preserve">
+    <value>It may appear in your junk mail folder.</value>
+  </data>
+  <data name="FileReaderWriter_EmailSentTitle" xml:space="preserve">
+    <value>Email Sent</value>
+  </data>
+  <data name="FileReaderWriter_SelectEmailCancelButton" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="FileReaderWriter_SelectEmailMessage" xml:space="preserve">
+    <value>Select Address to Send Data File</value>
+  </data>
+  <data name="HardwarePermissions_CameraPermissionDismissButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="HardwarePermissions_CameraPermissionMessage" xml:space="preserve">
+    <value>The HydroColor app requires access to the camera to collect a series of images used in the measurement. Please enable camera access for the HydroColor app in the system settings.</value>
+  </data>
+  <data name="HardwarePermissions_CameraPermissionTitle" xml:space="preserve">
+    <value>Camera Permission</value>
+  </data>
+  <data name="Library_DeleteButton" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Library_DeleteMeasurementCancelButton" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Library_DeleteMeasurementDeleteButton" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Library_DeleteMeasurementTitle" xml:space="preserve">
+    <value>Confirm Deletion</value>
+  </data>
+  <data name="Library_EditListButton" xml:space="preserve">
+    <value>Edit List</value>
+  </data>
+  <data name="Library_EditListDoneButton" xml:space="preserve">
+    <value>Done</value>
+  </data>
+  <data name="Library_EmailDataFileButton" xml:space="preserve">
+    <value>Email Data File...</value>
+  </data>
+  <data name="Library_MissingMeasurementsLink" xml:space="preserve">
+    <value>Missing Measurements?</value>
+  </data>
+  <data name="Library_MissingMeasurmentsDismissButtion" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Library_MissingMeasurmentsMessageAndroid" xml:space="preserve">
+    <value>HydroColor version 2.0 was a major update to how the app collects and stores data. Measurements collected with HydroColor versions before 2.0 are no longer viewable in the app. Don’t panic! The data file containing all your measurements is still available on your device. \n\nYou can download the datafile containing your past measurements by connecting your Android phone to a computer. The HydroColor data files are available under &lt;your phone&gt;\\Android\\data\\com.h2optics.hydrocolor\\files\\.</value>
+  </data>
+  <data name="Library_MissingMeasurmentsMessageIOS" xml:space="preserve">
+    <value>HydroColor version 2.0 was a major update to how the app collects and stores data. Measurements collected with HydroColor versions before 2.0 are no longer viewable in the app. Don’t panic! The data file containing all your measurements is still available on your device. \n\nYou can download the datafile containing your past measurements by connecting your iPhone to a computer. On Mac, the HydroColor data files are available under the ‘Files’ tab. On a PC, you must connect the iPhone with iTunes, then the data file is available under ‘File Sharing’.</value>
+  </data>
+  <data name="Library_MissingMeasurmentsTitle" xml:space="preserve">
+    <value>Missing Data</value>
+  </data>
+  <data name="Library_NoMeasurements" xml:space="preserve">
+    <value>No Measurements to Display</value>
+  </data>
+  <data name="Welcome_BackButton" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="Welcome_CollectingImagesBody" xml:space="preserve">
+    <value>HydroColor requires the collection of a gray card, water, and sky image to compute the reflectance. HydroColor uses the center of each image, show by a square over the camera preview. Ensure the area inside the square is uniformly filled with the gray card, sky, or water.\n\nThe gray card must be held level or placed on level surface before taking the gray card picture. Avoid imaging shadows on the gray card or debris on the water surface.</value>
+  </data>
+  <data name="Welcome_CollectingImagesTitle" xml:space="preserve">
+    <value>Collecting Images</value>
+  </data>
+  <data name="Welcome_DontShowIntroAgainCheckbox" xml:space="preserve">
+    <value>Don't Show Intro Again</value>
+  </data>
+  <data name="Welcome_ImageAnglesBody" xml:space="preserve">
+    <value>Each image is taken at a specific angle to minimize surface reflection.\n\nA compass and tilt display will guide you to the correct image angles. Line up the green arrows on both displays before capturing an image.</value>
+  </data>
+  <data name="Welcome_ImageAnglesTitle" xml:space="preserve">
+    <value>Image Angles</value>
+  </data>
+  <data name="Welcome_LearnMoreBody" xml:space="preserve">
+    <value>You can learn more about HydroColor at the following links:</value>
+  </data>
+  <data name="Welcome_LearnMoreTitle" xml:space="preserve">
+    <value>Learn More</value>
+  </data>
+  <data name="Welcome_NextButton" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="Welcome_StartButton" xml:space="preserve">
+    <value>Start</value>
+  </data>
+  <data name="Welcome_WelcomeToHydroColorBody" xml:space="preserve">
+    <value>HydroColor is a tool for measuring the reflectance (or simply color) of natural water bodies. The measured reflectance can be used to infer various properties of the water. \n\nHydroColor provides reflectance measurements in the red, green, and blue color channels of the camera. Additionally, water turbidity is derived from the reflectance in the red channel.</value>
+  </data>
+  <data name="Welcome_WelcomeToHydroColorTitle" xml:space="preserve">
+    <value>Welcome to HydroColor</value>
+  </data>
+  <data name="Welcome_WhatsNeededBody" xml:space="preserve">
+    <value>HydroColor requires a photographers 18% reflectance gray card. These are fairly standardized and only cost a few dollars. However, you must ensure the card is specified as 18% reflectance. \n\nYou will need access to deep unshaded water. If the bottom is visible, it is too shallow to use HydroColor. Docks and piers are usually the best place to perform HydroColor measurements.</value>
+  </data>
+  <data name="Welcome_WhatsNeededTitle" xml:space="preserve">
+    <value>What’s Needed?</value>
+  </data>
+</root>
