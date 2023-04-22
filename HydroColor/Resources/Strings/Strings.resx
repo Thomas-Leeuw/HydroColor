@@ -274,7 +274,9 @@
     <value>OK</value>
   </data>
   <data name="CollectData_SunElevationWarningMessage_1" xml:space="preserve">
-    <value>The best time for HydroColor measurements is when the sun is between 20 and 85 degrees above the horizon.\n\nThe sun elevation based on the phones current location and time is</value>
+    <value>The best time for HydroColor measurements is when the sun is between 20 and 85 degrees above the horizon.
+
+The sun elevation based on the phones current location and time is</value>
   </data>
   <data name="CollectData_SunElevationWarningMessage_2" xml:space="preserve">
     <value>degrees.</value>
@@ -483,10 +485,14 @@ The calibration procedure is simple. With the compass open on the screen (in Hyd
     <value>OK</value>
   </data>
   <data name="Library_MissingMeasurmentsMessageAndroid" xml:space="preserve">
-    <value>HydroColor version 2.0 was a major update to how the app collects and stores data. Measurements collected with HydroColor versions before 2.0 are no longer viewable in the app. Don’t panic! The data file containing all your measurements is still available on your device. \n\nYou can download the datafile containing your past measurements by connecting your Android phone to a computer. The HydroColor data files are available under &lt;your phone&gt;\\Android\\data\\com.h2optics.hydrocolor\\files\\.</value>
+    <value>HydroColor version 2.0 was a major update to how the app collects and stores data. Measurements collected with HydroColor versions before 2.0 are no longer viewable in the app. Don’t panic! The data file containing all your measurements is still available on your device.
+
+You can download the datafile containing your past measurements by connecting your Android phone to a computer. The HydroColor data files are available under &lt;your phone&gt;\\Android\\data\\com.h2optics.hydrocolor\\files\\.</value>
   </data>
   <data name="Library_MissingMeasurmentsMessageIOS" xml:space="preserve">
-    <value>HydroColor version 2.0 was a major update to how the app collects and stores data. Measurements collected with HydroColor versions before 2.0 are no longer viewable in the app. Don’t panic! The data file containing all your measurements is still available on your device. \n\nYou can download the datafile containing your past measurements by connecting your iPhone to a computer. On Mac, the HydroColor data files are available under the ‘Files’ tab. On a PC, you must connect the iPhone with iTunes, then the data file is available under ‘File Sharing’.</value>
+    <value>HydroColor version 2.0 was a major update to how the app collects and stores data. Measurements collected with HydroColor versions before 2.0 are no longer viewable in the app. Don’t panic! The data file containing all your measurements is still available on your device.
+
+You can download the datafile containing your past measurements by connecting your iPhone to a computer. On Mac, the HydroColor data files are available under the ‘Files’ tab. On a PC, you must connect the iPhone with iTunes, then the data file is available under ‘File Sharing’.</value>
   </data>
   <data name="Library_MissingMeasurmentsTitle" xml:space="preserve">
     <value>Missing Data</value>
@@ -494,11 +500,16 @@ The calibration procedure is simple. With the compass open on the screen (in Hyd
   <data name="Library_NoMeasurements" xml:space="preserve">
     <value>No Measurements to Display</value>
   </data>
+  <data name="SendEmailPopup_SendingEmail" xml:space="preserve">
+    <value>Sending Email ...</value>
+  </data>
   <data name="Welcome_BackButton" xml:space="preserve">
     <value>Back</value>
   </data>
   <data name="Welcome_CollectingImagesBody" xml:space="preserve">
-    <value>HydroColor requires the collection of a gray card, water, and sky image to compute the reflectance. HydroColor uses the center of each image, show by a square over the camera preview. Ensure the area inside the square is uniformly filled with the gray card, sky, or water.\n\nThe gray card must be held level or placed on level surface before taking the gray card picture. Avoid imaging shadows on the gray card or debris on the water surface.</value>
+    <value>HydroColor requires the collection of a gray card, water, and sky image to compute the reflectance. HydroColor uses the center of each image, show by a square over the camera preview. Ensure the area inside the square is uniformly filled with the gray card, sky, or water.
+
+The gray card must be held level or placed on level surface before taking the gray card picture. Avoid imaging shadows on the gray card or debris on the water surface.</value>
   </data>
   <data name="Welcome_CollectingImagesTitle" xml:space="preserve">
     <value>Collecting Images</value>
@@ -507,7 +518,9 @@ The calibration procedure is simple. With the compass open on the screen (in Hyd
     <value>Don't Show Intro Again</value>
   </data>
   <data name="Welcome_ImageAnglesBody" xml:space="preserve">
-    <value>Each image is taken at a specific angle to minimize surface reflection.\n\nA compass and tilt display will guide you to the correct image angles. Line up the green arrows on both displays before capturing an image.</value>
+    <value>Each image is taken at a specific angle to minimize surface reflection.
+
+A compass and tilt display will guide you to the correct image angles. Line up the green arrows on both displays before capturing an image.</value>
   </data>
   <data name="Welcome_ImageAnglesTitle" xml:space="preserve">
     <value>Image Angles</value>
@@ -525,13 +538,17 @@ The calibration procedure is simple. With the compass open on the screen (in Hyd
     <value>Start</value>
   </data>
   <data name="Welcome_WelcomeToHydroColorBody" xml:space="preserve">
-    <value>HydroColor is a tool for measuring the reflectance (or simply color) of natural water bodies. The measured reflectance can be used to infer various properties of the water. \n\nHydroColor provides reflectance measurements in the red, green, and blue color channels of the camera. Additionally, water turbidity is derived from the reflectance in the red channel.</value>
+    <value>HydroColor is a tool for measuring the reflectance (or simply color) of natural water bodies. The measured reflectance can be used to infer various properties of the water.
+
+HydroColor provides reflectance measurements in the red, green, and blue color channels of the camera. Additionally, water turbidity is derived from the reflectance in the red channel.</value>
   </data>
   <data name="Welcome_WelcomeToHydroColorTitle" xml:space="preserve">
     <value>Welcome to HydroColor</value>
   </data>
   <data name="Welcome_WhatsNeededBody" xml:space="preserve">
-    <value>HydroColor requires a photographers 18% reflectance gray card. These are fairly standardized and only cost a few dollars. However, you must ensure the card is specified as 18% reflectance. \n\nYou will need access to deep unshaded water. If the bottom is visible, it is too shallow to use HydroColor. Docks and piers are usually the best place to perform HydroColor measurements.</value>
+    <value>HydroColor requires a photographers 18% reflectance gray card. These are fairly standardized and only cost a few dollars. However, you must ensure the card is specified as 18% reflectance. 
+
+You will need access to deep unshaded water. If the bottom is visible, it is too shallow to use HydroColor. Docks and piers are usually the best place to perform HydroColor measurements.</value>
   </data>
   <data name="Welcome_WhatsNeededTitle" xml:space="preserve">
     <value>What’s Needed?</value>

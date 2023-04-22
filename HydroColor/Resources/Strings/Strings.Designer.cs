@@ -529,7 +529,9 @@ namespace HydroColor.Resources.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The best time for HydroColor measurements is when the sun is between 20 and 85 degrees above the horizon.\n\nThe sun elevation based on the phones current location and time is.
+        ///   Looks up a localized string similar to The best time for HydroColor measurements is when the sun is between 20 and 85 degrees above the horizon.
+        ///
+        ///The sun elevation based on the phones current location and time is.
         /// </summary>
         internal static string CollectData_SunElevationWarningMessage_1 {
             get {
@@ -1152,7 +1154,9 @@ namespace HydroColor.Resources.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to HydroColor version 2.0 was a major update to how the app collects and stores data. Measurements collected with HydroColor versions before 2.0 are no longer viewable in the app. Don’t panic! The data file containing all your measurements is still available on your device. \n\nYou can download the datafile containing your past measurements by connecting your Android phone to a computer. The HydroColor data files are available under &lt;your phone&gt;\\Android\\data\\com.h2optics.hydrocolor\\files\\..
+        ///   Looks up a localized string similar to HydroColor version 2.0 was a major update to how the app collects and stores data. Measurements collected with HydroColor versions before 2.0 are no longer viewable in the app. Don’t panic! The data file containing all your measurements is still available on your device.
+        ///
+        ///You can download the datafile containing your past measurements by connecting your Android phone to a computer. The HydroColor data files are available under &lt;your phone&gt;\\Android\\data\\com.h2optics.hydrocolor\\files\\..
         /// </summary>
         internal static string Library_MissingMeasurmentsMessageAndroid {
             get {
@@ -1161,7 +1165,9 @@ namespace HydroColor.Resources.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to HydroColor version 2.0 was a major update to how the app collects and stores data. Measurements collected with HydroColor versions before 2.0 are no longer viewable in the app. Don’t panic! The data file containing all your measurements is still available on your device. \n\nYou can download the datafile containing your past measurements by connecting your iPhone to a computer. On Mac, the HydroColor data files are available under the ‘Files’ tab. On a PC, you must connect the iPhone with iTunes, then the d [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to HydroColor version 2.0 was a major update to how the app collects and stores data. Measurements collected with HydroColor versions before 2.0 are no longer viewable in the app. Don’t panic! The data file containing all your measurements is still available on your device.
+        ///
+        ///You can download the datafile containing your past measurements by connecting your iPhone to a computer. On Mac, the HydroColor data files are available under the ‘Files’ tab. On a PC, you must connect the iPhone with iTunes, then the da [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Library_MissingMeasurmentsMessageIOS {
             get {
@@ -1188,6 +1194,15 @@ namespace HydroColor.Resources.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sending Email ....
+        /// </summary>
+        internal static string SendEmailPopup_SendingEmail {
+            get {
+                return ResourceManager.GetString("SendEmailPopup_SendingEmail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Back.
         /// </summary>
         internal static string Welcome_BackButton {
@@ -1197,7 +1212,9 @@ namespace HydroColor.Resources.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to HydroColor requires the collection of a gray card, water, and sky image to compute the reflectance. HydroColor uses the center of each image, show by a square over the camera preview. Ensure the area inside the square is uniformly filled with the gray card, sky, or water.\n\nThe gray card must be held level or placed on level surface before taking the gray card picture. Avoid imaging shadows on the gray card or debris on the water surface..
+        ///   Looks up a localized string similar to HydroColor requires the collection of a gray card, water, and sky image to compute the reflectance. HydroColor uses the center of each image, show by a square over the camera preview. Ensure the area inside the square is uniformly filled with the gray card, sky, or water.
+        ///
+        ///The gray card must be held level or placed on level surface before taking the gray card picture. Avoid imaging shadows on the gray card or debris on the water surface..
         /// </summary>
         internal static string Welcome_CollectingImagesBody {
             get {
@@ -1224,7 +1241,9 @@ namespace HydroColor.Resources.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Each image is taken at a specific angle to minimize surface reflection.\n\nA compass and tilt display will guide you to the correct image angles. Line up the green arrows on both displays before capturing an image..
+        ///   Looks up a localized string similar to Each image is taken at a specific angle to minimize surface reflection.
+        ///
+        ///A compass and tilt display will guide you to the correct image angles. Line up the green arrows on both displays before capturing an image..
         /// </summary>
         internal static string Welcome_ImageAnglesBody {
             get {
@@ -1278,7 +1297,9 @@ namespace HydroColor.Resources.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to HydroColor is a tool for measuring the reflectance (or simply color) of natural water bodies. The measured reflectance can be used to infer various properties of the water. \n\nHydroColor provides reflectance measurements in the red, green, and blue color channels of the camera. Additionally, water turbidity is derived from the reflectance in the red channel..
+        ///   Looks up a localized string similar to HydroColor is a tool for measuring the reflectance (or simply color) of natural water bodies. The measured reflectance can be used to infer various properties of the water.
+        ///
+        ///HydroColor provides reflectance measurements in the red, green, and blue color channels of the camera. Additionally, water turbidity is derived from the reflectance in the red channel..
         /// </summary>
         internal static string Welcome_WelcomeToHydroColorBody {
             get {
@@ -1296,7 +1317,9 @@ namespace HydroColor.Resources.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to HydroColor requires a photographers 18% reflectance gray card. These are fairly standardized and only cost a few dollars. However, you must ensure the card is specified as 18% reflectance. \n\nYou will need access to deep unshaded water. If the bottom is visible, it is too shallow to use HydroColor. Docks and piers are usually the best place to perform HydroColor measurements..
+        ///   Looks up a localized string similar to HydroColor requires a photographers 18% reflectance gray card. These are fairly standardized and only cost a few dollars. However, you must ensure the card is specified as 18% reflectance. 
+        ///
+        ///You will need access to deep unshaded water. If the bottom is visible, it is too shallow to use HydroColor. Docks and piers are usually the best place to perform HydroColor measurements..
         /// </summary>
         internal static string Welcome_WhatsNeededBody {
             get {

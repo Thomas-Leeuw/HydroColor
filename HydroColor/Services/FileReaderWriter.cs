@@ -5,6 +5,8 @@ using MailKit.Net.Smtp;
 using MailKit.Security;
 using SendGrid.Helpers.Mail;
 using HydroColor.Resources.Strings;
+using CommunityToolkit.Maui.Views;
+using HydroColor.Views;
 
 namespace HydroColor.Services
 {
@@ -505,19 +507,23 @@ Your HydroColor data file is attached. Do not reply to this email.";
                 attachmentName = $"HydroColor_{customFilenameSuffix}.txt";
             }
 
+
+            var EmailBusyPopup = new SendingEmailPopup();
+            EmailBusyPopup.BindingContext = this;
             bool EmailSent = false;
+            Shell.Current.CurrentPage.ShowPopup(EmailBusyPopup);
             try
             {
                 // MailKit is not working on older Android devices, ssl handshake exeception always occurs
                 // try MailKit first, then fall back on SendGrid Mail service
-                MailKitSendEmail(address, attachmentName);
+                await MailKitSendEmail(address, attachmentName);
                 EmailSent = true;
             }
             catch
             {
                 try
                 {
-                    SendGridSendEmail(address, attachmentName);
+                    await SendGridSendEmail(address, attachmentName);
                     EmailSent = true;
                 }
                 catch
@@ -526,8 +532,10 @@ Your HydroColor data file is attached. Do not reply to this email.";
                 }
             }
 
+            EmailBusyPopup.Close();
+
             if (EmailSent)
-            {
+            { 
                 await Shell.Current.CurrentPage.DisplayAlert(Strings.FileReaderWriter_EmailSentTitle, $"{Strings.FileReaderWriter_EmailSentMessage_1}\n\n{address}\n\n{Strings.FileReaderWriter_EmailSentMessage_2}", Strings.FileReaderWriter_EmailSentDismissButton);
             }
             else
@@ -545,8 +553,9 @@ Your HydroColor data file is attached. Do not reply to this email.";
 
         }
 
-        public void MailKitSendEmail(string address, string attachmentName)
+        public async Task MailKitSendEmail(string address, string attachmentName)
         {
+            await Task.Factory.StartNew(() => { 
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress(EmailSenderName, GmailCredentials.Email));
             message.To.Add(new MailboxAddress(EmailReceiverName, address));
@@ -565,26 +574,30 @@ Your HydroColor data file is attached. Do not reply to this email.";
             client.Authenticate(GmailCredentials.UserName, GmailCredentials.Password);
             client.Send(message);
             client.Disconnect(true);
+            });
         }
 
-        public void SendGridSendEmail(string address, string attachmentName)
+        public async Task SendGridSendEmail(string address, string attachmentName)
         {
-            var sendGridClient = new SendGrid.SendGridClient(GmailCredentials.SendGridAPIKey);
-            var msg = new SendGridMessage()
+            await Task.Factory.StartNew(() =>
             {
-                From = new EmailAddress(GmailCredentials.Email, EmailSenderName),
-                Subject = EmailSubject,
-                PlainTextContent = EmailBody + "\n\n(Sent With SendGrid)"
-            };
-            msg.AddTo(new EmailAddress(address, EmailReceiverName));
-            string DataFilePath = GetDataFileName();
-            byte[] byteData = File.ReadAllBytes(DataFilePath);
-            msg.AddAttachment(attachmentName, Convert.ToBase64String(byteData));
-            var response = sendGridClient.SendEmailAsync(msg).Result;
-            if (response.IsSuccessStatusCode == false)
-            {
-                throw new Exception("SendGrid Email Failed");
-            }
+                var sendGridClient = new SendGrid.SendGridClient(GmailCredentials.SendGridAPIKey);
+                var msg = new SendGridMessage()
+                {
+                    From = new EmailAddress(GmailCredentials.Email, EmailSenderName),
+                    Subject = EmailSubject,
+                    PlainTextContent = EmailBody + "\n\n(Sent With SendGrid)"
+                };
+                msg.AddTo(new EmailAddress(address, EmailReceiverName));
+                string DataFilePath = GetDataFileName();
+                byte[] byteData = File.ReadAllBytes(DataFilePath);
+                msg.AddAttachment(attachmentName, Convert.ToBase64String(byteData));
+                var response = sendGridClient.SendEmailAsync(msg).Result;
+                if (response.IsSuccessStatusCode == false)
+                {
+                    throw new Exception("SendGrid Email Failed");
+                }
+            });
         }
 
     }

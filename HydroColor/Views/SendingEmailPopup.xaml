@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:strings="clr-namespace:HydroColor.Resources.Strings"
+             x:Class="HydroColor.Views.SendingEmailPopup"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             Color="Transparent"
+             CanBeDismissedByTappingOutsideOfPopup="False">
+
+    <VerticalStackLayout Margin="10" x:Name="PopupFrame"
+           BackgroundColor="White" Opacity="0.90" VerticalOptions="Center">
+
+        <ActivityIndicator
+                    Margin="0,20,0,5"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"
+                    Color="Black"
+                    IsRunning="true"
+                    HeightRequest="50"
+                    WidthRequest="50"/>
+        <Label Text="{x:Static strings:Strings.SendEmailPopup_SendingEmail}" TextColor="Black" FontSize="16" HorizontalOptions="Center"/>
+
+        </VerticalStackLayout>
+</toolkit:Popup>
