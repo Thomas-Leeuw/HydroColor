@@ -34,6 +34,11 @@
 		<CodesignKey>Apple Distribution: Thomas Leeuw (QYE35RULW5)</CodesignKey>
 		<CodesignProvision>HydroColorProvProfile</CodesignProvision>
 	</PropertyGroup>
+  
+  <PropertyGroup Condition="'$(TargetFramework)'=='net7.0-ios'">
+    <CodesignKey>Apple Development: Created via API (S4222GC659)</CodesignKey>
+    <CodesignProvision>VS: com.H2Optics.HydroColor Development</CodesignProvision>
+  </PropertyGroup>
 
 
 

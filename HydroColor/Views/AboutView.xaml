@@ -79,6 +79,18 @@
                 <Label Text="{Binding AppVersionNumber, StringFormat='HydroColor v{0}'}" 
                        Margin="5,5"
                        HorizontalOptions="End"/>
+
+                <Label Text="Privacy Policy"
+                                    Margin="20,5,5,5"
+                                    TextColor="LightGray"
+                                    TextDecorations="Underline"
+                       HorizontalOptions="End">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer  Command="{Binding LinkClickedCommand}"
+                                            CommandParameter="https://sites.google.com/view/hydrocolor-albedo-privacy"/>
+                    </Label.GestureRecognizers>
+                </Label>
+
             </VerticalStackLayout>
         </ScrollView>
 
