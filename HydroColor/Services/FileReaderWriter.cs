@@ -7,6 +7,7 @@ using SendGrid.Helpers.Mail;
 using HydroColor.Resources.Strings;
 using CommunityToolkit.Maui.Views;
 using HydroColor.Views;
+using System.Linq.Expressions;
 
 namespace HydroColor.Services
 {
@@ -257,13 +258,17 @@ Your HydroColor data file is attached. Do not reply to this email.";
             DataRecord.MeasurementProducts.WaterRelativeLightLevel.Red = double.Parse(Data[42]);
             DataRecord.MeasurementProducts.WaterRelativeLightLevel.Green = double.Parse(Data[43]);
             DataRecord.MeasurementProducts.WaterRelativeLightLevel.Blue = double.Parse(Data[44]);
-
-            DataRecord.GrayCardImageData.JpegImage = File.ReadAllBytes(Path.Combine(DataFolderPath, $"{timestamp.ToString("yyyyMMdd_HHmmss")}_GrayCard.jpg"));
-            DataRecord.SkyImageData.JpegImage = File.ReadAllBytes(Path.Combine(DataFolderPath, $"{timestamp.ToString("yyyyMMdd_HHmmss")}_Sky.jpg"));
-            DataRecord.WaterImageData.JpegImage = File.ReadAllBytes(Path.Combine(DataFolderPath, $"{timestamp.ToString("yyyyMMdd_HHmmss")}_Water.jpg"));
+            try
+            {
+                DataRecord.GrayCardImageData.JpegImage = File.ReadAllBytes(Path.Combine(DataFolderPath, $"{timestamp.ToString("yyyyMMdd_HHmmss")}_GrayCard.jpg"));
+                DataRecord.SkyImageData.JpegImage = File.ReadAllBytes(Path.Combine(DataFolderPath, $"{timestamp.ToString("yyyyMMdd_HHmmss")}_Sky.jpg"));
+                DataRecord.WaterImageData.JpegImage = File.ReadAllBytes(Path.Combine(DataFolderPath, $"{timestamp.ToString("yyyyMMdd_HHmmss")}_Water.jpg"));
+            }
+            catch
+            { }
 
             return DataRecord;
-        }
+            }
 
         public HydroColorProcessedMeasurement GetDataRecord_v2p0(DateTime timestamp)
         {

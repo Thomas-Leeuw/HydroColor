@@ -17,8 +17,8 @@
 		<ApplicationIdGuid>40AF2490-DBFC-4C69-83AF-7F0E312CDDE2</ApplicationIdGuid>
 
 		<!-- Versions -->
-		<ApplicationDisplayVersion>2.2</ApplicationDisplayVersion>
-		<ApplicationVersion>5</ApplicationVersion>
+		<ApplicationDisplayVersion>2.3</ApplicationDisplayVersion>
+		<ApplicationVersion>6</ApplicationVersion>
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.2</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
@@ -34,6 +34,7 @@
 		<CodesignKey>Apple Distribution: Thomas Leeuw (QYE35RULW5)</CodesignKey>
 		<CodesignProvision>HydroColorProvProfile</CodesignProvision>
 	</PropertyGroup>
+
 
 
   <ItemGroup>
@@ -62,10 +63,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="CommunityToolkit.Maui" Version="4.0.0" />
-	  <PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0" />
-	  <PackageReference Include="MailKit" Version="3.5.0" />
-	  <PackageReference Include="Microsoft.Maui.Controls.Maps" Version="7.0.59" />
+	  <PackageReference Include="CommunityToolkit.Maui" Version="6.1.0" />
+	  <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+	  <PackageReference Include="MailKit" Version="4.3.0" />
+	  <PackageReference Include="Microsoft.Maui.Controls.Maps" Version="7.0.101" />
 	  <PackageReference Include="SendGrid" Version="9.28.1" />
 	</ItemGroup>
 

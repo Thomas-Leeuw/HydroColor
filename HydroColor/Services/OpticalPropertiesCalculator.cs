@@ -79,15 +79,26 @@ namespace HydroColor.Services
         {
             double Turbidity;
 
-            if (RedReflectance >= 0.0372)
+            if (RedReflectance >= 0.0344)
             {
-                // Red reflectace approches asymptote for trubidity over 80 NTU or Rrs over 0.0372
+                // Red reflectace approches asymptote for trubidity over 80 NTU or Rrs over 0.0344
                 Turbidity = 80;
             }
             else
             {
+                /* Turbidity equation was updated in v2.3 (2023/11/12)
+                 * to match Leeuw and Boss 2018. All previous versions
+                 * used the equation:
+                 * 
+                 * Turbidity = (27.7 * RedReflectance) / (0.05 - RedReflectance);
+                 * 
+                 * The change is insigificant for turbidies less than 40 NTU. 
+                 * For large NTU values, the new equation will give slightly 
+                 * lower values than the old equation.
+                 */
+
                 // From Leeuw and Boss 2018
-                Turbidity = (27.7 * RedReflectance) / (0.05 - RedReflectance);
+                Turbidity = (22.57 * RedReflectance) / (0.044 - RedReflectance);
             }
 
             return Math.Round(Turbidity,0);

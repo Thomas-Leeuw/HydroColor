@@ -65,7 +65,7 @@ namespace HydroColor.ViewModels
         }
 
         [RelayCommand]
-        async void DeleteItem(DataLibraryItem ItemToDelete)
+        async Task DeleteItem(DataLibraryItem ItemToDelete)
         {
             bool confirm = await Shell.Current.CurrentPage.DisplayAlert(Strings.Library_DeleteMeasurementTitle, $"{ItemToDelete.MeasurementName}\n{ItemToDelete.LocalTimestamp}", Strings.Library_DeleteMeasurementDeleteButton, Strings.Library_DeleteMeasurementCancelButton);
             if (!confirm)
@@ -91,7 +91,7 @@ namespace HydroColor.ViewModels
         }
 
         [RelayCommand]
-        async void MissingMeasurements()
+        async Task MissingMeasurements()
         {
 
             string messageBody;

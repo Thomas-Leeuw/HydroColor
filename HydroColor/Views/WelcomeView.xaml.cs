@@ -4,11 +4,19 @@ namespace HydroColor.Views;
 
 public partial class WelcomeView : ContentPage
 {
+	private Action PhysicalBackButtonPressed { get; set; }
+
 	public WelcomeView(WelcomeViewModel welcomeViewModel)
 	{
 		InitializeComponent();
-
-		BindingContext = welcomeViewModel;
+        PhysicalBackButtonPressed = welcomeViewModel.BackButtonClick;
+        BindingContext = welcomeViewModel;
 
 	}
+
+    protected override bool OnBackButtonPressed()
+    {
+		PhysicalBackButtonPressed?.Invoke();
+        return true;
+    }
 }

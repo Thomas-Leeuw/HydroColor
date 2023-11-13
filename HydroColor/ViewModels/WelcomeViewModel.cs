@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using HydroColor.Models;
 using HydroColor.Resources.Strings;
+using Microsoft.Maui.Maps;
 using System.Collections.ObjectModel;
 
 namespace HydroColor.ViewModels
@@ -29,6 +30,7 @@ namespace HydroColor.ViewModels
 
         public WelcomeViewModel()
         {
+
             WelcomePages = new ObservableCollection<WelcomePageModel>
             {
                 new()
@@ -69,7 +71,7 @@ namespace HydroColor.ViewModels
         }
 
         [RelayCommand]
-        async void NextButtonClick()
+        async Task NextButtonClick()
         {
             if (CarouselPosition + 1 < WelcomePages.Count)
             {
@@ -84,7 +86,7 @@ namespace HydroColor.ViewModels
         }
 
         [RelayCommand]
-        void BackButtonClick()
+        public void BackButtonClick()
         {
             if (CarouselPosition - 1 >= 0)
             {

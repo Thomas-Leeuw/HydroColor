@@ -111,7 +111,7 @@ namespace HydroColor.ViewModels
         }
 
         [RelayCommand]
-        async void ViewLoaded()
+        async Task ViewLoaded()
         {
             CurrentLocation = new Location();
             CurrentLocation.Accuracy = 0;
@@ -125,6 +125,15 @@ namespace HydroColor.ViewModels
         void ViewAppearing()
         {
             CheckSunElevationAngle();
+
+            // Workaround for bug in .net MAUI. Images are disappearing after tab navigation.
+            // Need to reload images each time the view appears.
+            // Only a problem on Android devices
+            #if ANDROID
+            OnGrayCardImageDataChanged(GrayCardImageData);
+            OnWaterImageDataChanged(WaterImageData);
+            OnSkyImageDataChanged(SkyImageData);
+            #endif
         }
 
         void ResetImageCapture()
@@ -153,7 +162,10 @@ namespace HydroColor.ViewModels
                 HaveGrayCardData = true;
                 GrayCardImageSquareColor = GrayCardImageData.ImageCapturedAtCorrectAngles ? Colors.LimeGreen : Colors.White;
             }
-
+            else
+            {
+                GrayCardThumbnailImage = ImageSource.FromFile("graycard_icon.png");
+            }
         }
         partial void OnWaterImageDataChanged(HydroColorImageCaptureModel value)
         {
@@ -163,6 +175,10 @@ namespace HydroColor.ViewModels
                 HaveWaterData = true;
                 WaterImageSquareColor = WaterImageData.ImageCapturedAtCorrectAngles ? Colors.LimeGreen : Colors.White;
             }
+            else
+            {
+                WaterThumbnailImage = ImageSource.FromFile("water_icon.png");
+            }
         }
         partial void OnSkyImageDataChanged(HydroColorImageCaptureModel value)
         {
@@ -171,6 +187,10 @@ namespace HydroColor.ViewModels
                 SkyThumbnailImage = ImageSource.FromStream(() => new MemoryStream(SkyImageData.JpegImage));
                 HaveSkyData = true;
                 SkyImageSquareColor = SkyImageData.ImageCapturedAtCorrectAngles ? Colors.LimeGreen : Colors.White;
+            }
+            else
+            {
+                SkyThumbnailImage = ImageSource.FromFile("sky_icon.png");
             }
         }
 
@@ -228,7 +248,7 @@ namespace HydroColor.ViewModels
         }
 
         [RelayCommand(CanExecute = nameof(CanCheckLocation))]
-        async void UserInputLatitude()
+        async Task UserInputLatitude()
         {
 
             string lat = await Shell.Current.CurrentPage.DisplayPromptAsync(Strings.CollectData_EnterLatitudeTitle, Strings.CollectData_EnterLatitudeMessage, initialValue: CurrentLocation.Latitude.ToString("F5"));
@@ -251,7 +271,7 @@ namespace HydroColor.ViewModels
         }
 
         [RelayCommand(CanExecute = nameof(CanCheckLocation))]
-        async void UserInputLongitude()
+        async Task UserInputLongitude()
         {
             string lon = await Shell.Current.CurrentPage.DisplayPromptAsync(Strings.CollectData_EnterLongitudeTitle, Strings.CollectData_EnterLongitudeMessage, initialValue: CurrentLocation.Longitude.ToString("F5"));
             if (lon == null) // cancel pressed
@@ -312,7 +332,7 @@ namespace HydroColor.ViewModels
         }
 
         [RelayCommand] // using CanExecute here causes crash on LGE Nexus 5, Android 6.0
-        async void AnalyzeImages()
+        async Task AnalyzeImages()
         {
             if (GrayCardImageData != null && WaterImageData != null && SkyImageData != null)
             {
