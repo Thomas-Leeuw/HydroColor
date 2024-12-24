@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Maui.Views;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using HydroColor.Models;
 using HydroColor.Resources.Strings;
@@ -32,7 +31,7 @@ namespace HydroColor.ViewModels
         {
             EditListButtonText = Strings.Library_EditListButton;
             ShowDeleteMeasurementsButtons = false;
-            RefreshLibraryItemsList();
+            RefreshLibraryItemsList();        
         }
 
         void RefreshLibraryItemsList()

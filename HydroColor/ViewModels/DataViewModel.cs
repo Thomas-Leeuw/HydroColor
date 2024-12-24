@@ -79,7 +79,7 @@ namespace HydroColor.ViewModels
         [RelayCommand]
         public void BackButton()
         {
-
+            
             // Passing null for the Query Properties is a workaround for a known issue (https://github.com/dotnet/maui/issues/10294)
             // If null is not sent, it will resend the old data again, even if the local parameters have been set to null
             Shell.Current.GoToAsync($"..", true, new Dictionary<string, object>
@@ -88,6 +88,7 @@ namespace HydroColor.ViewModels
                 [nameof(HydroColorImageTag.Water)] = null,
                 [nameof(HydroColorImageTag.Sky)] = null
             });
+            
         }
 
 

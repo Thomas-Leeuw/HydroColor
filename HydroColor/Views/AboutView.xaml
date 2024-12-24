@@ -2,6 +2,8 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:strings="clr-namespace:HydroColor.Resources.Strings"
+             xmlns:vm="clr-namespace:HydroColor.ViewModels"
+             x:DataType="vm:AboutViewModel"
              x:Class="HydroColor.Views.AboutView"
              Shell.NavBarIsVisible="false"
              Title="">

@@ -15,11 +15,13 @@
     Shell.TabBarTitleColor="White"
     Shell.TabBarForegroundColor="White"
     Shell.TabBarUnselectedColor="Gray">
-
+  
+    
     <ShellContent ContentTemplate="{DataTemplate views:WelcomeView}"/>
 
+
     <TabBar Route="MainTabView">
-        <Tab Title="{x:Static strings:Strings.AppShell_CollectDataTabTitle}" Icon="collect_data_icon.png">
+        <Tab Title="{x:Static strings:Strings.AppShell_CollectDataTabTitle}" Icon="collect_data_icon.png" >
             <ShellContent ContentTemplate="{DataTemplate views:CollectDataView}"/>
         </Tab>
         <Tab Title="{x:Static strings:Strings.AppShell_LibraryTabTitle}" Icon="library_icon.png">
@@ -29,5 +31,7 @@
             <ShellContent ContentTemplate="{DataTemplate views:AboutView}"/>
         </Tab>
     </TabBar>
+    
+
 
 </Shell>

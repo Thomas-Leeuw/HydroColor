@@ -13,40 +13,34 @@ public static class MauiProgram
 		builder
 			.UseMauiApp<App>()
 			.UseMauiCommunityToolkit()
-            .UseMauiMaps()
-            .ConfigureFonts(fonts =>
+			.UseMauiMaps()
+			.ConfigureFonts(fonts =>
 			{
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-			}).UseMauiCompatibility()
+			})
+			.UseMauiCompatibility()
 			.ConfigureMauiHandlers((handlers) => {
+
 
 #if ANDROID
                 handlers.AddCompatibilityRenderer(typeof(CameraPreview), typeof(HydroColor.Platforms.Android.CameraPreviewRenderer));
-#endif
+#elif IOS
+                handlers.AddHandler(typeof(CameraPreview), typeof(HydroColor.Platforms.iOS.CameraPreviewRenderer));
 
-#if IOS
-				handlers.AddHandler(typeof(CameraPreview), typeof(HydroColor.Platforms.iOS.CameraPreviewRenderer));
+				// Added a custom shell to disable animation when switching tabs.
+				// The animation was causing a flicker when switching tabs on iOS.
+				handlers.AddHandler(typeof(Shell), typeof(HydroColor.Platforms.iOS.CustomShell));
 #endif
             });
 
-        builder.Services.AddSingleton<CollectDataViewModel>();
-        builder.Services.AddSingleton<CollectDataView>();
 
-        builder.Services.AddSingleton<LibraryViewModel>();
-        builder.Services.AddSingleton<LibraryView>();
-
-        builder.Services.AddSingleton<AboutViewModel>();
-        builder.Services.AddSingleton<AboutView>();
-
-		builder.Services.AddTransient<CaptureImageViewModel>();
-		builder.Services.AddTransient<CaptureImageView>();
-
-        builder.Services.AddTransient<DataViewModel>();
-        builder.Services.AddTransient<DataView>();
-
-		builder.Services.AddTransient<WelcomeViewModel>();
-		builder.Services.AddTransient<WelcomeView>();
+        builder.Services.AddSingleton<CollectDataView, CollectDataViewModel>();
+        builder.Services.AddSingleton<LibraryView, LibraryViewModel>();
+        builder.Services.AddSingleton<AboutView, AboutViewModel>();
+		builder.Services.AddTransient<CaptureImageView, CaptureImageViewModel>();
+        builder.Services.AddTransient<DataView, DataViewModel>();
+		builder.Services.AddTransient<WelcomeView, WelcomeViewModel>();
 
         return builder.Build();
 	}

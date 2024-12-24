@@ -1,5 +1,4 @@
-﻿using HydroColor.Services;
-using HydroColor.Views;
+﻿using HydroColor.Views;
 
 namespace HydroColor;
 
@@ -9,7 +8,7 @@ public partial class AppShell : Shell
 	{
         InitializeComponent();
 
-		Routing.RegisterRoute(nameof(CaptureImageView), typeof(CaptureImageView));
+        Routing.RegisterRoute(nameof(CaptureImageView), typeof(CaptureImageView));
         Routing.RegisterRoute(nameof(DataView), typeof(DataView));
 		Routing.RegisterRoute(nameof(WelcomeView), typeof(WelcomeView));
 
@@ -21,5 +20,7 @@ public partial class AppShell : Shell
         {
             GoToAsync(nameof(WelcomeView));
         }
+
     }
+
 }

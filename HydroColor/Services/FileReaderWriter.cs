@@ -20,9 +20,7 @@ namespace HydroColor.Services
         {
 #if ANDROID
             get { return Android.App.Application.Context.GetExternalFilesDir(null).AbsolutePath; }      
-#endif
-
-#if IOS
+#elif IOS
             get { return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments); }      
 #endif
         }
@@ -535,27 +533,35 @@ Your HydroColor data file is attached. Do not reply to this email.";
                 {
 
                 }
-            }
+            }        
+
+            // Need to wait till popup is closed before displaying confirmation alert.
+            // Alert was not appearing on iOS.
+            EmailBusyPopup.Closed += (async (object sender, CommunityToolkit.Maui.Core.PopupClosedEventArgs e) =>
+            {
+                if (EmailSent)
+                {
+                    await Shell.Current.CurrentPage.DisplayAlert(Strings.FileReaderWriter_EmailSentTitle, $"{Strings.FileReaderWriter_EmailSentMessage_1}\n\n{address}\n\n{Strings.FileReaderWriter_EmailSentMessage_2}", Strings.FileReaderWriter_EmailSentDismissButton);
+                }
+                else
+                {
+                    string emailFailedMessage;
+#if ANDROID
+                    emailFailedMessage = Strings.FileReaderWriter_EmailFailedMessageAndroid;
+#elif IOS
+                    emailFailedMessage = Strings.FileReaderWriter_EmailFailedMessageIOS;
+#endif
+                    await Shell.Current.CurrentPage.DisplayAlert(Strings.FileReaderWriter_EmailFailedTitle, emailFailedMessage, Strings.FileReaderWriter_EmailFailedDismissButton);
+                }
+            });
 
             EmailBusyPopup.Close();
 
-            if (EmailSent)
-            { 
-                await Shell.Current.CurrentPage.DisplayAlert(Strings.FileReaderWriter_EmailSentTitle, $"{Strings.FileReaderWriter_EmailSentMessage_1}\n\n{address}\n\n{Strings.FileReaderWriter_EmailSentMessage_2}", Strings.FileReaderWriter_EmailSentDismissButton);
-            }
-            else
-            {
-                string emailFailedMessage;
-#if ANDROID
-                emailFailedMessage = Strings.FileReaderWriter_EmailFailedMessageAndroid;
-#endif
+        }
 
-#if IOS
-                emailFailedMessage = Strings.FileReaderWriter_EmailFailedMessageIOS;
-#endif
-                await Shell.Current.CurrentPage.DisplayAlert(Strings.FileReaderWriter_EmailFailedTitle, emailFailedMessage, Strings.FileReaderWriter_EmailFailedDismissButton);
-            }
-
+        private void EmailBusyPopup_Closed(object sender, CommunityToolkit.Maui.Core.PopupClosedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task MailKitSendEmail(string address, string attachmentName)

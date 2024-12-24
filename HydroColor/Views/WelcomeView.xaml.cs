@@ -12,11 +12,12 @@ public partial class WelcomeView : ContentPage
         PhysicalBackButtonPressed = welcomeViewModel.BackButtonClick;
         BindingContext = welcomeViewModel;
 
-	}
+    }
 
     protected override bool OnBackButtonPressed()
     {
 		PhysicalBackButtonPressed?.Invoke();
         return true;
     }
+
 }

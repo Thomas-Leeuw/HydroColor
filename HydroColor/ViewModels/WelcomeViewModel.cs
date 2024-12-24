@@ -2,7 +2,6 @@
 using CommunityToolkit.Mvvm.Input;
 using HydroColor.Models;
 using HydroColor.Resources.Strings;
-using Microsoft.Maui.Maps;
 using System.Collections.ObjectModel;
 
 namespace HydroColor.ViewModels

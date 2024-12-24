@@ -8,16 +8,21 @@
              xmlns:sensors="clr-namespace:Microsoft.Maui.Devices.Sensors;assembly=Microsoft.Maui.Essentials"
              xmlns:converters="clr-namespace:HydroColor.Converters"
              xmlns:strings="clr-namespace:HydroColor.Resources.Strings"
+             xmlns:views="clr-namespace:HydroColor.Views"
+             x:DataType="viewmodels:CollectDataViewModel"
              x:Class="HydroColor.Views.CollectDataView"
              Shell.NavBarIsVisible="false"
-             Title="">
+             Title=""
+             x:Name="CollectDataContentPage">
 
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior
-        EventName="Loaded"
-        Command="{Binding ViewLoadedCommand}" />
+            EventName="Loaded"
+            BindingContext="{Binding Path=BindingContext, Source={x:Reference CollectDataContentPage}, x:DataType=views:CollectDataView}"
+            Command="{Binding ViewLoadedCommand}"/>
         <toolkit:EventToCommandBehavior
             EventName="Appearing"
+            BindingContext="{Binding Path=BindingContext, Source={x:Reference CollectDataContentPage}, x:DataType=views:CollectDataView}"
             Command="{Binding ViewAppearingCommand}"/>
         <toolkit:StatusBarBehavior StatusBarColor="Black" StatusBarStyle="LightContent"/>
     </ContentPage.Behaviors>
@@ -29,12 +34,7 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <!-- The popup displayed by DisplayPromptAysnc on Android pushes the controls up instead of overlaying ontop of them-->
-    <!-- If there isn't room for the controls to be pushed out the way, it causes a huge memory leak. Seems to be a bug in .NET MAUI :( -->
-    <!-- The only solution was to wrap everything in a scroll view, presumably this allows the controls to be pushed up and out of the way-->
-    <ScrollView>
-
-        <Grid BackgroundColor="Black" x:Name="MainGrid">
+    <Grid BackgroundColor="Black">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
@@ -102,8 +102,8 @@
                 StrokeThickness="{OnPlatform 5, iOS=5, Android=3}" 
                 VerticalOptions="Center" 
                 HorizontalOptions="Center"
-                WidthRequest="{Binding Source={x:Reference GrayCardImageButton}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}}"
-                HeightRequest="{Binding Source={x:Reference GrayCardImageButton}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}}"
+                WidthRequest="{Binding Source={x:Reference GrayCardImageButton}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType='ImageButton'}"
+                HeightRequest="{Binding Source={x:Reference GrayCardImageButton}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType='ImageButton'}"
                 BackgroundColor="Transparent"
                 Stroke="{Binding GrayCardImageSquareColor}"
                 IsVisible="{Binding HaveGrayCardData}">
@@ -142,8 +142,8 @@
                 StrokeThickness="{OnPlatform 5, iOS=5, Android=3}" 
                 VerticalOptions="Center" 
                 HorizontalOptions="Center"
-                WidthRequest="{Binding Source={x:Reference WaterImageButton}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}}"
-                HeightRequest="{Binding Source={x:Reference WaterImageButton}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}}"
+                WidthRequest="{Binding Source={x:Reference WaterImageButton}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType='ImageButton'}"
+                HeightRequest="{Binding Source={x:Reference WaterImageButton}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType='ImageButton'}"
                 BackgroundColor="Transparent"
                 Stroke="{Binding WaterImageSquareColor}"
                 IsVisible="{Binding HaveWaterData}">
@@ -182,8 +182,8 @@
                 StrokeThickness="{OnPlatform 5, iOS=5, Android=3}" 
                 VerticalOptions="Center" 
                 HorizontalOptions="Center"
-                WidthRequest="{Binding Source={x:Reference SkyImageButton}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}}"
-                HeightRequest="{Binding Source={x:Reference SkyImageButton}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}}"
+                WidthRequest="{Binding Source={x:Reference SkyImageButton}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType='ImageButton'}"
+                HeightRequest="{Binding Source={x:Reference SkyImageButton}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType='ImageButton'}"
                 BackgroundColor="Transparent"
                 Stroke="{Binding SkyImageSquareColor}"
                 IsVisible="{Binding HaveSkyData}">
@@ -314,14 +314,14 @@
             </Grid>
 
             <maps:Map
-                Margin="5"
+                Margin="10"
                 Grid.Row="5"
                 Grid.ColumnSpan="3"
                 x:Name="UserLocationMap" 
                 MapType="Satellite"
                 ItemsSource="{Binding MapPins}">
                 <maps:Map.ItemTemplate>
-                    <DataTemplate>
+                <DataTemplate x:DataType="models:MapPinModel">
                         <maps:Pin 
                             Location="{Binding location}"
                             Label=" "/>
@@ -329,5 +329,4 @@
                 </maps:Map.ItemTemplate>
             </maps:Map>
         </Grid>
-    </ScrollView>
 </ContentPage>

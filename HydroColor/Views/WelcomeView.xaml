@@ -2,13 +2,18 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:strings="clr-namespace:HydroColor.Resources.Strings"
+             xmlns:vm="clr-namespace:HydroColor.ViewModels"
+             xmlns:models="clr-namespace:HydroColor.Models"
+             xmlns:views="clr-namespace:HydroColor.Views"
+             x:DataType="vm:WelcomeViewModel"
              x:Class="HydroColor.Views.WelcomeView"
              Background="Black"
              Shell.NavBarIsVisible="false"
              Shell.TabBarIsVisible="false">
 
-    <Grid RowDefinitions="*,Auto">
-        <CarouselView HorizontalOptions="FillAndExpand"
+    <Grid RowDefinitions="*,Auto" x:Name="TestGrid">
+        <CarouselView Grid.Row="0"
+                      HorizontalOptions="FillAndExpand"
                       VerticalOptions="FillAndExpand"
                       IsBounceEnabled="False"
                       Loop="True" 
@@ -18,23 +23,21 @@
                       IndicatorView="CarouselIndicator"
                       Position="{Binding CarouselPosition, Mode=TwoWay}">
             <CarouselView.ItemTemplate>
-                <DataTemplate>
+                <DataTemplate x:DataType="models:WelcomePageModel">
                     <ScrollView Orientation="Vertical">
-                        <Grid RowDefinitions="auto,*">
+                        <Grid RowDefinitions="auto,*" WidthRequest="{Binding Source={RelativeSource AncestorType={x:Type Grid}}, Path=Width, x:DataType='Grid'}">
                             <Image Grid.Row="0" Source="{Binding IntroImage}" MaximumHeightRequest="200" Margin="0,25,0,10"/>
                             <VerticalStackLayout Grid.Row="1">
                                 <Label Text="{Binding IntroTitle}"
                                    FontSize="25"
                                    Margin="0,0,0,20"
                                    HorizontalOptions="Center"/>
-                                <ScrollView Orientation="Vertical" Margin="5,0">
                                     <Label Text="{Binding IntroBody}"
-                                   
+                                   Margin="5,0"
                                    FontSize="17"
                                    HorizontalTextAlignment="Center"/>
-                                </ScrollView>
 
-                                <VerticalStackLayout IsVisible="{Binding Source={RelativeSource FindAncestor, AncestorType={x:Type ContentPage}}, Path=BindingContext.LearnMoreLinksVisible}" 
+                                <VerticalStackLayout IsVisible="{Binding LearnMoreLinksVisible, Source={RelativeSource AncestorType={x:Type vm:WelcomeViewModel}}, x:DataType=vm:WelcomeViewModel}" 
                                                  Margin="0,10,0,0">
                                     <Label Text="MISC-Lab Overview"
                                     Margin="10"
@@ -42,7 +45,7 @@
                                     TextColor="LightGray"
                                     TextDecorations="Underline">
                                         <Label.GestureRecognizers>
-                                            <TapGestureRecognizer  Command="{Binding Source={RelativeSource FindAncestor, AncestorType={x:Type ContentPage}}, Path=BindingContext.LinkClickedCommand}"
+                                            <TapGestureRecognizer  Command="{Binding LinkClickedCommand, Source={RelativeSource AncestorType={x:Type vm:WelcomeViewModel}}, x:DataType=vm:WelcomeViewModel}"
                                                                CommandParameter="https://misclab.umeoce.maine.edu/research/HydroColor.php"/>
                                         </Label.GestureRecognizers>
                                     </Label>
@@ -52,7 +55,7 @@
                                     TextColor="LightGray"
                                     TextDecorations="Underline">
                                         <Label.GestureRecognizers>
-                                            <TapGestureRecognizer  Command="{Binding Source={RelativeSource FindAncestor, AncestorType={x:Type ContentPage}}, Path=BindingContext.LinkClickedCommand}"
+                                            <TapGestureRecognizer  Command="{Binding LinkClickedCommand, Source={RelativeSource AncestorType={x:Type vm:WelcomeViewModel}}, x:DataType=vm:WelcomeViewModel}"
                                                                CommandParameter="https://www.mdpi.com/1424-8220/18/1/256"/>
                                         </Label.GestureRecognizers>
                                     </Label>
@@ -62,7 +65,7 @@
                                     TextColor="LightGray"
                                     TextDecorations="Underline">
                                         <Label.GestureRecognizers>
-                                            <TapGestureRecognizer  Command="{Binding Source={RelativeSource FindAncestor, AncestorType={x:Type ContentPage}}, Path=BindingContext.LinkClickedCommand}"
+                                            <TapGestureRecognizer  Command="{Binding LinkClickedCommand, Source={RelativeSource AncestorType={x:Type vm:WelcomeViewModel}}, x:DataType=vm:WelcomeViewModel}"
                                                                CommandParameter="https://github.com/Thomas-Leeuw/HydroColor"/>
                                         </Label.GestureRecognizers>
                                     </Label>
@@ -72,7 +75,7 @@
 
                             </VerticalStackLayout>
                         </Grid>
-                    </ScrollView>
+                    </ScrollView> 
                 </DataTemplate>
             </CarouselView.ItemTemplate>
         </CarouselView>
@@ -95,7 +98,7 @@
                     HorizontalOptions="End"
                     WidthRequest="75" Margin="0,10,0,0"/>
 
-            <VerticalStackLayout HorizontalOptions="Center" Margin="0,10,0,0">
+            <VerticalStackLayout HorizontalOptions="Center" Margin="0,10,0,0" Spacing="12">
                 <IndicatorView x:Name="CarouselIndicator" 
                            IndicatorsShape="Circle"
                            IndicatorSize="12"
@@ -103,12 +106,12 @@
                            SelectedIndicatorColor="White"
                            HorizontalOptions="Center"/>
 
-                <HorizontalStackLayout HorizontalOptions="Center">
+                <HorizontalStackLayout HorizontalOptions="Center" Spacing="5">
                     <CheckBox VerticalOptions="Center" 
                               IsChecked="{Binding HideWelcomeScreenChecked, Mode=TwoWay}" 
                               Color="White"/>
                     <Label Text="{x:Static strings:Strings.Welcome_DontShowIntroAgainCheckbox}" 
-                           FontSize="12" 
+                           FontSize="13" 
                            VerticalOptions="Center"/>
                 </HorizontalStackLayout>
             </VerticalStackLayout>

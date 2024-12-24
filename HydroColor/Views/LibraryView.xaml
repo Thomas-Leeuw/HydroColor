@@ -3,14 +3,19 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewmodels="clr-namespace:HydroColor.ViewModels"
+             xmlns:models="clr-namespace:HydroColor.Models"
              xmlns:strings="clr-namespace:HydroColor.Resources.Strings"
-             x:Class="HydroColor.Views.LibraryView"
+             xmlns:views="clr-namespace:HydroColor.Views"
+             x:Class="HydroColor.Views.LibraryView"                         
+             x:DataType="viewmodels:LibraryViewModel"
              Shell.NavBarIsVisible="False"
-             Title="">
+             Title=""
+             x:Name="LibraryContentPage">
 
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior
         EventName="Appearing"
+        BindingContext="{Binding Path=BindingContext, Source={x:Reference LibraryContentPage}, x:DataType=views:LibraryView}"
         Command="{Binding ViewAppearingCommand}" />
     </ContentPage.Behaviors>
 
@@ -47,11 +52,12 @@
             <ListView.Behaviors>
                 <toolkit:EventToCommandBehavior
                 EventName="ItemTapped"
+                BindingContext="{Binding Path=BindingContext, Source={x:Reference LibraryContentPage}, x:DataType=views:LibraryView}"
                 Command="{Binding ItemTappedCommand}"
                 x:TypeArguments="ItemTappedEventArgs"/>
             </ListView.Behaviors>
             <ListView.ItemTemplate>
-                <DataTemplate>
+                <DataTemplate x:DataType="models:DataLibraryItem">
                     <ViewCell>
 
                         <Grid RowDefinitions="*,*" ColumnDefinitions="75,*" Padding="5">
@@ -67,9 +73,9 @@
                                     TextColor="White" 
                                     HorizontalOptions="End" 
                                     CornerRadius="0"
-                                    Command="{Binding Source={RelativeSource FindAncestor, AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteItemCommand}"
+                                    Command="{Binding DeleteItemCommand, Source={RelativeSource AncestorType={x:Type viewmodels:LibraryViewModel}}, x:DataType=viewmodels:LibraryViewModel}"
                                     CommandParameter="{Binding}"
-                                    IsVisible="{Binding Source={RelativeSource FindAncestor, AncestorType={x:Type ContentPage}}, Path=BindingContext.ShowDeleteMeasurementsButtons}"/>
+                                    IsVisible="{Binding ShowDeleteMeasurementsButtons, Source={RelativeSource AncestorType={x:Type viewmodels:LibraryViewModel}}, x:DataType=viewmodels:LibraryViewModel}"/>
                             <Image 
                                     Source="right_arrow.png"
                                     Grid.Column="1" 
@@ -78,7 +84,7 @@
                                     HorizontalOptions="End"
                                     Aspect="AspectFit"
                                     HeightRequest="15"
-                                    IsVisible="{Binding Source={RelativeSource FindAncestor, AncestorType={x:Type ContentPage}}, Path=BindingContext.ShowDeleteMeasurementsButtons, Converter={StaticResource InvertedBoolConverter}}" />
+                                    IsVisible="{Binding ShowDeleteMeasurementsButtons, Converter={StaticResource InvertedBoolConverter}, Source={RelativeSource AncestorType={x:Type viewmodels:LibraryViewModel}}, x:DataType=viewmodels:LibraryViewModel}" />
                         </Grid>
                     </ViewCell>
                 </DataTemplate>

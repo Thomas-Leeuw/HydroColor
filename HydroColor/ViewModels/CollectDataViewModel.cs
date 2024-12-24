@@ -92,48 +92,47 @@ namespace HydroColor.ViewModels
         bool sunElevationAngleWarningVisible;
 
         private CancellationTokenSource _cancelTokenSource;
-
+        private bool _viewLoaded = false;
 
         public CollectDataViewModel()
         {
+
             ResetImageCapture();
             Shell.Current.Window.Resumed += Window_Resumed;
 
             VersionCorrections.UpdateTo2p1DataFileFormatIfNeeded();
         }
 
-        private void Window_Resumed(object sender, EventArgs e)
+        private async void Window_Resumed(object sender, EventArgs e)
         {
             CurrentLocation = new Location();
             CurrentLocation.Accuracy = 0;
             OnPropertyChanged(nameof(CurrentLocation));
-            GetCurrentLocation();
+            await GetCurrentLocation();
         }
 
         [RelayCommand]
         async Task ViewLoaded()
         {
-            CurrentLocation = new Location();
-            CurrentLocation.Accuracy = 0;
-            OnPropertyChanged(nameof(CurrentLocation));
-            MoveMapLocationAction(new MapSpan(new Location { Longitude = 0, Latitude = 0 }, 180, 180));
-            GetCurrentLocation();
-
+            // Loaded event is firing every time we navigate to the tab, event though it is registered as singleton.
+            // Not sure why.
+            // We only need to run this once at startup.
+            if (!_viewLoaded) 
+            {
+                _viewLoaded = true;
+                CurrentLocation = new Location();
+                CurrentLocation.Accuracy = 0;
+                OnPropertyChanged(nameof(CurrentLocation));
+                MoveMapLocationAction(new MapSpan(new Location { Longitude = 0, Latitude = 0 }, 180, 180));
+                await GetCurrentLocation();
+            }
+            
         }
 
         [RelayCommand]
         void ViewAppearing()
         {
             CheckSunElevationAngle();
-
-            // Workaround for bug in .net MAUI. Images are disappearing after tab navigation.
-            // Need to reload images each time the view appears.
-            // Only a problem on Android devices
-            #if ANDROID
-            OnGrayCardImageDataChanged(GrayCardImageData);
-            OnWaterImageDataChanged(WaterImageData);
-            OnSkyImageDataChanged(SkyImageData);
-            #endif
         }
 
         void ResetImageCapture()
@@ -209,6 +208,7 @@ namespace HydroColor.ViewModels
         [RelayCommand(CanExecute = nameof(CanCheckLocation))]
         async Task GetCurrentLocation()
         {
+            
             try
             {
                 CanCheckLocation = false;

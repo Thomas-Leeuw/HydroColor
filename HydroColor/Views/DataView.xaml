@@ -115,13 +115,14 @@
                        FontSize="18" />
         </Grid>
 
-        <Frame Grid.Row="3" Grid.ColumnSpan="3" BackgroundColor="Black" Margin="10" CornerRadius="5" BorderColor="DarkGray">
-            <ScrollView BackgroundColor="Black" HorizontalOptions="CenterAndExpand" VerticalScrollBarVisibility="Always" Orientation="Vertical">
+        <Border Grid.Row="3" Grid.ColumnSpan="3" BackgroundColor="DarkGray" Margin="10" StrokeShape="RoundRectangle 10,10,10,10" HorizontalOptions="Center">
+            <ScrollView BackgroundColor="Black" HorizontalOptions="CenterAndExpand" VerticalScrollBarVisibility="Always" Orientation="Vertical" Padding="10">
                 <Grid ColumnSpacing="8" RowSpacing="2" RowDefinitions="auto,auto,auto,auto,auto,auto,auto,auto,auto,auto" ColumnDefinitions="auto,auto,auto" HorizontalOptions="Center">
 
                     <Grid.Resources>
                         <Style TargetType="Label">
                             <Setter Property="FontSize" Value="18"/>
+                            <Setter Property="TextColor" Value="White"/>
                         </Style>
                     </Grid.Resources>
 
@@ -174,7 +175,7 @@
 
                 </Grid>
             </ScrollView>
-        </Frame>
+        </Border>
 
 
 
@@ -209,8 +210,8 @@
                 StrokeThickness="{OnPlatform 5, iOS=5, Android=3}" 
                 VerticalOptions="Center" 
                 HorizontalOptions="Center"
-                WidthRequest="{Binding Source={x:Reference GrayCardImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}}"
-                HeightRequest="{Binding Source={x:Reference GrayCardImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}}"
+                WidthRequest="{Binding Source={x:Reference GrayCardImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType='Image'}"
+                HeightRequest="{Binding Source={x:Reference GrayCardImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType='Image'}"
                 Stroke="{Binding GrayCardImageSquareColor}"
                 BackgroundColor="Transparent">
             <Border.StrokeShape>
@@ -232,8 +233,8 @@
                 StrokeThickness="{OnPlatform 5, iOS=5, Android=3}" 
                 VerticalOptions="Center" 
                 HorizontalOptions="Center"
-                WidthRequest="{Binding Source={x:Reference WaterImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}}"
-                HeightRequest="{Binding Source={x:Reference WaterImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}}"
+                WidthRequest="{Binding Source={x:Reference WaterImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType='Image'}"
+                HeightRequest="{Binding Source={x:Reference WaterImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType='Image'}"
                 Stroke="{Binding WaterImageSquareColor}"
                 BackgroundColor="Transparent">
             <Border.StrokeShape>
@@ -254,8 +255,8 @@
                 StrokeThickness="{OnPlatform 5, iOS=5, Android=3}" 
                 VerticalOptions="Center" 
                 HorizontalOptions="Center"
-                WidthRequest="{Binding Source={x:Reference SkyImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}}"
-                HeightRequest="{Binding Source={x:Reference SkyImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}}"
+                WidthRequest="{Binding Source={x:Reference SkyImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType='Image'}"
+                HeightRequest="{Binding Source={x:Reference SkyImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType='Image'}"
                 Stroke="{Binding SkyImageSquareColor}"
                 BackgroundColor="Transparent">
             <Border.StrokeShape>
