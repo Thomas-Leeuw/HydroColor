@@ -1,32 +1,36 @@
-﻿using HydroColor.Models;
+﻿#if ANDROID
+using CameraController = HydroColor.Platforms.Android.CameraController;
+#elif IOS
+using CameraController = HydroColor.Platforms.iOS.CameraController;
+#endif
 
 namespace HydroColor.ViewModels
 {
     public class CameraPreview : View
     {
-        public event EventHandler ImageCaptureRequested;
-        public event EventHandler CameraDidNotOpen;
-
-        public void CaptureImage()
-        {
-            ImageCaptureRequested?.Invoke(this, EventArgs.Empty);
-        }
-
-        public static readonly BindableProperty CapturedImageDataProperty = BindableProperty.Create(
-        propertyName: nameof(CapturedImageData),
-        returnType: typeof(HydroColorRawImageData),
+        public static readonly BindableProperty LayoutFinishedProperty = BindableProperty.Create(
+        propertyName: nameof(LayoutFinished),
+        returnType: typeof(bool),
         declaringType: typeof(CameraPreview),
-        defaultValue: null);
-
-        public HydroColorRawImageData CapturedImageData
+        defaultValue: false,
+        defaultBindingMode: BindingMode.OneWayToSource);
+        public bool LayoutFinished
         {
-            get { return (HydroColorRawImageData)GetValue(CapturedImageDataProperty); }
-            set { SetValue(CapturedImageDataProperty, value); }
+            get { return (bool)GetValue(LayoutFinishedProperty); }
+            set { SetValue(LayoutFinishedProperty, value); }
         }
 
-        public void CameraFailedToOpen()
+        public static readonly BindableProperty CameraControlProperty = BindableProperty.Create(
+        propertyName: nameof(CameraControl),
+        returnType: typeof(CameraController),
+        declaringType: typeof(CameraPreview),
+        defaultValue: null,
+        defaultBindingMode: BindingMode.TwoWay);
+
+        public CameraController CameraControl
         {
-            CameraDidNotOpen(this,EventArgs.Empty);
+            get { return (CameraController)GetValue(CameraControlProperty); }
+            set { SetValue(CameraControlProperty, value); }
         }
     }
 }

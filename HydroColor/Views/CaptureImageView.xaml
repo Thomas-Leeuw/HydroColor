@@ -11,7 +11,8 @@
              Title="{Binding ImageType.DisplayName}"
              Shell.TabBarIsVisible="false"
              Shell.NavBarIsVisible="true"
-             x:Name="CaptureImageContentPage">
+             x:Name="CaptureImageContentPage"
+             Unloaded="CaptureImageContentPage_Unloaded">
 
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior
@@ -80,13 +81,8 @@
             Grid.Row="0" 
             Grid.Column="1" 
             Margin="20"
-            CapturedImageData="{Binding ImageData, Mode=TwoWay}">
-            <viewmodels:CameraPreview.Behaviors>
-                <toolkit:EventToCommandBehavior
-                    EventName="CameraDidNotOpen"
-                    BindingContext="{Binding Path=BindingContext, Source={x:Reference CaptureImageContentPage}, x:DataType=views:CaptureImageView}"
-                    Command="{Binding CameraDidNotOpenCommand}"/>
-            </viewmodels:CameraPreview.Behaviors>
+            LayoutFinished="{Binding CameraPreviewLayoutFinished}"
+            CameraControl="{Binding CamControl}">
         </viewmodels:CameraPreview>
 
         <Border Grid.Row="0" Grid.Column="1" 

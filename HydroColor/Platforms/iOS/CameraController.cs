@@ -49,22 +49,14 @@ namespace HydroColor.Platforms.iOS
             };
         }
 
-        public async Task<bool> OpenCamera()
+        public bool OpenCamera()
         {
 
             // Get rear facing camera
             mCameraDevice = AVCaptureDevice.GetDefaultDevice(AVCaptureDeviceType.BuiltInWideAngleCamera, AVMediaTypes.Video, AVCaptureDevicePosition.Back);
             if (mCameraDevice == null)
             {
-                await Shell.Current.CurrentPage.DisplayAlert(Strings.CameraController_NoCameraTitle, Strings.CameraController_NoCameraMessage, Strings.CameraController_NoCameraDismissButton);
-                return false;
-            }
-
-            // Check camera permission
-            PermissionStatus permissionStatus = await HardwarePermissions.RequestPermission<Camera>();
-            if (permissionStatus != PermissionStatus.Granted)
-            {
-                return false;
+                throw new System.NotSupportedException("No camera found on the device");
             }
 
             // Create capture session
@@ -84,8 +76,7 @@ namespace HydroColor.Platforms.iOS
             }
             else
             {
-                await Shell.Current.CurrentPage.DisplayAlert("Camera Session", "A camera session could not be opened.", "OK");
-                return false;
+                throw new System.InvalidOperationException("A camera capture session could not be opened.");
             }
             mCaptureSession.CommitConfiguration();
 
@@ -122,14 +113,14 @@ namespace HydroColor.Platforms.iOS
 
             if (!rawFormatSupported)
             {
-                throw new System.NotSupportedException("Raw camera sensor data is not supported");
+                throw new System.NotSupportedException("Raw camera sensor data is not supported on your device");
             }
 
             // Use Jpeg for the processed photo type
             int jpegIndex = Array.FindIndex(mPhotoOutput.AvailablePhotoCodecTypes, x => x.ToLower().Contains("jpeg"));
             if (jpegIndex < 0)
             {
-                throw new System.NotSupportedException("jpeg images are not supported");
+                throw new System.NotSupportedException("jpeg images are not supported on your device");
             }
             var ProcessedFormat = new NSDictionary<NSString, NSObject>(AVVideo.CodecKey, new NSString(mPhotoOutput.AvailablePhotoCodecTypes[jpegIndex]));
 

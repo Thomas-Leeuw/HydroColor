@@ -6,6 +6,12 @@ using HydroColor.Resources.Strings;
 using HydroColor.Services;
 using HydroColor.Views;
 using System.Numerics;
+using static Microsoft.Maui.ApplicationModel.Permissions;
+#if ANDROID
+using CameraController = HydroColor.Platforms.Android.CameraController;
+#elif IOS
+using CameraController = HydroColor.Platforms.iOS.CameraController;
+#endif
 
 namespace HydroColor.ViewModels
 {
@@ -25,9 +31,6 @@ namespace HydroColor.ViewModels
 
         [ObservableProperty]
         HydroColorImageType imageType;
-
-        [ObservableProperty]
-        HydroColorRawImageData imageData;
 
         [ObservableProperty]
         Location currentLocation;
@@ -65,19 +68,54 @@ namespace HydroColor.ViewModels
         [ObservableProperty]
         Color captureButtonColor = Colors.White;
 
-        double magneticDeclination;
+        [ObservableProperty]
+        bool cameraPreviewLayoutFinished;
 
-        public Action CaptureImage;
+        [ObservableProperty]
+        CameraController camControl = new CameraController();
+
+        double magneticDeclination;
 
         HydroColorImageCaptureModel CapturedImageData;
 
         // used to correct a 180 flip in the compass above certain device tilt
         double compassHeadingCorrection = 0;
 
-        [RelayCommand]
-        void CameraDidNotOpen()
+        public CaptureImageViewModel()
         {
-            Shell.Current.GoToAsync($"..", true);
+            camControl.ImageCaptureCompletedEvent += ImageCaptureCompleted;
+        }
+
+        async partial void OnCameraPreviewLayoutFinishedChanged(bool value)
+        {
+            // Check camera permission
+            PermissionStatus permissionStatus = await HardwarePermissions.RequestPermission<Camera>();
+            if (permissionStatus != PermissionStatus.Granted)
+            {
+                await Shell.Current.GoToAsync($"..", true);
+                return;
+            }
+
+            try
+            {
+                CamControl.OpenCamera();
+            }
+            catch (NotSupportedException)
+            {
+                await Shell.Current.CurrentPage.DisplayAlert(Strings.CameraController_NoCameraTitle, Strings.CameraController_NoCameraMessage, Strings.CameraController_NoCameraDismissButton);
+                await Shell.Current.GoToAsync($"..", true);
+            }
+            catch (InvalidOperationException)
+            {
+                await Shell.Current.CurrentPage.DisplayAlert("Camera Session", "A camera session could not be opened.", "OK");
+                await Shell.Current.GoToAsync($"..", true);
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.CurrentPage.DisplayAlert("Camera Error", ex.Message, "OK");
+                await Shell.Current.GoToAsync($"..", true);
+            }
+
         }
 
         [RelayCommand]
@@ -110,6 +148,7 @@ namespace HydroColor.ViewModels
         {
             ToggleCompass(SensorControl.STOP);
             ToggleOrientation(SensorControl.STOP);
+            CamControl.CloseCamera();
         }
 
         [RelayCommand]
@@ -137,8 +176,9 @@ namespace HydroColor.ViewModels
         }
 
         [RelayCommand]
-        void CaptureButton()
+        async Task CaptureButton()
         {
+
             WaitingForImageResults = true;
             CapturedImageData = new();
 
@@ -154,25 +194,26 @@ namespace HydroColor.ViewModels
             ToggleOrientation(SensorControl.STOP);
             try
             {
-                CaptureImage();
-                // Wait for OnImageDataChanged callback
+                CamControl.TakeRAWImage();
+                // Wait for ImageCaptureCompleted callback
             }
             catch (NotSupportedException ex)
             {
-                Shell.Current.CurrentPage.DisplayAlert("Camera Not Supported", ex.Message, "OK");
-                Shell.Current.GoToAsync($"..", true);
+                await Shell.Current.CurrentPage.DisplayAlert("Camera Not Supported", ex.Message, "OK");
+                await Shell.Current.GoToAsync($"..", true);
             }
             catch(Exception ex)
             {
-                Shell.Current.CurrentPage.DisplayAlert("Camera Error", ex.Message, "OK");
-                Shell.Current.GoToAsync($"..", true);
+                await Shell.Current.CurrentPage.DisplayAlert("Camera Error", ex.Message, "OK");
+                await Shell.Current.GoToAsync($"..", true);
             }
             
         }
 
-        async partial void OnImageDataChanged(HydroColorRawImageData value)
+
+        async void ImageCaptureCompleted(object sender, ImageCaptureEventArgs e)
         {
-            if (value != null)
+            if (e.ImageData != null)
             {
                 await Task.Factory.StartNew(() => 
                 { 
@@ -183,11 +224,11 @@ namespace HydroColor.ViewModels
                     BayerPatternDemosaic BPD = new BayerPatternDemosaic();
 
                     // Convert Byte array to Uint16 values (and reshape into 2d array).
-                    UInt16[,] reshapedImageData = new UInt16[ImageData.ImageHeight, ImageData.RowStride / 2];
-                    Buffer.BlockCopy(ImageData.RawImagePixelData, 0, reshapedImageData, 0, ImageData.ImageHeight * ImageData.RowStride);
+                    UInt16[,] reshapedImageData = new UInt16[e.ImageData.ImageHeight, e.ImageData.RowStride / 2];
+                    Buffer.BlockCopy(e.ImageData.RawImagePixelData, 0, reshapedImageData, 0, e.ImageData.ImageHeight * e.ImageData.RowStride);
 
                     // Demosaic Bayer filter pattern
-                    ColorChannelData<UInt16[,]> RGBImages = BPD.Bayer2RGB(reshapedImageData, ImageData.ImageHeight, ImageData.ImageWidth, ImageData.BayerFilterPattern);
+                    ColorChannelData<UInt16[,]> RGBImages = BPD.Bayer2RGB(reshapedImageData, e.ImageData.ImageHeight, e.ImageData.ImageWidth, e.ImageData.BayerFilterPattern);
 
                     // Only use the center of the image. Take a square at the center 1/4 the size of the smallest dimension.
                     int minDimension = Math.Min(RGBImages.Red.GetLength(0), RGBImages.Red.GetLength(1));
@@ -195,15 +236,15 @@ namespace HydroColor.ViewModels
                     CapturedImageData.MedianPixelValue.Green = BPD.GetMedian(RGBImages.Green, minDimension / 4);
                     CapturedImageData.MedianPixelValue.Blue = BPD.GetMedian(RGBImages.Blue, minDimension / 4);
 
-                    CapturedImageData.BlackLevel = ImageData.BlackLevel;
-                    CapturedImageData.SensorSensitivity = ImageData.SensorSensitivity;
-                    CapturedImageData.ExposureTime = ImageData.ExposureTime;
-                    CapturedImageData.JpegImage = ImageData.JpegImage;
-                    CapturedImageData.BayerFilterPattern = ImageData.BayerFilterPattern;
+                    CapturedImageData.BlackLevel = e.ImageData.BlackLevel;
+                    CapturedImageData.SensorSensitivity = e.ImageData.SensorSensitivity;
+                    CapturedImageData.ExposureTime = e.ImageData.ExposureTime;
+                    CapturedImageData.JpegImage = e.ImageData.JpegImage;
+                    CapturedImageData.BayerFilterPattern = e.ImageData.BayerFilterPattern;
 
                     // clearing out the very large ImageData and RGBImages instances (Should go out of scope and be garbage collected regardless).
                     RGBImages = null;
-                    ImageData = null;
+                    e.ImageData = null;
 
                     // Was getting intermittitent error on Android: 'Only the original thread that created a view hierarchy can touch its views'
                     // invoking this on the main thread seems to have solved this issue, but not 100% certain

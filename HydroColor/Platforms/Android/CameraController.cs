@@ -27,7 +27,7 @@ namespace HydroColor.Platforms.Android
 
         readonly object mCameraStateLock = new object();
         CameraDevice mCameraDevice;
-        public CameraCharacteristics mCharacteristics;
+        CameraCharacteristics mCharacteristics;
 
         CameraCaptureSession mCaptureSession;
         CaptureRequest mCaptureRequest;
@@ -40,7 +40,24 @@ namespace HydroColor.Platforms.Android
         TotalCaptureResult mTotalCaptureResult;
         public HydroColorRawImageData mImageDataModel;
 
-        public async Task<bool> OpenCamera()
+        public CameraCharacteristics GetRearFacingCameraCharacteristics()
+        {
+            // Search for a compatible camera 
+            CameraManager cameraManager = (CameraManager)Platform.CurrentActivity.GetSystemService(Context.CameraService);
+            string cameraID = GetCompatibleCameraID(cameraManager);
+
+            if (string.IsNullOrEmpty(cameraID))
+            {
+                return null;
+            }
+            else
+            {
+                return cameraManager.GetCameraCharacteristics(cameraID);
+            }
+
+        }
+
+        public bool OpenCamera()
         {
 
             // Search for a compatible camera 
@@ -48,18 +65,10 @@ namespace HydroColor.Platforms.Android
             string cameraID = GetCompatibleCameraID(cameraManager);
             if (string.IsNullOrEmpty(cameraID))
             {
-                await Shell.Current.CurrentPage.DisplayAlert(Strings.CameraController_NoCameraTitle, Strings.CameraController_NoCameraMessage, Strings.CameraController_NoCameraDismissButton);
-                return false;
+                throw new System.NotSupportedException("No camera found on the device");
             }
 
             mCharacteristics = cameraManager.GetCameraCharacteristics(cameraID);
-
-            // Check camera permission
-            PermissionStatus permissionStatus = await HardwarePermissions.RequestPermission<Permissions.Camera>();
-            if (permissionStatus != PermissionStatus.Granted)
-            {
-                return false;
-            }
 
             CameraStateListener StateCallback = new CameraStateListener
             {

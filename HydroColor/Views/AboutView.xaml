@@ -20,7 +20,7 @@
                    FontSize="30"
                    VerticalOptions="Center"
                    VerticalTextAlignment="Center"/>
-                <Label Text="{x:Static strings:Strings.About_HydroColorTitle}"
+                <Label Text="{x:Static strings:Strings.About_HydroColorSubtitle}"
                    FontSize="20"
                    VerticalOptions="Center"
                    VerticalTextAlignment="Center"/>
