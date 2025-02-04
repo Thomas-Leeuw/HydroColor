@@ -2,7 +2,6 @@
 using Android.Runtime;
 using Android.Util;
 using Android.Views;
-using Color = Android.Graphics.Color;
 
 namespace HydroColor.Platforms.Android
 {
@@ -10,7 +9,6 @@ namespace HydroColor.Platforms.Android
     {
         int mRatioWidth = 0;
         int mRatioHeight = 0;
-        readonly object locker = new object();
 
         public AutoFitTextureView(Context context) : this(context, null)
         {
@@ -61,23 +59,6 @@ namespace HydroColor.Platforms.Android
                 {
                     SetMeasuredDimension(height * mRatioWidth / mRatioHeight, height);
                 }
-            }
-        }
-
-        public void ClearCanvas(Color color)
-        {
-            using var canvas = LockCanvas(null);
-            lock (locker)
-            {
-                try
-                {
-                    canvas.DrawColor(color);
-                }
-                finally
-                {
-                    UnlockCanvasAndPost(canvas);
-                }
-                Invalidate();
             }
         }
     }

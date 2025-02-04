@@ -86,6 +86,7 @@ namespace HydroColor.ViewModels
             camControl.ImageCaptureCompletedEvent += ImageCaptureCompleted;
         }
 
+        // need to wait for the layout to finish before opening the camera
         async partial void OnCameraPreviewLayoutFinishedChanged(bool value)
         {
             // Check camera permission

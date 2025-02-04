@@ -6,6 +6,7 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:strings="clr-namespace:HydroColor.Resources.Strings"
              xmlns:views="clr-namespace:HydroColor.Views"
+             xmlns:controls="clr-namespace:HydroColor.Controls"
              x:DataType="viewmodels:CaptureImageViewModel"
              x:Class="HydroColor.Views.CaptureImageView"
              Title="{Binding ImageType.DisplayName}"
@@ -76,21 +77,21 @@
             FontSize="22"
             IsVisible="{Binding ShowNumericTiltAndHeading}"/>
 
-        <viewmodels:CameraPreview
+        <controls:CameraPreview
             x:Name="cameraPreview"
             Grid.Row="0" 
             Grid.Column="1" 
             Margin="20"
             LayoutFinished="{Binding CameraPreviewLayoutFinished}"
             CameraControl="{Binding CamControl}">
-        </viewmodels:CameraPreview>
+        </controls:CameraPreview>
 
         <Border Grid.Row="0" Grid.Column="1" 
                 StrokeThickness="{OnPlatform 8, iOS=8, Android=4}" 
                 VerticalOptions="Center" 
                 HorizontalOptions="Center"
-                WidthRequest="{Binding Source={x:Reference cameraPreview}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType=viewmodels:CameraPreview}"
-                HeightRequest="{Binding Source={x:Reference cameraPreview}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType=viewmodels:CameraPreview}"
+                WidthRequest="{Binding Source={x:Reference cameraPreview}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType=controls:CameraPreview}"
+                HeightRequest="{Binding Source={x:Reference cameraPreview}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType=controls:CameraPreview}"
                 BackgroundColor="Transparent"
                 Stroke="{Binding CaptureButtonColor}">
             <Border.StrokeShape>

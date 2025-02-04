@@ -2,7 +2,7 @@
 
 namespace HydroColor.Platforms.iOS
 {
-    public class CustomCameraView : UIView
+    public class NativeCameraView : UIView
     {
         public event EventHandler LayoutFinishedEvent;
 

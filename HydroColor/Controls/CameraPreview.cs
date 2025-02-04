@@ -4,7 +4,7 @@ using CameraController = HydroColor.Platforms.Android.CameraController;
 using CameraController = HydroColor.Platforms.iOS.CameraController;
 #endif
 
-namespace HydroColor.ViewModels
+namespace HydroColor.Controls
 {
     public class CameraPreview : View
     {

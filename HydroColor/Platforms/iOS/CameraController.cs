@@ -5,9 +5,6 @@ using CoreImage;
 using CoreVideo;
 using Foundation;
 using HydroColor.Models;
-using HydroColor.Resources.Strings;
-using HydroColor.Services;
-using static Microsoft.Maui.ApplicationModel.Permissions;
 
 namespace HydroColor.Platforms.iOS
 {
@@ -15,8 +12,7 @@ namespace HydroColor.Platforms.iOS
     {
         public event EventHandler<ImageCaptureEventArgs> ImageCaptureCompletedEvent;
 
-        public CALayer UILayer;
-        public CGRect UIBounds;
+        public CALayer mCALayer;
 
         HydroColorRawImageData mImageData = new();
 
@@ -47,6 +43,16 @@ namespace HydroColor.Platforms.iOS
                     OnImageAvailable(photo);
                 }
             };
+        }
+
+        public void SetCALayer(CALayer layer)
+        {
+            mCALayer = layer;
+        }
+
+        public CALayer GetCALayer()
+        {
+            return mCALayer;
         }
 
         public bool OpenCamera()
@@ -82,11 +88,11 @@ namespace HydroColor.Platforms.iOS
 
             mPreviewLayer = new AVCaptureVideoPreviewLayer(mCaptureSession)
             {
-                Frame = UIBounds,
+                Frame = mCALayer.Bounds,
                 VideoGravity = AVLayerVideoGravity.ResizeAspect,
             };
   
-            UILayer.AddSublayer(mPreviewLayer);
+            mCALayer.AddSublayer(mPreviewLayer);
             mCaptureSession.StartRunning();
 
             return true;

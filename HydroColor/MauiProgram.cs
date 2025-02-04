@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui;
+using HydroColor.Controls;
 using HydroColor.ViewModels;
 using HydroColor.Views;
 
@@ -20,12 +21,12 @@ public static class MauiProgram
             })
             .ConfigureMauiHandlers(handlers =>
             {
-                handlers.AddHandler(typeof(CameraPreview), typeof(Handlers.CameraPreviewHandler));
+                handlers.AddHandler<CameraPreview, Handlers.CameraPreviewHandler>();
 
 #if IOS
                 // Added a custom shell to disable animation when switching tabs.
                 // The animation was causing a flicker when switching tabs on iOS.
-                handlers.AddHandler(typeof(Shell), typeof(HydroColor.Platforms.iOS.CustomShell));
+                handlers.AddHandler<Shell, Platforms.iOS.CustomShell>();
 #endif
             });
 

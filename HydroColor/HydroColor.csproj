@@ -19,30 +19,14 @@
 		<ApplicationIdGuid>40AF2490-DBFC-4C69-83AF-7F0E312CDDE2</ApplicationIdGuid>
 
 		<!-- Versions -->
-		<ApplicationDisplayVersion>2.3</ApplicationDisplayVersion>
-		<ApplicationVersion>6</ApplicationVersion>
+		<ApplicationDisplayVersion>2.4</ApplicationDisplayVersion>
+		<ApplicationVersion>7</ApplicationVersion>
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(TargetFramework)'=='net9.0-ios' and '$(Configuration)' == 'Debug'">
-	  <CodesignKey>Apple Development: Created via API (S4222GC659)</CodesignKey>
-	  <CodesignProvision>VS: WildCard Development</CodesignProvision>
-	</PropertyGroup>
-  
-  <PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Release'">
-		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
-		<CodesignKey>Apple Distribution: Thomas Leeuw (QYE35RULW5)</CodesignKey>
-		<CodesignProvision>HydroColorProvProfile</CodesignProvision>
-	</PropertyGroup>
-  
-  <PropertyGroup Condition="'$(TargetFramework)'=='net9.0-ios'">
-    <ProvisioningType>automatic</ProvisioningType>
-    <CodesignKey>Apple Development: Created via API (S4222GC659)</CodesignKey>
-    <CodesignProvision>VS: com.H2Optics.HydroColor Development</CodesignProvision>
-  </PropertyGroup>
-  
+
 
   <ItemGroup>
 		<!-- App Icon -->

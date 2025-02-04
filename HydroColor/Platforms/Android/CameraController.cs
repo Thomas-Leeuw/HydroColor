@@ -10,16 +10,17 @@ using Android.Graphics;
 using Android.Content;
 using HydroColor.Models;
 using HydroColor.Platforms.Android.Callbacks;
-using HydroColor.Services;
-using HydroColor.Resources.Strings;
+using Java.Util;
+using Java.Lang;
 
 namespace HydroColor.Platforms.Android
 {
     public class CameraController
     {
         public event EventHandler<ImageCaptureEventArgs> ImageCaptureCompletedEvent;
+        public HydroColorRawImageData mImageDataModel;
 
-        public AutoFitTextureView mTextureView;
+        AutoFitTextureView mTextureView;
         Surface mOutputSurface;
 
         HandlerThread mBackgroundThread;
@@ -38,7 +39,6 @@ namespace HydroColor.Platforms.Android
         ImageReader mRawImageReader;
 
         TotalCaptureResult mTotalCaptureResult;
-        public HydroColorRawImageData mImageDataModel;
 
         public CameraCharacteristics GetRearFacingCameraCharacteristics()
         {
@@ -350,7 +350,96 @@ namespace HydroColor.Platforms.Android
             };
 
             ImageCaptureCompletedEvent.Invoke(this, capArgs);
-    }
+        }
+
+        public void SetTextureView(AutoFitTextureView textureView)
+        {
+            mTextureView = textureView;
+            ConfigureTextureViewSize(GetRearFacingCameraCharacteristics());
+        }
+
+        public AutoFitTextureView GetTextureView()
+        {
+            return mTextureView;
+        }
+
+        Size ConfigureTextureViewSize(CameraCharacteristics cameraCharacteristics)
+        {
+            if (cameraCharacteristics == null)
+            {
+                return new Size(0, 0);
+            }
+
+            var map = (StreamConfigurationMap)cameraCharacteristics.Get(CameraCharacteristics.ScalerStreamConfigurationMap);
+
+            // For still image captures, we always use the largest available size.
+            Size largestJpeg = (Size)Collections.Max(Arrays.AsList(map.GetOutputSizes((int)ImageFormatType.Jpeg)),
+                                   new CompareSizesByArea());
+
+            // Swap the view dimensions as needed if they are rotated relative to
+            // the sensor.
+            int sensorOrientation = (int)cameraCharacteristics.Get(CameraCharacteristics.SensorOrientation);
+            bool swappedDimensions = sensorOrientation == 90 || sensorOrientation == 270;
+            int rotatedViewWidth = mTextureView.Width;
+            int rotatedViewHeight = mTextureView.Height;
+            if (swappedDimensions)
+            {
+                rotatedViewWidth = mTextureView.Height;
+                rotatedViewHeight = mTextureView.Width;
+            }
+
+
+            // Find the best preview size for these view dimensions and configured JPEG size.
+            Size previewSize = ChooseOptimalSize(map.GetOutputSizes(Class.FromType(typeof(SurfaceTexture))),
+                                   rotatedViewWidth, rotatedViewHeight, largestJpeg);
+
+            if (swappedDimensions)
+            {
+                mTextureView.SetAspectRatio(
+                    previewSize.Height, previewSize.Width);
+            }
+            else
+            {
+                mTextureView.SetAspectRatio(
+                    previewSize.Width, previewSize.Height);
+            }
+
+            // height and width of the buffer needs to match the image height and width, not the 
+            // texture view. So the dimensions are not swapped.
+            mTextureView.SurfaceTexture.SetDefaultBufferSize(previewSize.Width, previewSize.Height);
+
+            return previewSize;
+
+        }
+
+        Size ChooseOptimalSize(Size[] choices, int width, int height, Size aspectRatio)
+        {
+            // Collect the supported resolutions that are at least as big as the preview Surface
+            List<Size> bigEnough = new List<Size>();
+            int w = aspectRatio.Width;
+            int h = aspectRatio.Height;
+            foreach (Size option in choices)
+            {
+                if (option.Height == option.Width * h / w &&
+                    option.Width >= width && option.Height >= height)
+                {
+                    bigEnough.Add(option);
+                }
+            }
+
+            // Pick the smallest of those, assuming we found any
+            if (bigEnough.Count > 0)
+            {
+                return (Size)Collections.Min(bigEnough, new CompareSizesByArea());
+            }
+            else
+            {
+                // None found
+                return choices[0];
+            }
+        }
+
+
 
         void StartBackgroundThread()
         {
@@ -389,6 +478,26 @@ namespace HydroColor.Platforms.Android
                 }
             }
             StopBackgroundThread();
+        }
+    }
+
+    class CompareSizesByArea : Java.Lang.Object, IComparator
+    {
+        public int Compare(Size lhs, Size rhs)
+        {
+            // We cast here to ensure the multiplications won't overflow
+            return Long.Signum((long)lhs.Width * lhs.Height -
+            (long)rhs.Width * rhs.Height);
+        }
+
+        int IComparator.Compare(Java.Lang.Object lhs, Java.Lang.Object rhs)
+        {
+            return 0;
+        }
+
+        bool IComparator.Equals(Java.Lang.Object @object)
+        {
+            return false;
         }
     }
 }
