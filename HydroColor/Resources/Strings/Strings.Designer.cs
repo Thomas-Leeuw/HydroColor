@@ -1185,6 +1185,69 @@ namespace HydroColor.Resources.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to OK.
+        /// </summary>
+        internal static string Library_MeasurementNotOpenedDismissButton {
+            get {
+                return ResourceManager.GetString("Library_MeasurementNotOpenedDismissButton", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to This measurement could not be read from the data file. It has not been deleted and is still included when you email the data file..
+        /// </summary>
+        internal static string Library_MeasurementNotOpenedMessage {
+            get {
+                return ResourceManager.GetString("Library_MeasurementNotOpenedMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot Open Measurement.
+        /// </summary>
+        internal static string Library_MeasurementNotOpenedTitle {
+            get {
+                return ResourceManager.GetString("Library_MeasurementNotOpenedTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to OK.
+        /// </summary>
+        internal static string Library_UnreadableMeasurementsDismissButton {
+            get {
+                return ResourceManager.GetString("Library_UnreadableMeasurementsDismissButton", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Unreadable measurements: {0}. Tap for details..
+        /// </summary>
+        internal static string Library_UnreadableMeasurementsLink {
+            get {
+                return ResourceManager.GetString("Library_UnreadableMeasurementsLink", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Some lines in the data file could not be read and are not shown in this list (count: {0})..
+        /// </summary>
+        internal static string Library_UnreadableMeasurementsMessage {
+            get {
+                return ResourceManager.GetString("Library_UnreadableMeasurementsMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Unreadable Measurements.
+        /// </summary>
+        internal static string Library_UnreadableMeasurementsTitle {
+            get {
+                return ResourceManager.GetString("Library_UnreadableMeasurementsTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to No Measurements to Display.
         /// </summary>
         internal static string Library_NoMeasurements {

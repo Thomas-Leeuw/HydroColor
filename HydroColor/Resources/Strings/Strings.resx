@@ -497,8 +497,31 @@ You can download the datafile containing your past measurements by connecting yo
   <data name="Library_MissingMeasurmentsTitle" xml:space="preserve">
     <value>Missing Data</value>
   </data>
+  <data name="Library_MeasurementNotOpenedDismissButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Library_MeasurementNotOpenedMessage" xml:space="preserve">
+    <value>This measurement could not be read from the data file. It has not been deleted and is still included when you email the data file.</value>
+  </data>
+  <data name="Library_MeasurementNotOpenedTitle" xml:space="preserve">
+    <value>Cannot Open Measurement</value>
+  </data>
   <data name="Library_NoMeasurements" xml:space="preserve">
     <value>No Measurements to Display</value>
+  </data>
+  <data name="Library_UnreadableMeasurementsDismissButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Library_UnreadableMeasurementsLink" xml:space="preserve">
+    <value>Unreadable measurements: {0}. Tap for details.</value>
+  </data>
+  <data name="Library_UnreadableMeasurementsMessage" xml:space="preserve">
+    <value>Some lines in the data file could not be read and are not shown in this list (count: {0}). This can happen if the phone's language or region was changed after they were saved, or if the file was damaged.
+
+ They have not been deleted. They are still in the data file and are included when you email it.</value>
+  </data>
+  <data name="Library_UnreadableMeasurementsTitle" xml:space="preserve">
+    <value>Unreadable Measurements</value>
   </data>
   <data name="SendEmailPopup_SendingEmail" xml:space="preserve">
     <value>Sending Email ...</value>

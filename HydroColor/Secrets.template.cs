@@ -20,8 +20,5 @@ namespace HydroColor
         public const string EmailUserName = "sender@example.com";
         public const string EmailPassword = "YOUR_EMAIL_APP_PASSWORD";
         public const string EmailHost = "smtp.example.com";
-
-        // Fallback email service
-        public const string SendGridApiKey = "YOUR_SENDGRID_API_KEY";
     }
 }
