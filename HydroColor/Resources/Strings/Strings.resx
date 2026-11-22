@@ -162,6 +162,15 @@
   <data name="CaptureImage_CaptureButton" xml:space="preserve">
     <value>Capture</value>
   </data>
+  <data name="CaptureImage_CaptureFailedDismissButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="CaptureImage_CaptureFailedMessage" xml:space="preserve">
+    <value>The image could not be captured. Please try again.</value>
+  </data>
+  <data name="CaptureImage_CaptureFailedTitle" xml:space="preserve">
+    <value>Capture Failed</value>
+  </data>
   <data name="CaptureImage_CompassNotWorkingLink" xml:space="preserve">
     <value>Compass Not Working?</value>
   </data>
@@ -194,6 +203,15 @@
   </data>
   <data name="CollectData_AquiringLocationInProgress" xml:space="preserve">
     <value>Aquiring Location ...</value>
+  </data>
+  <data name="CollectData_DifferentCamerasDismissButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="CollectData_DifferentCamerasMessage" xml:space="preserve">
+    <value>The gray card, sky and water images were not all taken with the same camera lens, so they cannot be compared. Please retake the images.</value>
+  </data>
+  <data name="CollectData_DifferentCamerasTitle" xml:space="preserve">
+    <value>Different Cameras</value>
   </data>
   <data name="CollectData_EnterLatitudeMessage" xml:space="preserve">
     <value>Enter in decimal degrees, negative is South.</value>
@@ -441,6 +459,15 @@ The calibration procedure is simple. With the compass open on the screen (in Hyd
   </data>
   <data name="FileReaderWriter_EmailSentTitle" xml:space="preserve">
     <value>Email Sent</value>
+  </data>
+  <data name="FileReaderWriter_InvalidEmailDismissButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="FileReaderWriter_InvalidEmailMessage" xml:space="preserve">
+    <value>An email address must contain an @ symbol. Please check the address and try again.</value>
+  </data>
+  <data name="FileReaderWriter_InvalidEmailTitle" xml:space="preserve">
+    <value>Invalid Email Address</value>
   </data>
   <data name="FileReaderWriter_SelectEmailCancelButton" xml:space="preserve">
     <value>Cancel</value>

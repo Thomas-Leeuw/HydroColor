@@ -15,6 +15,11 @@ namespace HydroColor.Models
         public double UTCOffset { get; set; }
 
         // Camera Data
+        // CameraId, the raw image size and the Bayer pattern are used to check that the
+        // gray card, sky and water images all came from the same camera
+        public string CameraId { get; set; }
+        public int RawImageWidth { get; set; }
+        public int RawImageHeight { get; set; }
         public ColorChannelData<double> MedianPixelValue { get; set; } = new();
         public double ExposureTime { get; set; }
         public double SensorSensitivity { get; set; }

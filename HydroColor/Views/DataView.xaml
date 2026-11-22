@@ -190,7 +190,7 @@
                HorizontalOptions="Center"
                FontSize="14" />
         <Label Grid.Row="4"
-               Grid.Column="3"
+               Grid.Column="2"
                Text="{x:Static strings:Strings.Data_Sky}"
                HorizontalOptions="Center" 
                FontSize="14" />

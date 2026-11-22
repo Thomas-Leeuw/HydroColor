@@ -5,6 +5,7 @@ using CoreImage;
 using CoreVideo;
 using Foundation;
 using HydroColor.Models;
+using HydroColor.Services;
 
 namespace HydroColor.Platforms.iOS
 {
@@ -40,9 +41,33 @@ namespace HydroColor.Platforms.iOS
                 },
                 DidFinishProcessingPhotoAction = (captureOutput, photo, error) =>
                 {
-                    OnImageAvailable(photo);
+                    if (error != null || photo == null)
+                    {
+                        ReportCaptureFailed(error?.LocalizedDescription ?? "The camera did not return an image.");
+                        return;
+                    }
+
+                    try
+                    {
+                        OnImageAvailable(photo);
+                    }
+                    catch (Exception ex)
+                    {
+                        ReportCaptureFailed(ex.Message);
+                    }
                 }
             };
+        }
+
+        // Tells the page that the capture has failed (ImageData is null).
+        // This can be raised for both the raw and the processed photo; the page acts on the first one only.
+        void ReportCaptureFailed(string message)
+        {
+            ImageCaptureCompletedEvent?.Invoke(this, new ImageCaptureEventArgs()
+            {
+                ImageData = null,
+                ErrorMessage = message
+            });
         }
 
         public void SetCALayer(CALayer layer)
@@ -199,31 +224,19 @@ namespace HydroColor.Platforms.iOS
                 NSDictionary ImageMetadata = photo.WeakMetadata;
                 NSDictionary DNGMetadata = ((NSDictionary)ImageMetadata[ImageIO.CGImageProperties.DNGDictionary]);
 
-                ColorChannelData<double> BlackLevel = new();
-                try
+                // The black level is either a single number or a list of numbers.
+                // It is converted to one value per color channel below, once the Bayer pattern is known.
+                List<double> blackLevelValues = new();
+                NSObject blackLevelMetadata = DNGMetadata[ImageIO.CGImageProperties.DNGBlackLevel];
+                if (blackLevelMetadata is NSNumber singleBlackLevel)
                 {
-                    // Black level might be a single number
-                    NSNumber bl = (NSNumber)DNGMetadata[ImageIO.CGImageProperties.DNGBlackLevel];
-                    BlackLevel.Red = bl.UInt16Value;
-                    BlackLevel.Green = bl.UInt16Value;
-                    BlackLevel.Blue = bl.UInt16Value;
+                    blackLevelValues.Add(singleBlackLevel.DoubleValue);
                 }
-                catch
+                else if (blackLevelMetadata is NSArray blackLevelArray)
                 {
-                    // OR an array of numbers
-                    NSArray blackLevelStringArray = (NSArray)DNGMetadata[ImageIO.CGImageProperties.DNGBlackLevel];
-                    if (blackLevelStringArray.Count >= 3)
+                    for (nuint i = 0; i < blackLevelArray.Count; i++)
                     {
-                        // order of color channels is not known....
-                        BlackLevel.Red = blackLevelStringArray.GetItem<NSNumber>(0).UInt16Value;
-                        BlackLevel.Green = blackLevelStringArray.GetItem<NSNumber>(1).UInt16Value;
-                        BlackLevel.Blue = blackLevelStringArray.GetItem<NSNumber>(2).UInt16Value;
-                    }
-                    else
-                    {
-                        BlackLevel.Red = blackLevelStringArray.GetItem<NSNumber>(0).UInt16Value;
-                        BlackLevel.Green = blackLevelStringArray.GetItem<NSNumber>(0).UInt16Value;
-                        BlackLevel.Blue = blackLevelStringArray.GetItem<NSNumber>(0).UInt16Value;
+                        blackLevelValues.Add(blackLevelArray.GetItem<NSNumber>(i).DoubleValue);
                     }
                 }
 
@@ -248,6 +261,10 @@ namespace HydroColor.Platforms.iOS
                         break;
                 }
 
+                // A list of black levels is ordered by position in the Bayer pattern, not by color,
+                // so the Bayer pattern is needed to assign them to red, green and blue.
+                ColorChannelData<double> BlackLevel = BayerPatternDemosaic.GetChannelBlackLevels(blackLevelValues, bayerFilter);
+
                 // The ISO value saved in the EXIF data is rounded to the nearest standard ISO value.
                 // The rounded value is not accurate enough. According to Apple tech support, the EXIF ISO
                 // value is the only one availible in the image metadata. Therefore, I'm recording the exact
@@ -271,6 +288,7 @@ namespace HydroColor.Platforms.iOS
                 NSNumber baselineExposure = (NSNumber)DNGMetadata[ImageIO.CGImageProperties.DNGBaselineExposure];
                 double sensorSensitivity = ISOSpeed / Math.Pow(2, (double)baselineExposure);
 
+                mImageData.CameraId = mCameraDevice.UniqueID;
                 mImageData.RawImagePixelData = imageData;
                 mImageData.ImageHeight = (int)photo.Properties.Exif.PixelYDimension;
                 mImageData.ImageWidth = (int)photo.Properties.Exif.PixelXDimension;

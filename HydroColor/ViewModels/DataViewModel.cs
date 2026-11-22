@@ -66,15 +66,28 @@ namespace HydroColor.ViewModels
                                         reflecRed
                                         }.Max();
 
-            BlueBarChartHeight = (int) (reflecBlue / maxReflec * (BarChartHeight - 30));
-            GreenBarChartHeight = (int) (reflecGreen / maxReflec * (BarChartHeight - 30));
-            RedBarChartHeight = (int) (reflecRed / maxReflec * (BarChartHeight - 30));
+            BlueBarChartHeight = ScaleBarHeight(reflecBlue, maxReflec);
+            GreenBarChartHeight = ScaleBarHeight(reflecGreen, maxReflec);
+            RedBarChartHeight = ScaleBarHeight(reflecRed, maxReflec);
 
             GrayCardImageSquareColor = ProcMeas.GrayCardImageData.ImageCapturedAtCorrectAngles ? Colors.LimeGreen : Colors.White;
             SkyImageSquareColor = ProcMeas.SkyImageData.ImageCapturedAtCorrectAngles ? Colors.LimeGreen : Colors.White;
             WaterImageSquareColor = ProcMeas.WaterImageData.ImageCapturedAtCorrectAngles ? Colors.LimeGreen : Colors.White;
         }
 
+
+        // Height of a bar relative to the largest reflectance.
+        // Returns 0 when there is nothing to scale against (all reflectances zero) or a value is not a number.
+        int ScaleBarHeight(double reflectance, double maxReflectance)
+        {
+            if (!(maxReflectance > 0))
+            {
+                return 0;
+            }
+
+            double height = reflectance / maxReflectance * (BarChartHeight - 30);
+            return double.IsFinite(height) && height > 0 ? (int)height : 0;
+        }
 
         [RelayCommand]
         public void BackButton()

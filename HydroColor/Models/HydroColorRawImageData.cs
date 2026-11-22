@@ -19,6 +19,8 @@ namespace HydroColor.Models
 
     public class HydroColorRawImageData
     {
+        // Identifies the physical camera (lens and sensor) that produced the raw image
+        public string CameraId { get; set; }
         public byte[] RawImagePixelData { get; set; }
         public int ImageHeight { get; set; }
         public int ImageWidth { get; set; }

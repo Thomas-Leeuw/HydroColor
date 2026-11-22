@@ -586,41 +586,74 @@ Your HydroColor data file is attached. Do not reply to this email.";
                 storedAddresses.Add(Strings.FileReaderWriter_DeleteEmail);
             }
             storedAddresses.Insert(0, Strings.FileReaderWriter_AddEmail);
-            string address = await Shell.Current.CurrentPage.DisplayActionSheetAsync(Strings.FileReaderWriter_SelectEmailMessage, Strings.FileReaderWriter_SelectEmailCancelButton, null, storedAddresses.ToArray());
 
-            return address;
+            return await ChooseOption(Strings.FileReaderWriter_SelectEmailMessage, Strings.FileReaderWriter_SelectEmailCancelButton, storedAddresses);
+        }
+
+        // Shows a chooser and returns the option that was picked.
+        // Returns null if Cancel was pressed or the chooser was dismissed another way
+        // (on Android, tapping outside the chooser returns nothing at all).
+        // The choice is recognised by being one of the options offered, so it does not
+        // depend on the text of the Cancel button.
+        private static async Task<string> ChooseOption(string title, string cancelButtonText, List<string> options)
+        {
+            string selection = await Shell.Current.CurrentPage.DisplayActionSheetAsync(title, cancelButtonText, null, options.ToArray());
+            return selection != null && options.Contains(selection) ? selection : null;
+        }
+
+        // Asks for a new email address until one containing '@' is entered.
+        // Returns null if the prompt is cancelled or left empty.
+        private static async Task<string> PromptForNewEmailAddress()
+        {
+            string entered = "";
+            while (true)
+            {
+                entered = await Shell.Current.CurrentPage.DisplayPromptAsync(Strings.FileReaderWriter_AddEmailTitle, Strings.FileReaderWriter_AddEmailMessage, keyboard: Keyboard.Email, initialValue: entered);
+                if (string.IsNullOrWhiteSpace(entered)) // cancel pressed
+                {
+                    return null;
+                }
+
+                entered = entered.Trim();
+                if (entered.Contains('@'))
+                {
+                    return entered;
+                }
+
+                await Shell.Current.CurrentPage.DisplayAlertAsync(Strings.FileReaderWriter_InvalidEmailTitle, Strings.FileReaderWriter_InvalidEmailMessage, Strings.FileReaderWriter_InvalidEmailDismissButton);
+            }
         }
 
         public async void EmailDataFile()
         {
             string address = await DisplayEmailAddresses();
-            if (address.Contains(Strings.FileReaderWriter_SelectEmailCancelButton))
+            if (address == null) // cancelled
             {
                 return;
             }
 
-            while (address.Contains(Strings.FileReaderWriter_DeleteEmail) || address.Contains(Strings.FileReaderWriter_AddEmail))
+            while (address == Strings.FileReaderWriter_DeleteEmail || address == Strings.FileReaderWriter_AddEmail)
             {
-                if (address.Contains(Strings.FileReaderWriter_AddEmail))
+                if (address == Strings.FileReaderWriter_AddEmail)
                 {
-                    string newEmailAddress = await Shell.Current.CurrentPage.DisplayPromptAsync(Strings.FileReaderWriter_AddEmailTitle, Strings.FileReaderWriter_AddEmailMessage, keyboard: Keyboard.Email);
-                    if (string.IsNullOrEmpty(newEmailAddress)) // cancel pressed
+                    string newEmailAddress = await PromptForNewEmailAddress();
+                    if (newEmailAddress == null) // cancel pressed
                     {
                         return;
                     }
 
                     SaveNewEmailAddress(newEmailAddress);
                     address = await DisplayEmailAddresses();
-                    if (address.Contains(Strings.FileReaderWriter_SelectEmailCancelButton))
+                    if (address == null) // cancelled
                     {
                         return;
                     }
                 }
-                else if (address.Contains(Strings.FileReaderWriter_DeleteEmail))
+                else
                 {
                     List<string> storedAddresses = GetSavedEmailAddress();
-                    address = await Shell.Current.CurrentPage.DisplayActionSheetAsync(Strings.FileReaderWriter_DeleteEmailMessage, Strings.FileReaderWriter_DeleteEmailCancelButton, null, storedAddresses.ToArray());
-                    if (address.Contains(Strings.FileReaderWriter_SelectEmailCancelButton))
+                    address = await ChooseOption(Strings.FileReaderWriter_DeleteEmailMessage, Strings.FileReaderWriter_DeleteEmailCancelButton, storedAddresses);
+                    if (address == null) // cancelled
                     {
                         return;
                     }
@@ -632,11 +665,11 @@ Your HydroColor data file is attached. Do not reply to this email.";
 
                     RemoveEmailAddress(address);
                     address = await DisplayEmailAddresses();
-                    if (address.Contains(Strings.FileReaderWriter_SelectEmailCancelButton))
+                    if (address == null) // cancelled
                     {
                         return;
                     }
-                    
+
                 }
             }
 

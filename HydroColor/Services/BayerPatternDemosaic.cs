@@ -114,6 +114,88 @@ namespace HydroColor.Services
             return RGBImages;
         }
 
+        // Converts the black level values from the raw image metadata (the DNG 'BlackLevel' entry)
+        // into one black level for each color channel.
+        //
+        // The DNG format stores the black level as a small repeating tile, in reading order
+        // (row by row, starting at the top-left of the image). Each value therefore belongs to a
+        // POSITION in the tile, not to a color:
+        //
+        //   one value                 the same black level for every pixel
+        //   four values (2x2 tile)    [0] top-left   [1] top-right
+        //                             [2] bottom-left [3] bottom-right
+        //
+        // A 2x2 tile lines up with the 2x2 Bayer pattern, so the color at each position is given by
+        // the Bayer pattern. The positions used here must match those used in Bayer2RGB above.
+        //
+        // Any other layout with differing values cannot be mapped to colors, so the average is used
+        // for all three channels.
+        public static ColorChannelData<double> GetChannelBlackLevels(IReadOnlyList<double> blackLevelValues, BayerFilterType bayerFilterType)
+        {
+            if (blackLevelValues == null || blackLevelValues.Count == 0)
+            {
+                throw new ArgumentException("The image metadata does not contain a black level.");
+            }
+
+            ColorChannelData<double> BlackLevel = new();
+
+            bool allValuesEqual = blackLevelValues.All(value => value == blackLevelValues[0]);
+
+            if (!allValuesEqual && blackLevelValues.Count == 4 && bayerFilterType != BayerFilterType.Unknown)
+            {
+                double topLeft = blackLevelValues[0];
+                double topRight = blackLevelValues[1];
+                double bottomLeft = blackLevelValues[2];
+                double bottomRight = blackLevelValues[3];
+
+                switch (bayerFilterType)
+                {
+                    case BayerFilterType.BGGR:
+                        /* B G
+                        /  G R
+                        */
+                        BlackLevel.Blue = topLeft;
+                        BlackLevel.Green = (topRight + bottomLeft) / 2;
+                        BlackLevel.Red = bottomRight;
+                        break;
+                    case BayerFilterType.GBRG:
+                        /* G B
+                        /  R G
+                        */
+                        BlackLevel.Green = (topLeft + bottomRight) / 2;
+                        BlackLevel.Blue = topRight;
+                        BlackLevel.Red = bottomLeft;
+                        break;
+                    case BayerFilterType.GRBG:
+                        /* G R
+                        /  B G
+                        */
+                        BlackLevel.Green = (topLeft + bottomRight) / 2;
+                        BlackLevel.Red = topRight;
+                        BlackLevel.Blue = bottomLeft;
+                        break;
+                    case BayerFilterType.RGGB:
+                        /* R G
+                        /  G B
+                        */
+                        BlackLevel.Red = topLeft;
+                        BlackLevel.Green = (topRight + bottomLeft) / 2;
+                        BlackLevel.Blue = bottomRight;
+                        break;
+                }
+            }
+            else
+            {
+                // A single value, a list of equal values, or a layout that cannot be mapped to colors
+                double average = blackLevelValues.Average();
+                BlackLevel.Red = average;
+                BlackLevel.Green = average;
+                BlackLevel.Blue = average;
+            }
+
+            return BlackLevel;
+        }
+
         public UInt16 GetMedian(UInt16[,] Data, int PixleSquareSize)
         {
             int startRow = Data.GetLength(0) / 2 - PixleSquareSize / 2;

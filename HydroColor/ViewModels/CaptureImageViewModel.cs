@@ -82,6 +82,13 @@ namespace HydroColor.ViewModels
         // used to correct a 180 flip in the compass above certain device tilt
         double compassHeadingCorrection = 0;
 
+        // true while this page is on screen (between ViewAppearing and ViewUnloaded)
+        bool _pageActive;
+
+        // true once the result of a capture (success or failure) has been acted on.
+        // The camera can report more than once, for example for the raw and the processed photo on iOS.
+        bool _captureResultHandled;
+
         public CaptureImageViewModel()
         {
             camControl.ImageCaptureCompletedEvent += ImageCaptureCompleted;
@@ -123,6 +130,8 @@ namespace HydroColor.ViewModels
         [RelayCommand]
         void ViewAppearing()
         {
+            _pageActive = true;
+
             if (CurrentLocation.Latitude == 0 || CurrentLocation.Longitude == 0)
             {
                 ImageCollectionHelpText = Strings.CaptureImage_NoGPSNoHeadingHelp;
@@ -148,6 +157,8 @@ namespace HydroColor.ViewModels
         [RelayCommand]
         void ViewUnloaded()
         {
+            _pageActive = false;
+
             ToggleCompass(SensorControl.STOP);
             ToggleOrientation(SensorControl.STOP);
             CamControl.CloseCamera();
@@ -215,10 +226,23 @@ namespace HydroColor.ViewModels
 
         async void ImageCaptureCompleted(object sender, ImageCaptureEventArgs e)
         {
-            if (e.ImageData != null)
+            if (_captureResultHandled)
             {
-                await Task.Factory.StartNew(() => 
-                { 
+                return;
+            }
+            _captureResultHandled = true;
+
+            try
+            {
+                // No image data means the camera reported that the capture failed
+                if (e.ImageData == null)
+                {
+                    CaptureFailed(e.ErrorMessage);
+                    return;
+                }
+
+                await Task.Factory.StartNew(() =>
+                {
                     CapturedImageData.LocalTimeStamp = DateTime.Now;
                     CapturedImageData.UTCOffset = DateTimeOffset.Now.Offset.TotalHours;
 
@@ -243,26 +267,72 @@ namespace HydroColor.ViewModels
                     CapturedImageData.ExposureTime = e.ImageData.ExposureTime;
                     CapturedImageData.JpegImage = e.ImageData.JpegImage;
                     CapturedImageData.BayerFilterPattern = e.ImageData.BayerFilterPattern;
+                    CapturedImageData.CameraId = e.ImageData.CameraId;
+                    CapturedImageData.RawImageWidth = e.ImageData.ImageWidth;
+                    CapturedImageData.RawImageHeight = e.ImageData.ImageHeight;
 
                     // clearing out the very large ImageData and RGBImages instances (Should go out of scope and be garbage collected regardless).
                     RGBImages = null;
                     e.ImageData = null;
 
-                    // Was getting intermittitent error on Android: 'Only the original thread that created a view hierarchy can touch its views'
-                    // invoking this on the main thread seems to have solved this issue, but not 100% certain
-                    MainThread.BeginInvokeOnMainThread(async () =>
+                });
+
+                // Was getting intermittitent error on Android: 'Only the original thread that created a view hierarchy can touch its views'
+                // invoking this on the main thread seems to have solved this issue, but not 100% certain
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    if (!_pageActive)
+                    {
+                        return; // the user left the page while the image was being processed
+                    }
+
+                    try
                     {
                         await Shell.Current.GoToAsync($"..", true, new Dictionary<string, object>
                         {
                             [ImageType.HCImageTag.ToString()] = CapturedImageData
                         });
-
-                    });
-
+                    }
+                    catch
+                    {
+                    }
                 });
-
+            }
+            catch (Exception ex)
+            {
+                // Any error while processing the image is reported to the user instead of closing the app
+                CaptureFailed(ex.Message);
             }
 
+        }
+
+        // Shows the capture failed message and returns to the previous page
+        void CaptureFailed(string detail)
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                WaitingForImageResults = false;
+
+                if (!_pageActive)
+                {
+                    return; // the user already left the page
+                }
+
+                try
+                {
+                    string message = Strings.CaptureImage_CaptureFailedMessage;
+                    if (!string.IsNullOrEmpty(detail))
+                    {
+                        message += "\n\n" + detail;
+                    }
+
+                    await Shell.Current.CurrentPage.DisplayAlertAsync(Strings.CaptureImage_CaptureFailedTitle, message, Strings.CaptureImage_CaptureFailedDismissButton);
+                    await Shell.Current.GoToAsync($"..", true);
+                }
+                catch
+                {
+                }
+            });
         }
 
         private void ToggleCompass(SensorControl sensorControl)

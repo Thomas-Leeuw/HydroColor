@@ -5,10 +5,20 @@ namespace HydroColor.Services
     {
         public static double GetDeclination(double lat, double lon)
         {
+            // The table covers latitudes -80 to 80 and longitudes -180 to 180.
+            // Keep the position inside the table; beyond +/-80 latitude the value at 80 is used.
+            lat = Math.Clamp(lat, -80, 80);
+            lon = Math.Clamp(lon, -180, 180);
+
             // first longitude in the table less than the specified value (on the western side)
-            int LonIdxW = Array.FindLastIndex(Longitude, x => x <= lon); 
+            int LonIdxW = Array.FindLastIndex(Longitude, x => x <= lon);
             // first latitude in the table less than the specified value (on the southern side)
             int LatIdxS = Array.FindIndex(Latitude, x => x <= lat);
+
+            // The interpolation below also reads the table entry to the east (LonIdxW + 1) and to the
+            // north (LatIdxS - 1), so on the eastern and northern edges use the last full cell.
+            LonIdxW = Math.Clamp(LonIdxW, 0, Longitude.Length - 2);
+            LatIdxS = Math.Clamp(LatIdxS, 1, Latitude.Length - 1);
 
             double decSW = DeclinationTable[LatIdxS ,LonIdxW];
             double decSE = DeclinationTable[LatIdxS, LonIdxW + 1];

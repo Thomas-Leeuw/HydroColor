@@ -196,6 +196,33 @@ namespace HydroColor.Resources.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to OK.
+        /// </summary>
+        internal static string CaptureImage_CaptureFailedDismissButton {
+            get {
+                return ResourceManager.GetString("CaptureImage_CaptureFailedDismissButton", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The image could not be captured. Please try again..
+        /// </summary>
+        internal static string CaptureImage_CaptureFailedMessage {
+            get {
+                return ResourceManager.GetString("CaptureImage_CaptureFailedMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Capture Failed.
+        /// </summary>
+        internal static string CaptureImage_CaptureFailedTitle {
+            get {
+                return ResourceManager.GetString("CaptureImage_CaptureFailedTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Compass Not Working?.
         /// </summary>
         internal static string CaptureImage_CompassNotWorkingLink {
@@ -294,6 +321,33 @@ namespace HydroColor.Resources.Strings {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to OK.
+        /// </summary>
+        internal static string CollectData_DifferentCamerasDismissButton {
+            get {
+                return ResourceManager.GetString("CollectData_DifferentCamerasDismissButton", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The gray card, sky and water images were not all taken with the same camera lens, so they cannot be compared. Please retake the images..
+        /// </summary>
+        internal static string CollectData_DifferentCamerasMessage {
+            get {
+                return ResourceManager.GetString("CollectData_DifferentCamerasMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Different Cameras.
+        /// </summary>
+        internal static string CollectData_DifferentCamerasTitle {
+            get {
+                return ResourceManager.GetString("CollectData_DifferentCamerasTitle", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Enter in decimal degrees, negative is South..
         /// </summary>
@@ -1027,6 +1081,33 @@ namespace HydroColor.Resources.Strings {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to OK.
+        /// </summary>
+        internal static string FileReaderWriter_InvalidEmailDismissButton {
+            get {
+                return ResourceManager.GetString("FileReaderWriter_InvalidEmailDismissButton", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to An email address must contain an @ symbol. Please check the address and try again..
+        /// </summary>
+        internal static string FileReaderWriter_InvalidEmailMessage {
+            get {
+                return ResourceManager.GetString("FileReaderWriter_InvalidEmailMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid Email Address.
+        /// </summary>
+        internal static string FileReaderWriter_InvalidEmailTitle {
+            get {
+                return ResourceManager.GetString("FileReaderWriter_InvalidEmailTitle", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>

@@ -9,6 +9,7 @@ using Java.Nio;
 using Android.Graphics;
 using Android.Content;
 using HydroColor.Models;
+using HydroColor.Services;
 using HydroColor.Platforms.Android.Callbacks;
 using Java.Util;
 using Java.Lang;
@@ -30,6 +31,10 @@ namespace HydroColor.Platforms.Android
         CameraDevice mCameraDevice;
         CameraCharacteristics mCharacteristics;
 
+        // The camera that was opened, and the manager used to look up camera characteristics
+        string mCameraId;
+        CameraManager mCameraManager;
+
         CameraCaptureSession mCaptureSession;
         CaptureRequest mCaptureRequest;
 
@@ -39,6 +44,9 @@ namespace HydroColor.Platforms.Android
         ImageReader mRawImageReader;
 
         TotalCaptureResult mTotalCaptureResult;
+
+        // true from the moment a capture is requested until it completes or fails
+        bool mCaptureInProgress;
 
         public CameraCharacteristics GetRearFacingCameraCharacteristics()
         {
@@ -69,6 +77,8 @@ namespace HydroColor.Platforms.Android
             }
 
             mCharacteristics = cameraManager.GetCameraCharacteristics(cameraID);
+            mCameraId = cameraID;
+            mCameraManager = cameraManager;
 
             CameraStateListener StateCallback = new CameraStateListener
             {
@@ -83,10 +93,12 @@ namespace HydroColor.Platforms.Android
                 OnDisconnectedAction = camera =>
                 {
                     CloseCamera();
+                    ReportCaptureFailed("The camera was disconnected.");
                 },
                 OnErrorAction = (camera, error) =>
                 {
                     CloseCamera();
+                    ReportCaptureFailed($"The camera reported an error ({error}).");
                 },
                 OnClosedAction = camera =>
                 {
@@ -136,7 +148,17 @@ namespace HydroColor.Platforms.Android
 
             OnImageAvailableListener mOnImageAvailableListener = new OnImageAvailableListener
             {
-                OnImageAvailableAction = reader => OnImageAvailable(reader)
+                OnImageAvailableAction = reader =>
+                {
+                    try
+                    {
+                        OnImageAvailable(reader);
+                    }
+                    catch (System.Exception ex)
+                    {
+                        ReportCaptureFailed(ex.Message);
+                    }
+                }
             };
 
             mRawImageReader = CreateImageReader(mOnImageAvailableListener, ImageFormatType.RawSensor);
@@ -215,12 +237,22 @@ namespace HydroColor.Platforms.Android
                      * So we need to check if the ImageDataModel is complete in both OnCaptureCompleted and in OnImageAvailable
                      * and only proceed if all the data is available
                      */
-                    if (mImageDataModel.RawImagePixelData != null && mImageDataModel.JpegImage != null && mTotalCaptureResult != null)
+                    try
                     {
-                        OnImageCaptureCompleted();
+                        if (mImageDataModel.RawImagePixelData != null && mImageDataModel.JpegImage != null && mTotalCaptureResult != null)
+                        {
+                            OnImageCaptureCompleted();
+                        }
+                    }
+                    catch (System.Exception ex)
+                    {
+                        ReportCaptureFailed(ex.Message);
                     }
                 },
-                OnCaptureFailedAction = (session, request, failure) => { },
+                OnCaptureFailedAction = (session, request, failure) =>
+                {
+                    ReportCaptureFailed("The camera reported that the capture failed.");
+                },
                 OnCaptureSequenceCompletedAction = (session, sequenceID, frameNumber) => {  }
             };
         }
@@ -254,6 +286,7 @@ namespace HydroColor.Platforms.Android
 
             mImageDataModel = new HydroColorRawImageData();
             mTotalCaptureResult = null;
+            mCaptureInProgress = true;
             // After capture is completed callbacks in both CaptureCallback and OnImageAvailableListener are called
             mCaptureSession.Capture(mCaptureRequest, mCaptureListener, mBackgroundHandler);
             
@@ -303,40 +336,62 @@ namespace HydroColor.Platforms.Android
 
             // SensorDynamicBlackLevel may be more accurate, but not availible on older operating systems
             // ((float[]) result.Get(CaptureResult.SensorDynamicBlackLevel)).Cast<UInt16>().ToArray();
-            BlackLevelPattern SensorBlackLevel = (BlackLevelPattern)mCharacteristics.Get(CameraCharacteristics.SensorBlackLevelPattern);
+            // The camera that was opened can be a "logical" camera made of several physical cameras (lenses).
+            // The raw image comes from whichever physical camera was active, and each has its own Bayer
+            // pattern and black level, so these are read from the camera that produced this image.
+            // The active physical camera is only reported on Android 10 (API 29) and later; on older
+            // versions, and for cameras that are not logical cameras, the opened camera is used.
+            CameraCharacteristics imageCharacteristics = mCharacteristics;
+            string imageCameraId = mCameraId;
+            if (OperatingSystem.IsAndroidVersionAtLeast(29))
+            {
+                string activePhysicalId = mTotalCaptureResult.Get(CaptureResult.LogicalMultiCameraActivePhysicalId)?.ToString();
+                if (!string.IsNullOrEmpty(activePhysicalId))
+                {
+                    imageCharacteristics = mCameraManager.GetCameraCharacteristics(activePhysicalId);
+                    imageCameraId = activePhysicalId;
+                }
+            }
+            mImageDataModel.CameraId = imageCameraId;
 
-            SensorInfoColorFilterArrangement pixelFormat = (SensorInfoColorFilterArrangement)(int)mCharacteristics.Get(CameraCharacteristics.SensorInfoColorFilterArrangement);
+            BlackLevelPattern SensorBlackLevel = (BlackLevelPattern)imageCharacteristics.Get(CameraCharacteristics.SensorBlackLevelPattern);
+
+            SensorInfoColorFilterArrangement pixelFormat = (SensorInfoColorFilterArrangement)(int)imageCharacteristics.Get(CameraCharacteristics.SensorInfoColorFilterArrangement);
             BayerFilterType bayerFilter;
-            ColorChannelData<double> BlackLevel = new();
             switch (pixelFormat)
             {
                 case SensorInfoColorFilterArrangement.Bggr: /* Bayer 10-bit Little-Endian, packed in 16-bits, ordered B G B G... alternating with G R G R... */
                     bayerFilter = BayerFilterType.BGGR;
-                    BlackLevel.Red = (UInt16)SensorBlackLevel.GetOffsetForIndex(1, 1); // args are column, row
-                    BlackLevel.Green = (UInt16)SensorBlackLevel.GetOffsetForIndex(1, 0);
-                    BlackLevel.Blue = (UInt16)SensorBlackLevel.GetOffsetForIndex(0, 0);
                     break;
                 case SensorInfoColorFilterArrangement.Gbrg: /* Bayer 10-bit Little-Endian, packed in 16-bits, ordered G B G B... alternating with R G R G... */
                     bayerFilter = BayerFilterType.GBRG;
-                    BlackLevel.Red = (UInt16)SensorBlackLevel.GetOffsetForIndex(0, 1); // args are column, row
-                    BlackLevel.Green = (UInt16)SensorBlackLevel.GetOffsetForIndex(0, 0);
-                    BlackLevel.Blue = (UInt16)SensorBlackLevel.GetOffsetForIndex(1, 0);
                     break;
                 case SensorInfoColorFilterArrangement.Grbg: /* Bayer 10-bit Little-Endian, packed in 16-bits, ordered G R G R... alternating with B G B G... */
                     bayerFilter = BayerFilterType.GRBG;
-                    BlackLevel.Red = (UInt16)SensorBlackLevel.GetOffsetForIndex(1, 0); // args are column, row
-                    BlackLevel.Green = (UInt16)SensorBlackLevel.GetOffsetForIndex(0, 0);
-                    BlackLevel.Blue = (UInt16)SensorBlackLevel.GetOffsetForIndex(0, 1);
                     break;
                 case SensorInfoColorFilterArrangement.Rggb: /* Bayer 10-bit Little-Endian, packed in 16-bits, ordered R G R G... alternating with G B G B... */
                     bayerFilter = BayerFilterType.RGGB;
-                    BlackLevel.Red = (UInt16)SensorBlackLevel.GetOffsetForIndex(0, 0); // args are column, row
-                    BlackLevel.Green = (UInt16)SensorBlackLevel.GetOffsetForIndex(1, 0);
-                    BlackLevel.Blue = (UInt16)SensorBlackLevel.GetOffsetForIndex(1, 1);
                     break;
                 default:
                     bayerFilter = BayerFilterType.Unknown;
                     break;
+            }
+
+            // The black level is reported for each position of the 2x2 Bayer pattern.
+            // GetChannelBlackLevels assigns the positions to red, green and blue using the Bayer pattern
+            // (the two green positions are averaged, as the green pixels are).
+            // For an unknown pattern the black level is left at zero.
+            ColorChannelData<double> BlackLevel = new();
+            if (bayerFilter != BayerFilterType.Unknown)
+            {
+                double[] blackLevelTile =
+                {
+                    SensorBlackLevel.GetOffsetForIndex(0, 0),   // top-left     (args are column, row)
+                    SensorBlackLevel.GetOffsetForIndex(1, 0),   // top-right
+                    SensorBlackLevel.GetOffsetForIndex(0, 1),   // bottom-left
+                    SensorBlackLevel.GetOffsetForIndex(1, 1)    // bottom-right
+                };
+                BlackLevel = BayerPatternDemosaic.GetChannelBlackLevels(blackLevelTile, bayerFilter);
             }
 
             mImageDataModel.BayerFilterPattern = bayerFilter;
@@ -349,7 +404,25 @@ namespace HydroColor.Platforms.Android
                 ImageData = mImageDataModel
             };
 
-            ImageCaptureCompletedEvent.Invoke(this, capArgs);
+            mCaptureInProgress = false;
+            ImageCaptureCompletedEvent?.Invoke(this, capArgs);
+        }
+
+        // Tells the page that the capture in progress has failed (ImageData is null).
+        // Does nothing if no capture is in progress, so a failure is reported only once.
+        void ReportCaptureFailed(string message)
+        {
+            if (!mCaptureInProgress)
+            {
+                return;
+            }
+            mCaptureInProgress = false;
+
+            ImageCaptureCompletedEvent?.Invoke(this, new ImageCaptureEventArgs()
+            {
+                ImageData = null,
+                ErrorMessage = message
+            });
         }
 
         public void SetTextureView(AutoFitTextureView textureView)
@@ -452,28 +525,49 @@ namespace HydroColor.Platforms.Android
         }
         void StopBackgroundThread()
         {
-            
+            HandlerThread thread;
+            lock (mCameraStateLock)
+            {
+                thread = mBackgroundThread;
+                mBackgroundThread = null;
+                mBackgroundHandler = null;
+            }
+
+            if (thread == null)
+            {
+                return; // already stopped
+            }
+
             try
             {
-                mBackgroundThread.QuitSafely();
-                mBackgroundThread.Join();
-                mBackgroundThread = null;
-                lock (mCameraStateLock)
+                thread.QuitSafely();
+
+                // CloseCamera can be called from a camera callback (disconnected, error, configure failed),
+                // which runs on this background thread. A thread cannot wait for itself to finish, so only
+                // wait when called from another thread, and never wait indefinitely.
+                bool calledFromBackgroundThread = Java.Lang.Thread.CurrentThread().Id == thread.Id;
+                if (!calledFromBackgroundThread)
                 {
-                    mBackgroundHandler = null;
+                    thread.Join(2000);
                 }
             }
-            catch 
+            catch
             {
             }
         }
         public void CloseCamera()
         {
-            if (mCameraDevice != null)
+            lock (mCameraStateLock)
             {
-                lock (mCameraStateLock)
+                if (mCameraDevice != null)
                 {
-                    mCameraDevice.Close();
+                    try
+                    {
+                        mCameraDevice.Close();
+                    }
+                    catch
+                    {
+                    }
                     mCameraDevice = null;
                 }
             }
@@ -490,9 +584,10 @@ namespace HydroColor.Platforms.Android
             (long)rhs.Width * rhs.Height);
         }
 
+        // This is the method Java calls (for example from Collections.Max and Collections.Min)
         int IComparator.Compare(Java.Lang.Object lhs, Java.Lang.Object rhs)
         {
-            return 0;
+            return Compare(global::Android.Runtime.Extensions.JavaCast<Size>(lhs), global::Android.Runtime.Extensions.JavaCast<Size>(rhs));
         }
 
         bool IComparator.Equals(Java.Lang.Object @object)

@@ -94,6 +94,9 @@ namespace HydroColor.ViewModels
         private CancellationTokenSource _cancelTokenSource;
         private bool _viewLoaded = false;
 
+        // true when the current coordinates were typed in by the user (not from GPS)
+        private bool _locationEnteredManually = false;
+
         public CollectDataViewModel()
         {
 
@@ -105,9 +108,19 @@ namespace HydroColor.ViewModels
 
         private async void Window_Resumed(object sender, EventArgs e)
         {
-            CurrentLocation = new Location();
-            CurrentLocation.Accuracy = 0;
-            OnPropertyChanged(nameof(CurrentLocation));
+            // Coordinates typed in by the user are kept. They were entered because GPS was not giving a position.
+            if (_locationEnteredManually)
+            {
+                return;
+            }
+
+            // A location request is already running (for example, the app resumed after the permission prompt)
+            if (!CanCheckLocation)
+            {
+                return;
+            }
+
+            // Refresh the GPS position. The previous position stays on screen until the new one arrives.
             await GetCurrentLocation();
         }
 
@@ -220,26 +233,35 @@ namespace HydroColor.ViewModels
                 if (NewLocation != null)
                 {
                     CurrentLocation = NewLocation;
+                    _locationEnteredManually = false;
                     MoveMapPinLocation();
                 }
                 else
                 {
-                    MapPins.Clear();
-                    MoveMapLocationAction(new MapSpan(new Location { Longitude = 0, Latitude = 0 }, 180, 180));
+                    // No new position. Keep showing the previous one if there is one;
+                    // otherwise show the whole map, as at startup.
+                    MoveMapPinLocation();
+                    if (CurrentLocation.Latitude == 0 || CurrentLocation.Longitude == 0)
+                    {
+                        MoveMapLocationAction(new MapSpan(new Location { Longitude = 0, Latitude = 0 }, 180, 180));
+                    }
                     await Shell.Current.CurrentPage.DisplayAlertAsync(Strings.CollectData_NoGPSTitle, Strings.CollectData_NoGPSMessage, Strings.CollectData_NoGPSDismissButton);
                 }
             }
-            // Catch one of the following exceptions:
-            //   FeatureNotSupportedException
-            //   FeatureNotEnabledException
-            //   PermissionException
             catch (PermissionException)
             {
                 await Shell.Current.CurrentPage.DisplayAlertAsync(Strings.CollectData_LocationPermissionDeniedTitle, Strings.CollectData_LocationPermissionDeniedMessage, Strings.CollectData_LocationPermissionDeniedDismissButton);
             }
+            catch (FeatureNotSupportedException)
+            {
+                // The device has no GPS
+                await Shell.Current.CurrentPage.DisplayAlertAsync(Strings.CollectData_GPSNotSupportedTitle, Strings.CollectData_GPSNotSupportedMessage, Strings.CollectData_GPSNotSupportedDismissButton);
+            }
             catch
             {
-                await Shell.Current.CurrentPage.DisplayAlertAsync(Strings.CollectData_GPSNotSupportedTitle, Strings.CollectData_GPSNotSupportedMessage, Strings.CollectData_GPSNotSupportedDismissButton);
+                // Anything else (location services switched off, a timeout, a cancelled request):
+                // the position could not be determined this time, so offer a retry or manual entry.
+                await Shell.Current.CurrentPage.DisplayAlertAsync(Strings.CollectData_NoGPSTitle, Strings.CollectData_NoGPSMessage, Strings.CollectData_NoGPSDismissButton);
             }
             finally
             {
@@ -260,6 +282,7 @@ namespace HydroColor.ViewModels
             {
                 if (Math.Abs(Latitude) <= 90)
                 {
+                    _locationEnteredManually = true;
                     CurrentLocation.Accuracy = 0;
                     CurrentLocation.Latitude = Latitude;
                     OnPropertyChanged(nameof(CurrentLocation));
@@ -283,6 +306,7 @@ namespace HydroColor.ViewModels
                 if (Math.Abs(Longitude) <= 180)
                 {
 
+                    _locationEnteredManually = true;
                     CurrentLocation.Accuracy = 0;
                     CurrentLocation.Longitude = Longitude;
                     OnPropertyChanged(nameof(CurrentLocation));
@@ -337,6 +361,13 @@ namespace HydroColor.ViewModels
             if (GrayCardImageData != null && WaterImageData != null && SkyImageData != null)
             {
 
+                // The three images are only comparable if they came from the same camera (lens and sensor)
+                if (!ImagesFromSameCamera(GrayCardImageData, SkyImageData, WaterImageData))
+                {
+                    await Shell.Current.CurrentPage.DisplayAlertAsync(Strings.CollectData_DifferentCamerasTitle, Strings.CollectData_DifferentCamerasMessage, Strings.CollectData_DifferentCamerasDismissButton);
+                    return;
+                }
+
                 string measurementName = await Shell.Current.CurrentPage.DisplayPromptAsync(Strings.CollectData_MeasurementNameTitle, Strings.CollectData_MeasurementNameMessage);
                 if (measurementName == null) // cancel pressed
                 {
@@ -371,6 +402,17 @@ namespace HydroColor.ViewModels
                 await Shell.Current.CurrentPage.DisplayAlertAsync(Strings.CollectData_IncompleteImagesTitle, Strings.CollectData_IncompleteImagesMessage, Strings.CollectData_IncompleteImagesDismissButton);
             }
 
+        }
+
+        // True when every image reports the same camera, Bayer pattern and raw image size
+        static bool ImagesFromSameCamera(params HydroColorImageCaptureModel[] images)
+        {
+            HydroColorImageCaptureModel first = images[0];
+            return images.All(image =>
+                image.CameraId == first.CameraId
+                && image.BayerFilterPattern == first.BayerFilterPattern
+                && image.RawImageWidth == first.RawImageWidth
+                && image.RawImageHeight == first.RawImageHeight);
         }
 
         void CancelLocationRequest()
