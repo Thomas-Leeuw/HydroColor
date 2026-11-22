@@ -8,6 +8,7 @@ using HydroColor.Resources.Strings;
 using CommunityToolkit.Maui.Views;
 using HydroColor.Views;
 using System.Linq.Expressions;
+using CommunityToolkit.Maui.Extensions;
 
 namespace HydroColor.Services
 {
@@ -437,7 +438,7 @@ Your HydroColor data file is attached. Do not reply to this email.";
                 storedAddresses.Add(Strings.FileReaderWriter_DeleteEmail);
             }
             storedAddresses.Insert(0, Strings.FileReaderWriter_AddEmail);
-            string address = await Shell.Current.CurrentPage.DisplayActionSheet(Strings.FileReaderWriter_SelectEmailMessage, Strings.FileReaderWriter_SelectEmailCancelButton, null, storedAddresses.ToArray());
+            string address = await Shell.Current.CurrentPage.DisplayActionSheetAsync(Strings.FileReaderWriter_SelectEmailMessage, Strings.FileReaderWriter_SelectEmailCancelButton, null, storedAddresses.ToArray());
 
             return address;
         }
@@ -470,12 +471,12 @@ Your HydroColor data file is attached. Do not reply to this email.";
                 else if (address.Contains(Strings.FileReaderWriter_DeleteEmail))
                 {
                     List<string> storedAddresses = GetSavedEmailAddress();
-                    address = await Shell.Current.CurrentPage.DisplayActionSheet(Strings.FileReaderWriter_DeleteEmailMessage, Strings.FileReaderWriter_DeleteEmailCancelButton, null, storedAddresses.ToArray());
+                    address = await Shell.Current.CurrentPage.DisplayActionSheetAsync(Strings.FileReaderWriter_DeleteEmailMessage, Strings.FileReaderWriter_DeleteEmailCancelButton, null, storedAddresses.ToArray());
                     if (address.Contains(Strings.FileReaderWriter_SelectEmailCancelButton))
                     {
                         return;
                     }
-                    bool confirmDelete = await Shell.Current.CurrentPage.DisplayAlert(Strings.FileReaderWriter_ConfirmDeleteEmailTitle, $"{Strings.FileReaderWriter_ConfirmDeleteEmailMessage}\n\n{address}", Strings.FileReaderWriter_ConfirmDeleteEmailDeleteButton, Strings.FileReaderWriter_ConfirmDeleteEmailCancelButton);
+                    bool confirmDelete = await Shell.Current.CurrentPage.DisplayAlertAsync(Strings.FileReaderWriter_ConfirmDeleteEmailTitle, $"{Strings.FileReaderWriter_ConfirmDeleteEmailMessage}\n\n{address}", Strings.FileReaderWriter_ConfirmDeleteEmailDeleteButton, Strings.FileReaderWriter_ConfirmDeleteEmailCancelButton);
                     if (!confirmDelete)
                     {
                         return;
@@ -514,7 +515,9 @@ Your HydroColor data file is attached. Do not reply to this email.";
             var EmailBusyPopup = new SendingEmailPopup();
             EmailBusyPopup.BindingContext = this;
             bool EmailSent = false;
-            Shell.Current.CurrentPage.ShowPopup(EmailBusyPopup);
+            // ShowPopupAsync only completes when the popup is closed, so it must not be awaited here.
+            // Keep the task and await it after the popup is closed below.
+            var popupTask = Shell.Current.CurrentPage.ShowPopupAsync(EmailBusyPopup);
             try
             {
                 // MailKit is not working on older Android devices, ssl handshake exeception always occurs
@@ -535,40 +538,31 @@ Your HydroColor data file is attached. Do not reply to this email.";
                 }
             }        
 
-            // Need to wait till popup is closed before displaying confirmation alert.
-            // Alert was not appearing on iOS.
-            EmailBusyPopup.Closed += (async (object sender, CommunityToolkit.Maui.Core.PopupClosedEventArgs e) =>
+            await EmailBusyPopup.CloseAsync();
+            await popupTask;
+
+            if (EmailSent)
             {
-                if (EmailSent)
-                {
-                    await Shell.Current.CurrentPage.DisplayAlert(Strings.FileReaderWriter_EmailSentTitle, $"{Strings.FileReaderWriter_EmailSentMessage_1}\n\n{address}\n\n{Strings.FileReaderWriter_EmailSentMessage_2}", Strings.FileReaderWriter_EmailSentDismissButton);
-                }
-                else
-                {
-                    string emailFailedMessage;
+                await Shell.Current.CurrentPage.DisplayAlertAsync(Strings.FileReaderWriter_EmailSentTitle, $"{Strings.FileReaderWriter_EmailSentMessage_1}\n\n{address}\n\n{Strings.FileReaderWriter_EmailSentMessage_2}", Strings.FileReaderWriter_EmailSentDismissButton);
+            }
+            else
+            {
+                string emailFailedMessage;
 #if ANDROID
                     emailFailedMessage = Strings.FileReaderWriter_EmailFailedMessageAndroid;
 #elif IOS
-                    emailFailedMessage = Strings.FileReaderWriter_EmailFailedMessageIOS;
+                emailFailedMessage = Strings.FileReaderWriter_EmailFailedMessageIOS;
 #endif
-                    await Shell.Current.CurrentPage.DisplayAlert(Strings.FileReaderWriter_EmailFailedTitle, emailFailedMessage, Strings.FileReaderWriter_EmailFailedDismissButton);
-                }
-            });
+                await Shell.Current.CurrentPage.DisplayAlertAsync(Strings.FileReaderWriter_EmailFailedTitle, emailFailedMessage, Strings.FileReaderWriter_EmailFailedDismissButton);
+            }
 
-            EmailBusyPopup.Close();
-
-        }
-
-        private void EmailBusyPopup_Closed(object sender, CommunityToolkit.Maui.Core.PopupClosedEventArgs e)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task MailKitSendEmail(string address, string attachmentName)
         {
             await Task.Factory.StartNew(() => { 
             var message = new MimeMessage();
-            message.From.Add(new MailboxAddress(EmailSenderName, GmailCredentials.Email));
+            message.From.Add(new MailboxAddress(EmailSenderName, Secrets.EmailAddress));
             message.To.Add(new MailboxAddress(EmailReceiverName, address));
             message.Subject = EmailSubject;
 
@@ -581,8 +575,8 @@ Your HydroColor data file is attached. Do not reply to this email.";
 
             SmtpClient client = new SmtpClient();
             client.CheckCertificateRevocation = false;
-            client.Connect(GmailCredentials.Host, 587, SecureSocketOptions.Auto);
-            client.Authenticate(GmailCredentials.UserName, GmailCredentials.Password);
+            client.Connect(Secrets.EmailHost, 587, SecureSocketOptions.Auto);
+            client.Authenticate(Secrets.EmailUserName, Secrets.EmailPassword);
             client.Send(message);
             client.Disconnect(true);
             });
@@ -592,10 +586,10 @@ Your HydroColor data file is attached. Do not reply to this email.";
         {
             await Task.Factory.StartNew(() =>
             {
-                var sendGridClient = new SendGrid.SendGridClient(GmailCredentials.SendGridAPIKey);
+                var sendGridClient = new SendGrid.SendGridClient(Secrets.SendGridApiKey);
                 var msg = new SendGridMessage()
                 {
-                    From = new EmailAddress(GmailCredentials.Email, EmailSenderName),
+                    From = new EmailAddress(Secrets.EmailAddress, EmailSenderName),
                     Subject = EmailSubject,
                     PlainTextContent = EmailBody + "\n\n(Sent With SendGrid)"
                 };

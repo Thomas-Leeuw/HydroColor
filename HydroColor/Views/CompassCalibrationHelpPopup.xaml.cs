@@ -15,6 +15,6 @@ public partial class CompassCalibrationHelpPopup : Popup
 
     private void OKButton_Clicked(object sender, EventArgs e)
     {
-		Close();
+		CloseAsync();
     }
 }

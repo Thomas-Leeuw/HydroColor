@@ -157,7 +157,7 @@
             WidthRequest="200"
             HeightRequest="120"
             Text="{Binding ImageCollectionHelpText}"
-            VerticalOptions="CenterAndExpand"
+            VerticalOptions="Center"
             HorizontalOptions="Start"
             IsVisible="{Binding CompassVisible, Converter={StaticResource InvertedBoolConverter}}"
             />

@@ -399,3 +399,4 @@ FodyWeavers.xsd
 
 # Email Credentials
 HydroColor/GmailCredentials.cs
+HydroColor/Secrets.cs

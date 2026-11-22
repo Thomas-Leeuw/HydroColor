@@ -241,7 +241,7 @@
                        Margin="5" 
                        Grid.Row="0" 
                        Grid.Column="0" 
-                       FontSize="Medium" 
+                       FontSize="17" 
                        VerticalOptions="Center"/>
 
                 <Button Text="{Binding CurrentLocation.Latitude, StringFormat='{}{0:#,0.00000}'}" 
@@ -250,14 +250,14 @@
                         WidthRequest="125" 
                         Grid.Row="0" 
                         Grid.Column="1"
-                        FontSize="Medium"
+                        FontSize="17"
                         Margin="5"/>
 
                 <Label Text="{x:Static strings:Strings.CollectData_LongitudeAbbreviation}" 
                        Margin="5" 
                        Grid.Row="1" 
                        Grid.Column="0" 
-                       FontSize="Medium" 
+                       FontSize="17" 
                        VerticalOptions="Center"/>
 
                 <Button Text="{Binding CurrentLocation.Longitude, StringFormat='{}{0:#,0.00000}'}" 
@@ -266,7 +266,7 @@
                         WidthRequest="125" 
                         Grid.Row="1"
                         Grid.Column="1"
-                        FontSize="Medium"
+                        FontSize="17"
                         Margin="5"/>
                 
                 <VerticalStackLayout Grid.Row="0"

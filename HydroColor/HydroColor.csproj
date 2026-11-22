@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net9.0-ios;net9.0-android</TargetFrameworks>
-    <RuntimeIdentifiers Condition="$(TargetFramework.Contains('-android'))">android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers>
-
+		<TargetFrameworks>net11.0-ios;net11.0-android</TargetFrameworks>
+    <RuntimeIdentifiers Condition="$(TargetFramework.Contains('-android'))">android-arm;android-arm64;android-x64</RuntimeIdentifiers>
+    
 		<OutputType>Exe</OutputType>
 		<RootNamespace>HydroColor</RootNamespace>
 		<UseMaui>true</UseMaui>
@@ -23,8 +23,17 @@
 		<ApplicationVersion>7</ApplicationVersion>
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- Secrets.cs holds the real API keys and is not committed to git.
+		     Use it when it exists; otherwise build with the placeholder values in Secrets.template.cs. -->
+		<Compile Remove="Secrets.template.cs" Condition="Exists('Secrets.cs')" />
+		<!-- Keep the template visible in Solution Explorer even when it is not being compiled. -->
+		<None Include="Secrets.template.cs" Condition="Exists('Secrets.cs')" />
+	</ItemGroup>
+
 
 
 
@@ -56,12 +65,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-    <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.21" />
-	  <PackageReference Include="CommunityToolkit.Maui" Version="10.0.0" />
-	  <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-	  <PackageReference Include="MailKit" Version="4.9.0" />
-	  <PackageReference Include="Microsoft.Maui.Controls.Maps" Version="9.0.21" />
-	  <PackageReference Include="SendGrid" Version="9.29.3" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="11.0.10" />
+		<PackageReference Include="Microsoft.Maui.Controls.Maps" Version="11.0.10" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="17.0.0" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+		<PackageReference Include="MailKit" Version="4.18.2" />
+		<PackageReference Include="SendGrid" Version="9.29.3" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -108,6 +117,5 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>
-
 
 </Project>

@@ -116,7 +116,7 @@
         </Grid>
 
         <Border Grid.Row="3" Grid.ColumnSpan="3" BackgroundColor="DarkGray" Margin="10" StrokeShape="RoundRectangle 10,10,10,10" HorizontalOptions="Center">
-            <ScrollView BackgroundColor="Black" HorizontalOptions="CenterAndExpand" VerticalScrollBarVisibility="Always" Orientation="Vertical" Padding="10">
+            <ScrollView BackgroundColor="Black" HorizontalOptions="Center" VerticalScrollBarVisibility="Always" Orientation="Vertical" Padding="10">
                 <Grid ColumnSpacing="8" RowSpacing="2" RowDefinitions="auto,auto,auto,auto,auto,auto,auto,auto,auto,auto" ColumnDefinitions="auto,auto,auto" HorizontalOptions="Center">
 
                     <Grid.Resources>

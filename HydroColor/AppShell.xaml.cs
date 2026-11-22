@@ -1,4 +1,7 @@
 ﻿using HydroColor.Views;
+using System.Diagnostics;
+using System.Globalization;
+using System.Resources;
 
 namespace HydroColor;
 
@@ -14,11 +17,11 @@ public partial class AppShell : Shell
 
         if (Preferences.Default.Get(PreferenceKeys.HideWelcomeScreen, false))
         {
-            GoToAsync("//MainTabView");
+            CurrentItem = MainTabsShellContent; 
         }
         else
         {
-            GoToAsync(nameof(WelcomeView));
+            CurrentItem = WelcomeShellContent;  
         }
 
     }

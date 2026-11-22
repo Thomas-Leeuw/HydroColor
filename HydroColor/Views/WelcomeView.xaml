@@ -13,10 +13,10 @@
 
     <Grid RowDefinitions="*,Auto" x:Name="TestGrid">
         <CarouselView Grid.Row="0"
-                      HorizontalOptions="FillAndExpand"
-                      VerticalOptions="FillAndExpand"
+                      HorizontalOptions="Fill"
+                      VerticalOptions="Fill"
                       IsBounceEnabled="False"
-                      Loop="True" 
+                      Loop="False"
                       IsSwipeEnabled="False"
                       ItemsSource="{Binding WelcomePages}"
                       PositionChangedCommand="{Binding CarouselPositionChangedCommand}"
@@ -37,7 +37,7 @@
                                    FontSize="17"
                                    HorizontalTextAlignment="Center"/>
 
-                                <VerticalStackLayout IsVisible="{Binding LearnMoreLinksVisible, Source={RelativeSource AncestorType={x:Type vm:WelcomeViewModel}}, x:DataType=vm:WelcomeViewModel}" 
+                                <VerticalStackLayout IsVisible="{Binding ShowLearnMoreLinks}"
                                                  Margin="0,10,0,0">
                                     <Label Text="MISC-Lab Overview"
                                     Margin="10"

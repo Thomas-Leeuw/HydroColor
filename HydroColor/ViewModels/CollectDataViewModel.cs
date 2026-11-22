@@ -226,7 +226,7 @@ namespace HydroColor.ViewModels
                 {
                     MapPins.Clear();
                     MoveMapLocationAction(new MapSpan(new Location { Longitude = 0, Latitude = 0 }, 180, 180));
-                    await Shell.Current.CurrentPage.DisplayAlert(Strings.CollectData_NoGPSTitle, Strings.CollectData_NoGPSMessage, Strings.CollectData_NoGPSDismissButton);
+                    await Shell.Current.CurrentPage.DisplayAlertAsync(Strings.CollectData_NoGPSTitle, Strings.CollectData_NoGPSMessage, Strings.CollectData_NoGPSDismissButton);
                 }
             }
             // Catch one of the following exceptions:
@@ -235,11 +235,11 @@ namespace HydroColor.ViewModels
             //   PermissionException
             catch (PermissionException)
             {
-                await Shell.Current.CurrentPage.DisplayAlert(Strings.CollectData_LocationPermissionDeniedTitle, Strings.CollectData_LocationPermissionDeniedMessage, Strings.CollectData_LocationPermissionDeniedDismissButton);
+                await Shell.Current.CurrentPage.DisplayAlertAsync(Strings.CollectData_LocationPermissionDeniedTitle, Strings.CollectData_LocationPermissionDeniedMessage, Strings.CollectData_LocationPermissionDeniedDismissButton);
             }
             catch
             {
-                await Shell.Current.CurrentPage.DisplayAlert(Strings.CollectData_GPSNotSupportedTitle, Strings.CollectData_GPSNotSupportedMessage, Strings.CollectData_GPSNotSupportedDismissButton);
+                await Shell.Current.CurrentPage.DisplayAlertAsync(Strings.CollectData_GPSNotSupportedTitle, Strings.CollectData_GPSNotSupportedMessage, Strings.CollectData_GPSNotSupportedDismissButton);
             }
             finally
             {
@@ -328,7 +328,7 @@ namespace HydroColor.ViewModels
         void SunElevationAngleWarningTapped()
         {
             double SunElevationAngle = CheckSunElevationAngle();
-            Shell.Current.CurrentPage.DisplayAlert(Strings.CollectData_SunElevationWarningTitle, $"{Strings.CollectData_SunElevationWarningMessage_1} {SunElevationAngle.ToString("F0")} {Strings.CollectData_SunElevationWarningMessage_2}", Strings.CollectData_SunElevationWarningDismissButton);
+            Shell.Current.CurrentPage.DisplayAlertAsync(Strings.CollectData_SunElevationWarningTitle, $"{Strings.CollectData_SunElevationWarningMessage_1} {SunElevationAngle.ToString("F0")} {Strings.CollectData_SunElevationWarningMessage_2}", Strings.CollectData_SunElevationWarningDismissButton);
         }
 
         [RelayCommand] // using CanExecute here causes crash on LGE Nexus 5, Android 6.0
@@ -368,7 +368,7 @@ namespace HydroColor.ViewModels
             }
             else
             {
-                await Shell.Current.CurrentPage.DisplayAlert(Strings.CollectData_IncompleteImagesTitle, Strings.CollectData_IncompleteImagesMessage, Strings.CollectData_IncompleteImagesDismissButton);
+                await Shell.Current.CurrentPage.DisplayAlertAsync(Strings.CollectData_IncompleteImagesTitle, Strings.CollectData_IncompleteImagesMessage, Strings.CollectData_IncompleteImagesDismissButton);
             }
 
         }

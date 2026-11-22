@@ -24,9 +24,6 @@ namespace HydroColor.ViewModels
         [ObservableProperty]
         bool hideWelcomeScreenChecked;
 
-        [ObservableProperty]
-        bool learnMoreLinksVisible;
-
         public WelcomeViewModel()
         {
 
@@ -60,7 +57,8 @@ namespace HydroColor.ViewModels
                 {
                     IntroTitle = Strings.Welcome_LearnMoreTitle,
                     IntroBody = Strings.Welcome_LearnMoreBody,
-                    IntroImage = "learn_more.png"
+                    IntroImage = "learn_more.png",
+                    ShowLearnMoreLinks = true
                 }
             };
 
@@ -98,7 +96,6 @@ namespace HydroColor.ViewModels
         {
             BackButtonVisible = CarouselPosition != 0;
             NextButtonText = CarouselPosition == WelcomePages.Count - 1 ? Strings.Welcome_StartButton : Strings.Welcome_NextButton;
-            LearnMoreLinksVisible = CarouselPosition == 4;
 
         }
 

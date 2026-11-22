@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Maui.Views;
+﻿using CommunityToolkit.Maui.Extensions;
+using CommunityToolkit.Maui.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using HydroColor.Models;
@@ -103,17 +104,17 @@ namespace HydroColor.ViewModels
             }
             catch (NotSupportedException)
             {
-                await Shell.Current.CurrentPage.DisplayAlert(Strings.CameraController_NoCameraTitle, Strings.CameraController_NoCameraMessage, Strings.CameraController_NoCameraDismissButton);
+                await Shell.Current.CurrentPage.DisplayAlertAsync(Strings.CameraController_NoCameraTitle, Strings.CameraController_NoCameraMessage, Strings.CameraController_NoCameraDismissButton);
                 await Shell.Current.GoToAsync($"..", true);
             }
             catch (InvalidOperationException)
             {
-                await Shell.Current.CurrentPage.DisplayAlert("Camera Session", "A camera session could not be opened.", "OK");
+                await Shell.Current.CurrentPage.DisplayAlertAsync("Camera Session", "A camera session could not be opened.", "OK");
                 await Shell.Current.GoToAsync($"..", true);
             }
             catch (Exception ex)
             {
-                await Shell.Current.CurrentPage.DisplayAlert("Camera Error", ex.Message, "OK");
+                await Shell.Current.CurrentPage.DisplayAlertAsync("Camera Error", ex.Message, "OK");
                 await Shell.Current.GoToAsync($"..", true);
             }
 
@@ -158,7 +159,7 @@ namespace HydroColor.ViewModels
             var CompassHelpPopup = new CompassCalibrationHelpPopup();
             CompassHelpPopup.BindingContext = this;
 
-            Shell.Current.CurrentPage.ShowPopup(CompassHelpPopup);
+            Shell.Current.CurrentPage.ShowPopupAsync(CompassHelpPopup);
         }
 
         [RelayCommand]
@@ -200,12 +201,12 @@ namespace HydroColor.ViewModels
             }
             catch (NotSupportedException ex)
             {
-                await Shell.Current.CurrentPage.DisplayAlert("Camera Not Supported", ex.Message, "OK");
+                await Shell.Current.CurrentPage.DisplayAlertAsync("Camera Not Supported", ex.Message, "OK");
                 await Shell.Current.GoToAsync($"..", true);
             }
             catch(Exception ex)
             {
-                await Shell.Current.CurrentPage.DisplayAlert("Camera Error", ex.Message, "OK");
+                await Shell.Current.CurrentPage.DisplayAlertAsync("Camera Error", ex.Message, "OK");
                 await Shell.Current.GoToAsync($"..", true);
             }
             
@@ -283,7 +284,7 @@ namespace HydroColor.ViewModels
             }
             else if (sensorControl == SensorControl.START) // Attempting to start sensor that is not supported
             {
-                Shell.Current.CurrentPage.DisplayAlert(Strings.CaptureImage_NoCompassTitle, Strings.CaptureImage_NoCompassMessage, Strings.CaptureImage_NoCompassDismissButton);
+                Shell.Current.CurrentPage.DisplayAlertAsync(Strings.CaptureImage_NoCompassTitle, Strings.CaptureImage_NoCompassMessage, Strings.CaptureImage_NoCompassDismissButton);
 
             }
             
@@ -316,7 +317,7 @@ namespace HydroColor.ViewModels
             }
             else if (sensorControl == SensorControl.START) // Attempting to start sensor that is not supported
             {
-                Shell.Current.CurrentPage.DisplayAlert(Strings.CaptureImage_NoOrientationTitle, Strings.CaptureImage_NoOrientationMessage, Strings.CaptureImage_NoOrientationDismissButton);
+                Shell.Current.CurrentPage.DisplayAlertAsync(Strings.CaptureImage_NoOrientationTitle, Strings.CaptureImage_NoOrientationMessage, Strings.CaptureImage_NoOrientationDismissButton);
 
             }
         }

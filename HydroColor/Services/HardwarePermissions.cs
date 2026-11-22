@@ -45,7 +45,7 @@ namespace HydroColor.Services
         {
             if (typeof(T) == typeof(Permissions.Camera))
             {
-                await Shell.Current.CurrentPage.DisplayAlert(Strings.HardwarePermissions_CameraPermissionTitle, Strings.HardwarePermissions_CameraPermissionMessage, Strings.HardwarePermissions_CameraPermissionDismissButton);
+                await Shell.Current.CurrentPage.DisplayAlertAsync(Strings.HardwarePermissions_CameraPermissionTitle, Strings.HardwarePermissions_CameraPermissionMessage, Strings.HardwarePermissions_CameraPermissionDismissButton);
 
             }
         }
