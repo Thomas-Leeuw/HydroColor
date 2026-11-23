@@ -14,14 +14,7 @@ namespace HydroColor.ViewModels
         ObservableCollection<DataLibraryItem> dataLibraryItems;
 
         [ObservableProperty]
-        bool showDeleteMeasurementsButtons;
-
-        [ObservableProperty]
-        string editListButtonText = Strings.Library_EditListButton;
-
-        [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(EmailDataFileCommand))]
-        [NotifyCanExecuteChangedFor(nameof(EditListCommand))]
         bool measurementsExist;
 
         // Number of lines in the data file that could not be read (they are not shown in the list)
@@ -43,9 +36,7 @@ namespace HydroColor.ViewModels
         [RelayCommand]
         void ViewAppearing()
         {
-            EditListButtonText = Strings.Library_EditListButton;
-            ShowDeleteMeasurementsButtons = false;
-            RefreshLibraryItemsList();        
+            RefreshLibraryItemsList();
         }
 
         void RefreshLibraryItemsList()
@@ -54,11 +45,6 @@ namespace HydroColor.ViewModels
 
             UnreadableMeasurementCount = unreadableCount;
             MeasurementsExist = DataItems.Count > 0;
-            if (!MeasurementsExist)
-            {
-                EditListButtonText = Strings.Library_EditListButton;
-                ShowDeleteMeasurementsButtons = false;
-            }
 
             // place newest measurements at the top of the list
             DataItems.Reverse();
@@ -66,24 +52,21 @@ namespace HydroColor.ViewModels
         }
 
         [RelayCommand]
-        async Task ItemTapped(ItemTappedEventArgs e)
+        async Task ItemTapped(DataLibraryItem item)
         {
-            if (!ShowDeleteMeasurementsButtons)
+            HydroColorProcessedMeasurement ProcMeas = DataFile.GetDataRecord(item.LocalTimestamp);
+
+            if (ProcMeas == null)
             {
-                HydroColorProcessedMeasurement ProcMeas = DataFile.GetDataRecord(((DataLibraryItem)e.Item).LocalTimestamp);
-
-                if (ProcMeas == null)
-                {
-                    // The record is missing or incomplete in the data file
-                    await Shell.Current.CurrentPage.DisplayAlertAsync(Strings.Library_MeasurementNotOpenedTitle, Strings.Library_MeasurementNotOpenedMessage, Strings.Library_MeasurementNotOpenedDismissButton);
-                    return;
-                }
-
-                await Shell.Current.GoToAsync(nameof(DataView), new Dictionary<string, object>
-                {
-                    ["MeasurementData"] = ProcMeas
-                });
+                // The record is missing or incomplete in the data file
+                await Shell.Current.CurrentPage.DisplayAlertAsync(Strings.Library_MeasurementNotOpenedTitle, Strings.Library_MeasurementNotOpenedMessage, Strings.Library_MeasurementNotOpenedDismissButton);
+                return;
             }
+
+            await Shell.Current.GoToAsync(nameof(DataView), new Dictionary<string, object>
+            {
+                ["MeasurementData"] = ProcMeas
+            });
         }
 
         [RelayCommand]
@@ -109,13 +92,6 @@ namespace HydroColor.ViewModels
         async Task UnreadableMeasurements()
         {
             await Shell.Current.CurrentPage.DisplayAlertAsync(Strings.Library_UnreadableMeasurementsTitle, string.Format(Strings.Library_UnreadableMeasurementsMessage, UnreadableMeasurementCount), Strings.Library_UnreadableMeasurementsDismissButton);
-        }
-
-        [RelayCommand(CanExecute = nameof(MeasurementsExist))]
-        void EditList()
-        {
-            EditListButtonText = ShowDeleteMeasurementsButtons ? Strings.Library_EditListButton : Strings.Library_EditListDoneButton;
-            ShowDeleteMeasurementsButtons = !ShowDeleteMeasurementsButtons;
         }
 
         [RelayCommand]

@@ -89,6 +89,9 @@ namespace HydroColor.ViewModels
         // The camera can report more than once, for example for the raw and the processed photo on iOS.
         bool _captureResultHandled;
 
+        // true while OpenCameraPreview is running, so two triggers cannot open the camera twice
+        bool _openingCamera;
+
         public CaptureImageViewModel()
         {
             camControl.ImageCaptureCompletedEvent += ImageCaptureCompleted;
@@ -97,32 +100,82 @@ namespace HydroColor.ViewModels
         // need to wait for the layout to finish before opening the camera
         async partial void OnCameraPreviewLayoutFinishedChanged(bool value)
         {
-            // Check camera permission
-            PermissionStatus permissionStatus = await HardwarePermissions.RequestPermission<Camera>();
-            if (permissionStatus != PermissionStatus.Granted)
+            if (!value)
             {
-                await Shell.Current.GoToAsync($"..", true);
+                // The preview surface was destroyed: the app went to the background or the page is closing.
+                CamControl.CloseCamera();
                 return;
             }
 
+            await OpenCameraPreview();
+        }
+
+        // Called when the app returns to the foreground.
+        // The camera can be taken away while the app is not in front (screen locked, another camera app opened)
+        // without the preview surface being recreated, so it is reopened here if needed.
+        async void Window_Resumed(object sender, EventArgs e)
+        {
+            if (_pageActive && CameraPreviewLayoutFinished)
+            {
+                await OpenCameraPreview();
+            }
+        }
+
+        // Opens the camera and starts the preview, unless it is already open
+        async Task OpenCameraPreview()
+        {
+            if (_captureResultHandled)
+            {
+                return; // a capture has already finished and the page is closing
+            }
+
+            if (WaitingForImageResults)
+            {
+                // The app went to the background during a capture and the camera was closed before the image arrived.
+                _captureResultHandled = true;
+                CaptureFailed("The app was moved to the background during the capture.");
+                return;
+            }
+
+            if (CamControl.IsOpen || _openingCamera)
+            {
+                return;
+            }
+            _openingCamera = true;
+
             try
             {
-                CamControl.OpenCamera();
+                // Check camera permission
+                PermissionStatus permissionStatus = await HardwarePermissions.RequestPermission<Camera>();
+                if (permissionStatus != PermissionStatus.Granted)
+                {
+                    await Shell.Current.GoToAsync($"..", true);
+                    return;
+                }
+
+                try
+                {
+                    CamControl.OpenCamera();
+                }
+                catch (NotSupportedException)
+                {
+                    await Shell.Current.CurrentPage.DisplayAlertAsync(Strings.CameraController_NoCameraTitle, Strings.CameraController_NoCameraMessage, Strings.CameraController_NoCameraDismissButton);
+                    await Shell.Current.GoToAsync($"..", true);
+                }
+                catch (InvalidOperationException)
+                {
+                    await Shell.Current.CurrentPage.DisplayAlertAsync("Camera Session", "A camera session could not be opened.", "OK");
+                    await Shell.Current.GoToAsync($"..", true);
+                }
+                catch (Exception ex)
+                {
+                    await Shell.Current.CurrentPage.DisplayAlertAsync("Camera Error", ex.Message, "OK");
+                    await Shell.Current.GoToAsync($"..", true);
+                }
             }
-            catch (NotSupportedException)
+            finally
             {
-                await Shell.Current.CurrentPage.DisplayAlertAsync(Strings.CameraController_NoCameraTitle, Strings.CameraController_NoCameraMessage, Strings.CameraController_NoCameraDismissButton);
-                await Shell.Current.GoToAsync($"..", true);
-            }
-            catch (InvalidOperationException)
-            {
-                await Shell.Current.CurrentPage.DisplayAlertAsync("Camera Session", "A camera session could not be opened.", "OK");
-                await Shell.Current.GoToAsync($"..", true);
-            }
-            catch (Exception ex)
-            {
-                await Shell.Current.CurrentPage.DisplayAlertAsync("Camera Error", ex.Message, "OK");
-                await Shell.Current.GoToAsync($"..", true);
+                _openingCamera = false;
             }
 
         }
@@ -131,6 +184,10 @@ namespace HydroColor.ViewModels
         void ViewAppearing()
         {
             _pageActive = true;
+
+            // Reopen the camera if needed when the app returns to the foreground
+            Shell.Current.Window.Resumed -= Window_Resumed;
+            Shell.Current.Window.Resumed += Window_Resumed;
 
             if (CurrentLocation.Latitude == 0 || CurrentLocation.Longitude == 0)
             {
@@ -158,6 +215,7 @@ namespace HydroColor.ViewModels
         void ViewUnloaded()
         {
             _pageActive = false;
+            Shell.Current.Window.Resumed -= Window_Resumed;
 
             ToggleCompass(SensorControl.STOP);
             ToggleOrientation(SensorControl.STOP);

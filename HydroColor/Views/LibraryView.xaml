@@ -27,69 +27,57 @@
 
     <Grid RowDefinitions="auto,*,auto,auto" BackgroundColor="Black">
 
-        <Button Grid.Row="0" 
-                Text="{Binding EditListButtonText}" 
-                HorizontalOptions="Start" 
+        <Button Grid.Row="0"
+                Text="{x:Static strings:Strings.Library_EmailDataFileButton}"
+                HorizontalOptions="End"
                 FontSize="12"
                 Margin="5"
-                Command="{Binding EditListCommand}"/>
+                Command="{Binding EmailDataFileCommand}"/>
 
-        <Button Grid.Row="0" 
-                Text="{x:Static strings:Strings.Library_EmailDataFileButton}" 
-                HorizontalOptions="End" 
-                FontSize="12"
-                Margin="5"
-                Command="{Binding EmailDataFileCommand}"
-                IsVisible="{Binding ShowDeleteMeasurementsButtons, Converter={StaticResource InvertedBoolConverter}}"/>
-
-        <ListView Grid.Row="1" 
-                  ItemsSource="{Binding DataLibraryItems}" 
-                  SeparatorColor="White"
-                  BackgroundColor="Black" 
-                  SelectionMode="None" 
-                  RowHeight="75" 
-                  CachingStrategy="RecycleElement">
-            <ListView.Behaviors>
-                <toolkit:EventToCommandBehavior
-                EventName="ItemTapped"
-                BindingContext="{Binding Path=BindingContext, Source={x:Reference LibraryContentPage}, x:DataType=views:LibraryView}"
-                Command="{Binding ItemTappedCommand}"
-                x:TypeArguments="ItemTappedEventArgs"/>
-            </ListView.Behaviors>
-            <ListView.ItemTemplate>
+        <!-- Swipe a row left to show its Delete button -->
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding DataLibraryItems}"
+                        BackgroundColor="Black"
+                        SelectionMode="None">
+            <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:DataLibraryItem">
-                    <ViewCell>
+                    <SwipeView BackgroundColor="Black">
+                        <SwipeView.RightItems>
+                            <SwipeItems Mode="Reveal">
+                                <SwipeItem Text="{x:Static strings:Strings.Library_DeleteButton}"
+                                           BackgroundColor="Red"
+                                           Command="{Binding DeleteItemCommand, Source={RelativeSource AncestorType={x:Type viewmodels:LibraryViewModel}}, x:DataType=viewmodels:LibraryViewModel}"
+                                           CommandParameter="{Binding}"/>
+                            </SwipeItems>
+                        </SwipeView.RightItems>
 
-                        <Grid RowDefinitions="*,*" ColumnDefinitions="75,*" Padding="5">
-                            <Image Grid.Column="0" Grid.RowSpan="2" Source="{Binding WaterImageURI}"/>
-                            <Label Grid.Column="1" Grid.Row="0" Text="{Binding MeasurementName}" TextColor="White" FontSize="18"/>
-                            <Label Grid.Column="1" Grid.Row="1" Text="{Binding LocalTimestamp}" TextColor="White" FontSize="16"/>
-                            <Button Text="{x:Static strings:Strings.Library_DeleteButton}" 
-                                    FontSize="18"
-                                    FontAttributes="Bold"
-                                    Grid.Column="1" 
-                                    Grid.RowSpan="2" 
-                                    Background="Red" 
-                                    TextColor="White" 
-                                    HorizontalOptions="End" 
-                                    CornerRadius="0"
-                                    Command="{Binding DeleteItemCommand, Source={RelativeSource AncestorType={x:Type viewmodels:LibraryViewModel}}, x:DataType=viewmodels:LibraryViewModel}"
-                                    CommandParameter="{Binding}"
-                                    IsVisible="{Binding ShowDeleteMeasurementsButtons, Source={RelativeSource AncestorType={x:Type viewmodels:LibraryViewModel}}, x:DataType=viewmodels:LibraryViewModel}"/>
-                            <Image 
-                                    Source="right_arrow.png"
-                                    Grid.Column="1" 
-                                    Grid.RowSpan="2"
-                                    VerticalOptions="Center"
-                                    HorizontalOptions="End"
-                                    Aspect="AspectFit"
-                                    HeightRequest="15"
-                                    IsVisible="{Binding ShowDeleteMeasurementsButtons, Converter={StaticResource InvertedBoolConverter}, Source={RelativeSource AncestorType={x:Type viewmodels:LibraryViewModel}}, x:DataType=viewmodels:LibraryViewModel}" />
+                        <!-- One row: 74 for the content plus a 1 pixel white separator line -->
+                        <Grid RowDefinitions="74,1" BackgroundColor="Black">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding ItemTappedCommand, Source={RelativeSource AncestorType={x:Type viewmodels:LibraryViewModel}}, x:DataType=viewmodels:LibraryViewModel}"
+                                    CommandParameter="{Binding}"/>
+                            </Grid.GestureRecognizers>
+
+                            <Grid Grid.Row="0" RowDefinitions="*,*" ColumnDefinitions="75,*" Padding="5">
+                                <Image Grid.Column="0" Grid.RowSpan="2" Source="{Binding WaterImageURI}"/>
+                                <Label Grid.Column="1" Grid.Row="0" Text="{Binding MeasurementName}" TextColor="White" FontSize="18"/>
+                                <Label Grid.Column="1" Grid.Row="1" Text="{Binding LocalTimestamp}" TextColor="White" FontSize="16"/>
+                                <Image Source="right_arrow.png"
+                                       Grid.Column="1"
+                                       Grid.RowSpan="2"
+                                       VerticalOptions="Center"
+                                       HorizontalOptions="End"
+                                       Aspect="AspectFit"
+                                       HeightRequest="15"/>
+                            </Grid>
+
+                            <BoxView Grid.Row="1" Color="White"/>
                         </Grid>
-                    </ViewCell>
+                    </SwipeView>
                 </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
 
         <Label Text="{x:Static strings:Strings.Library_NoMeasurements}" 
                Grid.Row="1"

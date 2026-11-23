@@ -49,6 +49,19 @@ namespace HydroColor.Handlers
 #endif
                 VirtualView.LayoutFinished = true; // set layout finished property on the 'CameraPreview' control
             });
+
+#if ANDROID
+            // The preview surface is destroyed when the app goes to the background (and when the page closes).
+            // Clearing LayoutFinished lets it change to true again when a new surface is created,
+            // which reopens the camera.
+            platformView.SurfaceDestroyedEvent += ((object sender, EventArgs e) =>
+            {
+                if (((IElementHandler)this).VirtualView is CameraPreview preview)
+                {
+                    preview.LayoutFinished = false;
+                }
+            });
+#endif
         }
 
         protected override void DisconnectHandler(NativeCameraView platformView)

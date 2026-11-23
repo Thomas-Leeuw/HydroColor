@@ -48,6 +48,10 @@ namespace HydroColor.Platforms.Android
         // true from the moment a capture is requested until it completes or fails
         bool mCaptureInProgress;
 
+        // true from OpenCamera until CloseCamera. CloseCamera also runs when the camera
+        // is disconnected or reports an error, so this is false after the camera is lost.
+        public bool IsOpen { get; private set; }
+
         public CameraCharacteristics GetRearFacingCameraCharacteristics()
         {
             // Search for a compatible camera 
@@ -108,6 +112,7 @@ namespace HydroColor.Platforms.Android
             // Open the camera
             StartBackgroundThread();
             cameraManager.OpenCamera(cameraID, StateCallback, mBackgroundHandler);
+            IsOpen = true;
 
             return true;
         }
@@ -557,6 +562,7 @@ namespace HydroColor.Platforms.Android
         }
         public void CloseCamera()
         {
+            IsOpen = false;
             lock (mCameraStateLock)
             {
                 if (mCameraDevice != null)

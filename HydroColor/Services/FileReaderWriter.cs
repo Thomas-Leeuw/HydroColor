@@ -696,6 +696,7 @@ Your HydroColor data file is attached. Do not reply to this email.";
             var EmailBusyPopup = new SendingEmailPopup();
             EmailBusyPopup.BindingContext = this;
             bool EmailSent = false;
+            string emailErrorDetail = "";
             // ShowPopupAsync only completes when the popup is closed, so it must not be awaited here.
             // Keep the task and await it after the popup is closed below.
             var popupTask = Shell.Current.CurrentPage.ShowPopupAsync(EmailBusyPopup);
@@ -705,9 +706,10 @@ Your HydroColor data file is attached. Do not reply to this email.";
                 await MailKitSendEmail(address, attachmentName);
                 EmailSent = true;
             }
-            catch
+            catch (Exception ex)
             {
-                // EmailSent stays false and the "Email Failed" message is shown below.
+                // EmailSent stays false and the "Email Failed" message is shown below, with the reason.
+                emailErrorDetail = ex.Message;
             }
 
             await EmailBusyPopup.CloseAsync();
@@ -725,6 +727,10 @@ Your HydroColor data file is attached. Do not reply to this email.";
 #elif IOS
                 emailFailedMessage = Strings.FileReaderWriter_EmailFailedMessageIOS;
 #endif
+                if (!string.IsNullOrEmpty(emailErrorDetail))
+                {
+                    emailFailedMessage += "\n\nError: " + emailErrorDetail;
+                }
                 await Shell.Current.CurrentPage.DisplayAlertAsync(Strings.FileReaderWriter_EmailFailedTitle, emailFailedMessage, Strings.FileReaderWriter_EmailFailedDismissButton);
             }
 

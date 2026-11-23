@@ -26,6 +26,9 @@ namespace HydroColor.Platforms.iOS
 
         public AVCaptureSession mCaptureSession { get; private set; }
 
+        // true from OpenCamera until CloseCamera
+        public bool IsOpen => mCaptureSession != null;
+
         public CameraController()
         {
             mPhotoOutput = new AVCapturePhotoOutput();
@@ -197,7 +200,13 @@ namespace HydroColor.Platforms.iOS
         {
             if (mCaptureSession != null)
             {
+                if (mCaptureSession.Running)
+                {
+                    mCaptureSession.StopRunning();
+                }
+                mPreviewLayer?.RemoveFromSuperLayer();
                 mCaptureSession.Dispose();
+                mCaptureSession = null;
             }
         }
 
@@ -290,8 +299,9 @@ namespace HydroColor.Platforms.iOS
 
                 mImageData.CameraId = mCameraDevice.UniqueID;
                 mImageData.RawImagePixelData = imageData;
-                mImageData.ImageHeight = (int)photo.Properties.Exif.PixelYDimension;
-                mImageData.ImageWidth = (int)photo.Properties.Exif.PixelXDimension;
+                // The size is taken from the raw pixel buffer itself, as on Android, so it always matches the pixel data.
+                mImageData.ImageHeight = (int)pixelBuffer.Height;
+                mImageData.ImageWidth = (int)pixelBuffer.Width;
                 mImageData.ExposureTime = (float)photo.Properties.Exif.ExposureTime;
                 mImageData.SensorSensitivity = sensorSensitivity;
                 mImageData.BayerFilterPattern = bayerFilter;

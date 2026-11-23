@@ -9,6 +9,7 @@ namespace HydroColor.Platforms.Android
     public class NativeCameraView : FrameLayout, TextureView.ISurfaceTextureListener
     {
         public event EventHandler LayoutFinishedEvent;
+        public event EventHandler SurfaceDestroyedEvent;
         public AutoFitTextureView textureView { get; private set; }
 
         View view;
@@ -53,6 +54,7 @@ namespace HydroColor.Platforms.Android
 
         public bool OnSurfaceTextureDestroyed(SurfaceTexture surface)
         {
+            SurfaceDestroyedEvent?.Invoke(this, EventArgs.Empty);
             return true;
         }
 
