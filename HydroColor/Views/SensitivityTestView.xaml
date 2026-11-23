@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:HydroColor.ViewModels"
+             xmlns:converters="clr-namespace:HydroColor.Converters"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:views="clr-namespace:HydroColor.Views"
+             xmlns:controls="clr-namespace:HydroColor.Controls"
+             x:DataType="viewmodels:SensitivityTestViewModel"
+             x:Class="HydroColor.Views.SensitivityTestView"
+             Title="Sensitivity Test"
+             Shell.TabBarIsVisible="false"
+             Shell.NavBarIsVisible="true"
+             x:Name="SensitivityTestContentPage"
+             Unloaded="SensitivityTestContentPage_Unloaded">
+
+    <!-- Reached from the About page, only while camera diagnostics mode is on -->
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior
+            EventName="Appearing"
+            BindingContext="{Binding Path=BindingContext, Source={x:Reference SensitivityTestContentPage}, x:DataType=views:SensitivityTestView}"
+            Command="{Binding ViewAppearingCommand}" />
+        <toolkit:EventToCommandBehavior
+            EventName="Unloaded"
+            BindingContext="{Binding Path=BindingContext, Source={x:Reference SensitivityTestContentPage}, x:DataType=views:SensitivityTestView}"
+            Command="{Binding ViewUnloadedCommand}" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:CameraBoxOverlayWidthConverter x:Key="CameraBoxOverlayWidthConverter"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid BackgroundColor="Black" RowDefinitions="240,auto,auto,*" RowSpacing="8" Padding="10">
+
+        <controls:CameraPreview
+            x:Name="cameraPreview"
+            Grid.Row="0"
+            WidthRequest="180"
+            HeightRequest="240"
+            HorizontalOptions="Center"
+            LayoutFinished="{Binding CameraPreviewLayoutFinished}"
+            CameraControl="{Binding CamControl}"/>
+
+        <!-- The square that is measured, as on the capture page -->
+        <Border Grid.Row="0"
+                StrokeThickness="{OnPlatform 4, iOS=4, Android=2}"
+                VerticalOptions="Center"
+                HorizontalOptions="Center"
+                WidthRequest="{Binding Source={x:Reference cameraPreview}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType=controls:CameraPreview}"
+                HeightRequest="{Binding Source={x:Reference cameraPreview}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType=controls:CameraPreview}"
+                BackgroundColor="Transparent"
+                Stroke="White"/>
+
+        <Label Grid.Row="1" Text="{Binding StatusText}" FontSize="13" TextColor="White"/>
+
+        <HorizontalStackLayout Grid.Row="2" Spacing="10" HorizontalOptions="Center">
+            <Button Text="Start" Command="{Binding StartCommand}"/>
+            <Button Text="Cancel" Command="{Binding CancelCommand}"/>
+            <Button Text="Copy" Command="{Binding CopyCommand}"/>
+        </HorizontalStackLayout>
+
+        <ScrollView Grid.Row="3" Orientation="Both">
+            <Label Text="{Binding ResultsText}"
+                   FontFamily="{OnPlatform Android=monospace, iOS=Menlo}"
+                   FontSize="10"
+                   TextColor="White"
+                   WidthRequest="1500"
+                   HorizontalOptions="Start"
+                   LineBreakMode="WordWrap"/>
+        </ScrollView>
+
+    </Grid>
+</ContentPage>

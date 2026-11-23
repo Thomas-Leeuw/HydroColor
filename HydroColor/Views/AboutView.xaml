@@ -78,20 +78,40 @@
                     </Label.GestureRecognizers>
                 </Label>
 
-                <Label Text="{Binding AppVersionNumber, StringFormat='HydroColor v{0}'}" 
-                       Margin="5,5"
-                       HorizontalOptions="End"/>
+                <Grid ColumnDefinitions="*,auto" Margin="5,5">
 
-                <Label Text="Privacy Policy"
-                                    Margin="20,5,5,5"
-                                    TextColor="LightGray"
-                                    TextDecorations="Underline"
-                       HorizontalOptions="End">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer  Command="{Binding LinkClickedCommand}"
-                                            CommandParameter="https://sites.google.com/view/hydrocolor-albedo-privacy"/>
-                    </Label.GestureRecognizers>
-                </Label>
+                    <!-- Opens the camera diagnostics popup. Kept faint on purpose. -->
+                    <Label Grid.Column="0"
+                           Text="Camera Diagnostics"
+                           FontSize="12"
+                           TextColor="DimGray"
+                           TextDecorations="Underline"
+                           VerticalOptions="End"
+                           HorizontalOptions="Start"
+                           Margin="15,0,0,5">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ShowDiagnosticsSettingsCommand}"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+
+                    <VerticalStackLayout Grid.Column="1">
+                        <Label Text="{Binding AppVersionNumber, StringFormat='HydroColor v{0}'}"
+                               Margin="0,5"
+                               HorizontalOptions="End"/>
+
+                        <Label Text="Privacy Policy"
+                               Margin="0,5,0,5"
+                               TextColor="LightGray"
+                               TextDecorations="Underline"
+                               HorizontalOptions="End">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding LinkClickedCommand}"
+                                                      CommandParameter="https://sites.google.com/view/hydrocolor-albedo-privacy"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </VerticalStackLayout>
+
+                </Grid>
 
             </VerticalStackLayout>
         </ScrollView>

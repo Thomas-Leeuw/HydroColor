@@ -91,6 +91,10 @@ namespace HydroColor.ViewModels
         [ObservableProperty]
         bool sunElevationAngleWarningVisible;
 
+        // true while camera diagnostics mode is on (shows a reminder label)
+        [ObservableProperty]
+        bool diagnosticsOn;
+
         private CancellationTokenSource _cancelTokenSource;
         private bool _viewLoaded = false;
 
@@ -146,6 +150,37 @@ namespace HydroColor.ViewModels
         void ViewAppearing()
         {
             CheckSunElevationAngle();
+            DiagnosticsOn = CameraDiagnostics.Enabled;
+        }
+
+        // Shows the camera values of a new image. Does nothing unless diagnostics mode was on for the capture.
+        async void ShowImageDiagnostics(string imageName, HydroColorImageCaptureModel image)
+        {
+            if (image?.Diagnostics == null)
+            {
+                return;
+            }
+
+            try
+            {
+                string text = image.Diagnostics.ToDisplayText();
+                System.Diagnostics.Debug.WriteLine($"HydroColor diagnostics: {imageName}\n{text}");
+
+                await Task.Delay(600); // let the return from the capture page finish first
+                if (Shell.Current.CurrentPage is not CollectDataView)
+                {
+                    return;
+                }
+
+                bool copy = await Shell.Current.CurrentPage.DisplayAlertAsync($"Camera Diagnostics: {imageName}", text, "Copy", "Close");
+                if (copy)
+                {
+                    await Clipboard.Default.SetTextAsync($"{imageName}\n{text}");
+                }
+            }
+            catch
+            {
+            }
         }
 
         void ResetImageCapture()
@@ -173,6 +208,7 @@ namespace HydroColor.ViewModels
                 GrayCardThumbnailImage = ImageSource.FromStream(() => new MemoryStream(GrayCardImageData.JpegImage));
                 HaveGrayCardData = true;
                 GrayCardImageSquareColor = GrayCardImageData.ImageCapturedAtCorrectAngles ? Colors.LimeGreen : Colors.White;
+                ShowImageDiagnostics(Strings.CollectData_GrayCardDisplayName, value);
             }
             else
             {
@@ -186,6 +222,7 @@ namespace HydroColor.ViewModels
                 WaterThumbnailImage = ImageSource.FromStream(() => new MemoryStream(WaterImageData.JpegImage));
                 HaveWaterData = true;
                 WaterImageSquareColor = WaterImageData.ImageCapturedAtCorrectAngles ? Colors.LimeGreen : Colors.White;
+                ShowImageDiagnostics(Strings.CollectData_WaterDisplayName, value);
             }
             else
             {
@@ -199,6 +236,7 @@ namespace HydroColor.ViewModels
                 SkyThumbnailImage = ImageSource.FromStream(() => new MemoryStream(SkyImageData.JpegImage));
                 HaveSkyData = true;
                 SkyImageSquareColor = SkyImageData.ImageCapturedAtCorrectAngles ? Colors.LimeGreen : Colors.White;
+                ShowImageDiagnostics(Strings.CollectData_SkyDisplayName, value);
             }
             else
             {

@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using HydroColor.Models;
+using HydroColor.Services;
 
 namespace HydroColor.ViewModels
 {
@@ -73,6 +74,33 @@ namespace HydroColor.ViewModels
             GrayCardImageSquareColor = ProcMeas.GrayCardImageData.ImageCapturedAtCorrectAngles ? Colors.LimeGreen : Colors.White;
             SkyImageSquareColor = ProcMeas.SkyImageData.ImageCapturedAtCorrectAngles ? Colors.LimeGreen : Colors.White;
             WaterImageSquareColor = ProcMeas.WaterImageData.ImageCapturedAtCorrectAngles ? Colors.LimeGreen : Colors.White;
+
+            OnPropertyChanged(nameof(HasDiagnostics));
+        }
+
+        // True when the measurement was just taken in camera diagnostics mode
+        public bool HasDiagnostics => ProcMeas?.GrayCardImageData?.Diagnostics != null
+            || ProcMeas?.SkyImageData?.Diagnostics != null
+            || ProcMeas?.WaterImageData?.Diagnostics != null;
+
+        // Shows the camera values of the three images side by side (diagnostics mode only)
+        [RelayCommand]
+        async Task ShowDiagnostics()
+        {
+            try
+            {
+                string text = CaptureDiagnostics.ToSummaryText(ProcMeas.GrayCardImageData.Diagnostics, ProcMeas.SkyImageData.Diagnostics, ProcMeas.WaterImageData.Diagnostics);
+                System.Diagnostics.Debug.WriteLine($"HydroColor diagnostics: summary\n{text}");
+
+                bool copy = await Shell.Current.CurrentPage.DisplayAlertAsync("Camera Diagnostics", text, "Copy", "Close");
+                if (copy)
+                {
+                    await Clipboard.Default.SetTextAsync(text);
+                }
+            }
+            catch
+            {
+            }
         }
 
 

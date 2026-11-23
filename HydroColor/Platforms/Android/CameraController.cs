@@ -52,6 +52,10 @@ namespace HydroColor.Platforms.Android
         // is disconnected or reports an error, so this is false after the camera is lost.
         public bool IsOpen { get; private set; }
 
+        // When true the preview keeps running after a capture, so several captures can be taken in a row
+        // (sensitivity test). False for a normal measurement, where the page closes after one capture.
+        public bool KeepRunningAfterCapture { get; set; }
+
         public CameraCharacteristics GetRearFacingCameraCharacteristics()
         {
             // Search for a compatible camera 
@@ -287,14 +291,69 @@ namespace HydroColor.Platforms.Android
 
         public void TakeRAWImage()
         {
-            mCaptureSession.StopRepeating();
+            StartCapture(mCaptureRequest);
+        }
+
+        // Takes a raw image with the ISO and exposure time given, instead of automatic exposure (sensitivity test)
+        public void TakeRAWImage(double iso, double exposureSeconds)
+        {
+            CaptureRequest.Builder builder = mCameraDevice.CreateCaptureRequest(CameraTemplate.StillCapture);
+            builder.AddTarget(mJpegImageReader.Surface);
+            builder.AddTarget(mRawImageReader.Surface);
+            builder.Set(CaptureRequest.JpegOrientation, (int)mCharacteristics.Get(CameraCharacteristics.SensorOrientation));
+            builder.Set(CaptureRequest.ControlAeMode, (int)ControlAEMode.Off);
+            builder.Set(CaptureRequest.SensorSensitivity, (int)System.Math.Round(iso));
+            builder.Set(CaptureRequest.SensorExposureTime, (long)(exposureSeconds * 1e9));
+
+            StartCapture(builder.Build());
+        }
+
+        void StartCapture(CaptureRequest request)
+        {
+            if (!KeepRunningAfterCapture)
+            {
+                mCaptureSession.StopRepeating();
+            }
 
             mImageDataModel = new HydroColorRawImageData();
             mTotalCaptureResult = null;
             mCaptureInProgress = true;
             // After capture is completed callbacks in both CaptureCallback and OnImageAvailableListener are called
-            mCaptureSession.Capture(mCaptureRequest, mCaptureListener, mBackgroundHandler);
-            
+            mCaptureSession.Capture(request, mCaptureListener, mBackgroundHandler);
+        }
+
+        // On Android the manual settings apply to one capture only, so there is nothing to restore
+        public void RestoreAutoExposure()
+        {
+        }
+
+        // The ISO and exposure time range for captures with settings chosen by the app.
+        // Call after OpenCamera.
+        public ManualExposureLimits GetManualExposureLimits()
+        {
+            ManualExposureLimits limits = new();
+
+            limits.Supported = mCharacteristics.Get(CameraCharacteristics.RequestAvailableCapabilities)
+                .ToArray<int>().Contains((int)RequestAvailableCapabilities.ManualSensor);
+            if (!limits.Supported)
+            {
+                return limits;
+            }
+
+            global::Android.Util.Range isoRange = (global::Android.Util.Range)mCharacteristics.Get(CameraCharacteristics.SensorInfoSensitivityRange);
+            global::Android.Util.Range exposureRange = (global::Android.Util.Range)mCharacteristics.Get(CameraCharacteristics.SensorInfoExposureTimeRange);
+            limits.MinISO = (int)isoRange.Lower;
+            limits.MaxISO = (int)isoRange.Upper;
+            limits.MinExposureSeconds = (long)exposureRange.Lower / 1e9;
+            limits.MaxExposureSeconds = (long)exposureRange.Upper / 1e9;
+
+            Java.Lang.Object maxAnalog = mCharacteristics.Get(CameraCharacteristics.SensorMaxAnalogSensitivity);
+            if (maxAnalog != null)
+            {
+                limits.MaxAnalogISO = (int)maxAnalog;
+            }
+
+            return limits;
         }
 
         void OnImageAvailable(ImageReader reader)
@@ -404,6 +463,19 @@ namespace HydroColor.Platforms.Android
             mImageDataModel.ExposureTime = (float)mTotalCaptureResult.Get(CaptureResult.SensorExposureTime) / 1000000000;
             mImageDataModel.SensorSensitivity = (int)mTotalCaptureResult.Get(CaptureResult.SensorSensitivity);
 
+            // Diagnostics are gathered only in diagnostics mode, after the measurement values are complete,
+            // and can never fail the capture.
+            if (CameraDiagnostics.Enabled)
+            {
+                try
+                {
+                    mImageDataModel.Diagnostics = GatherDiagnostics(imageCharacteristics, imageCameraId, SensorBlackLevel);
+                }
+                catch
+                {
+                }
+            }
+
             ImageCaptureEventArgs capArgs = new ImageCaptureEventArgs()
             {
                 ImageData = mImageDataModel
@@ -411,6 +483,69 @@ namespace HydroColor.Platforms.Android
 
             mCaptureInProgress = false;
             ImageCaptureCompletedEvent?.Invoke(this, capArgs);
+        }
+
+        // Reads the camera values shown in diagnostics mode. None of them is used in a calculation.
+        // Each value is read on its own; one that the phone does not provide is shown as "not reported".
+        CaptureDiagnostics GatherDiagnostics(CameraCharacteristics c, string cameraUsed, BlackLevelPattern blackLevel)
+        {
+            CaptureDiagnostics d = new();
+            TotalCaptureResult r = mTotalCaptureResult;
+
+            d.Add("Camera opened", () => mCameraId);
+            d.Add("Camera used", () => cameraUsed);
+            d.Add("Lenses behind opened camera", () => OperatingSystem.IsAndroidVersionAtLeast(28) ? string.Join(" ", mCharacteristics.PhysicalCameraIds) : null);
+            d.Add("Hardware level", () => Describe(c.Get(CameraCharacteristics.InfoSupportedHardwareLevel), "limited", "full", "legacy", "level 3", "external"));
+            d.Add("Bayer pattern", () => mImageDataModel.BayerFilterPattern.ToString());
+            d.Add("Raw size", () => $"{mImageDataModel.ImageWidth} x {mImageDataModel.ImageHeight}");
+            d.Add("Row length (bytes)", () => mImageDataModel.RowStride);
+            d.Add("Pixel array size", () => c.Get(CameraCharacteristics.SensorInfoPixelArraySize));
+            d.Add("Active area", () => c.Get(CameraCharacteristics.SensorInfoActiveArraySize));
+            d.Add("Sensor pixel mode", () => OperatingSystem.IsAndroidVersionAtLeast(31) ? Describe(r.Get(CaptureResult.SensorPixelMode), "default", "maximum resolution") : null);
+            d.Add("Black level, fixed", () => $"{blackLevel.GetOffsetForIndex(0, 0)} {blackLevel.GetOffsetForIndex(1, 0)} {blackLevel.GetOffsetForIndex(0, 1)} {blackLevel.GetOffsetForIndex(1, 1)}");
+            d.Add("Black level, this capture", () => r.Get(CaptureResult.SensorDynamicBlackLevel)?.ToArray<float>());
+            d.Add("Optical black regions", () => c.Get(CameraCharacteristics.SensorOpticalBlackRegions));
+            d.Add("White level, fixed", () => c.Get(CameraCharacteristics.SensorInfoWhiteLevel));
+            d.Add("White level, this capture", () => r.Get(CaptureResult.SensorDynamicWhiteLevel));
+            d.Add("ISO range", () => c.Get(CameraCharacteristics.SensorInfoSensitivityRange));
+            d.Add("Highest analog ISO", () => c.Get(CameraCharacteristics.SensorMaxAnalogSensitivity));
+            d.Add("Post-raw boost", () => r.Get(CaptureResult.ControlPostRawSensitivityBoost));
+            d.Add("Exposure time range (ns)", () => c.Get(CameraCharacteristics.SensorInfoExposureTimeRange));
+            d.Add("Auto-exposure state", () => Describe(r.Get(CaptureResult.ControlAeState), "inactive", "searching", "converged", "locked", "flash required", "precapture"));
+            d.Add("Exposure compensation", () => r.Get(CaptureResult.ControlAeExposureCompensation));
+            d.Add("Aperture (f-number)", () => r.Get(CaptureResult.LensAperture));
+            d.Add("Available apertures", () => c.Get(CameraCharacteristics.LensInfoAvailableApertures)?.ToArray<float>());
+            d.Add("Lens filter density", () => r.Get(CaptureResult.LensFilterDensity));
+            d.Add("Focal length (mm)", () => r.Get(CaptureResult.LensFocalLength));
+            d.Add("Focus distance (1/m)", () => r.Get(CaptureResult.LensFocusDistance));
+            d.Add("Focus distance calibration", () => Describe(c.Get(CameraCharacteristics.LensInfoFocusDistanceCalibration), "uncalibrated", "approximate", "calibrated"));
+            d.Add("Zoom ratio", () => OperatingSystem.IsAndroidVersionAtLeast(30) ? r.Get(CaptureResult.ControlZoomRatio) : null);
+            d.Add("Lens shading applied to raw", () => c.Get(CameraCharacteristics.SensorInfoLensShadingApplied));
+            d.Add("Hot pixel mode", () => Describe(r.Get(CaptureResult.HotPixelMode), "off", "fast", "high quality"));
+            d.Add("Noise reduction mode", () => Describe(r.Get(CaptureResult.NoiseReductionMode), "off", "fast", "high quality", "minimal", "zero shutter lag"));
+            // noise profile: one (S, O) pair per colour position
+            d.Add("Noise profile", () => string.Join(" ", r.Get(CaptureResult.SensorNoiseProfile).ToArray<global::Android.Util.Pair>().Select(p => $"({((double)p.First).ToString("G4", System.Globalization.CultureInfo.InvariantCulture)}, {((double)p.Second).ToString("G4", System.Globalization.CultureInfo.InvariantCulture)})")));
+
+            try
+            {
+                d.WhiteLevel = (int)c.Get(CameraCharacteristics.SensorInfoWhiteLevel);
+            }
+            catch
+            {
+            }
+
+            return d;
+        }
+
+        // Shows a camera code with its meaning, for example "2 (converged)"
+        static string Describe(Java.Lang.Object code, params string[] meanings)
+        {
+            if (code == null)
+            {
+                return null;
+            }
+            int value = (int)code;
+            return value >= 0 && value < meanings.Length ? $"{value} ({meanings[value]})" : value.ToString();
         }
 
         // Tells the page that the capture in progress has failed (ImageData is null).

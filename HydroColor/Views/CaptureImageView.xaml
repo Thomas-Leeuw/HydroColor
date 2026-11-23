@@ -73,8 +73,8 @@
             Grid.Row="0"
             Grid.Column="0"
             Margin="10"
-            Text="{Binding DeviceOffNadirAngle, StringFormat='{}{0:#,0.000}'}"
-            FontSize="22"
+            Text="{Binding DeviceOffNadirAngle, StringFormat='Tilt {0:#,0.000}'}"
+            FontSize="13"
             IsVisible="{Binding ShowNumericTiltAndHeading}"/>
 
         <controls:CameraPreview
@@ -166,8 +166,8 @@
             Grid.Row="1"
             Grid.ColumnSpan="2"
             Margin="10"
-            Text="{Binding TrueNorthHeading, StringFormat='{}{0:#,0.00}'}"
-            FontSize="22"
+            Text="{Binding TrueNorthHeading, StringFormat='Heading {0:#,0.00}'}"
+            FontSize="13"
             IsVisible="{Binding ShowNumericTiltAndHeading}"
             />
 
@@ -175,8 +175,8 @@
             Grid.Row="1"
             Grid.ColumnSpan="2"
             Margin="10"
-            Text="{Binding SunAzimuth, StringFormat='{}{0:#,0.00}'}"
-            FontSize="20"
+            Text="{Binding SunAzimuth, StringFormat='Sun az {0:#,0.00}'}"
+            FontSize="13"
             VerticalOptions="End"
             IsVisible="{Binding ShowNumericTiltAndHeading}"
             />
@@ -185,8 +185,8 @@
             Grid.Row="1"
             Grid.ColumnSpan="2"
             Margin="10"
-            Text="{Binding SunElevationAngle, StringFormat='{}{0:#,0.00}'}"
-            FontSize="20"
+            Text="{Binding SunElevationAngle, StringFormat='Sun el {0:#,0.00}'}"
+            FontSize="13"
             VerticalOptions="End"
             HorizontalOptions="Center"
             IsVisible="{Binding ShowNumericTiltAndHeading}"

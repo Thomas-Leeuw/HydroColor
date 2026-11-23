@@ -37,6 +37,7 @@ public static class MauiProgram
         builder.Services.AddTransient<CaptureImageView, CaptureImageViewModel>();
         builder.Services.AddTransient<DataView, DataViewModel>();
         builder.Services.AddTransient<WelcomeView, WelcomeViewModel>();
+        builder.Services.AddTransient<SensitivityTestView, SensitivityTestViewModel>();
 
         return builder.Build();
     }

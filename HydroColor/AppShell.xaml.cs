@@ -14,6 +14,7 @@ public partial class AppShell : Shell
         Routing.RegisterRoute(nameof(CaptureImageView), typeof(CaptureImageView));
         Routing.RegisterRoute(nameof(DataView), typeof(DataView));
 		Routing.RegisterRoute(nameof(WelcomeView), typeof(WelcomeView));
+        Routing.RegisterRoute(nameof(SensitivityTestView), typeof(SensitivityTestView));
 
         if (Preferences.Default.Get(PreferenceKeys.HideWelcomeScreen, false))
         {

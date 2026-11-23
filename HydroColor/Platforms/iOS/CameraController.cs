@@ -2,6 +2,7 @@
 using CoreAnimation;
 using CoreGraphics;
 using CoreImage;
+using CoreMedia;
 using CoreVideo;
 using Foundation;
 using HydroColor.Models;
@@ -24,10 +25,18 @@ namespace HydroColor.Platforms.iOS
 
         double ImageISOSpeed;
 
+        // The camera's own exposure time just before the capture (seconds). Used for the calculation;
+        // zero if it could not be read.
+        double ImageExposureDuration;
+
         public AVCaptureSession mCaptureSession { get; private set; }
 
         // true from OpenCamera until CloseCamera
         public bool IsOpen => mCaptureSession != null;
+
+        // When true the preview keeps running after a capture, so several captures can be taken in a row
+        // (sensitivity test). False for a normal measurement, where the page closes after one capture.
+        public bool KeepRunningAfterCapture { get; set; }
 
         public CameraController()
         {
@@ -37,10 +46,24 @@ namespace HydroColor.Platforms.iOS
                 WillCapturePhotoAction = (captureOutput, resolvedSettings) =>
                 {
                     ImageISOSpeed = mCameraDevice.ISO;
+
+                    // The camera's own exposure time, read just before the capture like the ISO.
+                    // Zero means it could not be read, and the EXIF value is used instead.
+                    ImageExposureDuration = 0;
+                    try
+                    {
+                        ImageExposureDuration = mCameraDevice.ExposureDuration.Seconds;
+                    }
+                    catch
+                    {
+                    }
                 },
                 DidCapturePhotoAction = (captureOutput, resolvedSettings) =>
                 {
-                    mPreviewLayer.Session.StopRunning();
+                    if (!KeepRunningAfterCapture)
+                    {
+                        mPreviewLayer.Session.StopRunning();
+                    }
                 },
                 DidFinishProcessingPhotoAction = (captureOutput, photo, error) =>
                 {
@@ -185,8 +208,79 @@ namespace HydroColor.Platforms.iOS
             return capturePhotoSettings;
         }
 
+        // The ISO and exposure time range for captures with settings chosen by the app.
+        // Call after OpenCamera.
+        public ManualExposureLimits GetManualExposureLimits()
+        {
+            ManualExposureLimits limits = new();
+
+            limits.Supported = mCameraDevice.IsExposureModeSupported(AVCaptureExposureMode.Custom);
+            if (!limits.Supported)
+            {
+                return limits;
+            }
+
+            limits.MinISO = mCameraDevice.ActiveFormat.MinISO;
+            limits.MaxISO = mCameraDevice.ActiveFormat.MaxISO;
+            limits.MinExposureSeconds = mCameraDevice.ActiveFormat.MinExposureDuration.Seconds;
+            limits.MaxExposureSeconds = mCameraDevice.ActiveFormat.MaxExposureDuration.Seconds;
+            return limits;
+        }
+
+        // Takes a raw image with the ISO and exposure time given, instead of automatic exposure (sensitivity test).
+        // The image is taken once the camera reports that the settings are in effect.
+        public void TakeRAWImage(double iso, double exposureSeconds)
+        {
+            if (!mCameraDevice.LockForConfiguration(out NSError error))
+            {
+                throw new InvalidOperationException(error?.LocalizedDescription ?? "The camera settings could not be changed.");
+            }
+
+            try
+            {
+                mCameraDevice.LockExposure(CMTime.FromSeconds(exposureSeconds, 1000000000), (float)iso, (syncTime) =>
+                {
+                    try
+                    {
+                        TakeRAWImage();
+                    }
+                    catch (Exception ex)
+                    {
+                        ReportCaptureFailed(ex.Message);
+                    }
+                });
+            }
+            finally
+            {
+                mCameraDevice.UnlockForConfiguration();
+            }
+        }
+
+        // Returns the camera to automatic exposure after captures with manual settings
+        public void RestoreAutoExposure()
+        {
+            if (mCameraDevice == null || !mCameraDevice.LockForConfiguration(out NSError error))
+            {
+                return;
+            }
+
+            try
+            {
+                if (mCameraDevice.IsExposureModeSupported(AVCaptureExposureMode.ContinuousAutoExposure))
+                {
+                    mCameraDevice.ExposureMode = AVCaptureExposureMode.ContinuousAutoExposure;
+                }
+            }
+            finally
+            {
+                mCameraDevice.UnlockForConfiguration();
+            }
+        }
+
         public void TakeRAWImage()
         {
+            // Start each capture with empty image data, so a result is never completed with parts of an earlier capture
+            mImageData = new HydroColorRawImageData();
 
             // Create the setting used for image capture, they can only be used once
             AVCapturePhotoSettings capturePhotoSettings = CreateCapturePhotoSettings();
@@ -302,12 +396,67 @@ namespace HydroColor.Platforms.iOS
                 // The size is taken from the raw pixel buffer itself, as on Android, so it always matches the pixel data.
                 mImageData.ImageHeight = (int)pixelBuffer.Height;
                 mImageData.ImageWidth = (int)pixelBuffer.Width;
-                mImageData.ExposureTime = (float)photo.Properties.Exif.ExposureTime;
+                // The EXIF exposure time is rounded to 1 over a whole number, which is several percent off at long
+                // exposures (measured with the sensitivity test). The camera's own value is used instead,
+                // with the EXIF value kept as a fallback.
+                mImageData.ExposureTime = ImageExposureDuration > 0 ? ImageExposureDuration : (float)photo.Properties.Exif.ExposureTime;
                 mImageData.SensorSensitivity = sensorSensitivity;
                 mImageData.BayerFilterPattern = bayerFilter;
                 mImageData.RowStride = (int)bytesPerRow;
                 mImageData.BlackLevel = BlackLevel;
-                
+
+                // Diagnostics are gathered only in diagnostics mode, after the measurement values are complete,
+                // and can never fail the capture. None of these values is used in a calculation.
+                // Each value is read on its own; one that the phone does not provide is shown as "not reported".
+                if (CameraDiagnostics.Enabled)
+                {
+                    try
+                    {
+                        CaptureDiagnostics d = new();
+                        d.Add("Camera used", () => mCameraDevice.UniqueID);
+                        d.Add("Camera type", () => mCameraDevice.DeviceType.ToString());
+                        d.Add("Lenses behind camera", () => OperatingSystem.IsIOSVersionAtLeast(13) ? mCameraDevice.ConstituentDevices?.Length ?? 0 : null);
+                        d.Add("Camera format", () => mCameraDevice.ActiveFormat.ToString());
+                        d.Add("Lens model", () => photo.Properties.Exif.Dictionary[ImageIO.CGImageProperties.ExifLensModel]?.ToString());
+                        d.Add("Bayer pattern", () => bayerFilter.ToString());
+                        d.Add("Raw size", () => $"{pixelBuffer.Width} x {pixelBuffer.Height}");
+                        d.Add("Row length (bytes)", () => bytesPerRow);
+                        d.Add("Active area", () => DNGMetadata[ImageIO.CGImageProperties.DNGActiveArea]?.ToString());
+                        d.Add("Default crop size", () => DNGMetadata[ImageIO.CGImageProperties.DNGDefaultCropSize]?.ToString());
+                        d.Add("Black level, reported", () => blackLevelValues);
+                        d.Add("White level", () => DNGMetadata[ImageIO.CGImageProperties.DNGWhiteLevel]?.ToString());
+                        d.Add("USED baseline exposure",() => baselineExposure.DoubleValue);
+                        d.Add("USED camera ISO",() => ISOSpeed);
+                        d.Add("ISO, EXIF", () => photo.Properties.Exif.ISOSpeedRatings);
+                        d.Add("ISO range of format", () => $"{mCameraDevice.ActiveFormat.MinISO} to {mCameraDevice.ActiveFormat.MaxISO}");
+                        d.Add("Exposure time, EXIF (s)", () => photo.Properties.Exif.ExposureTime);
+                        d.Add("Exposure time, camera (s)", () => ImageExposureDuration);
+                        d.Add("Exposure mode", () => mCameraDevice.ExposureMode.ToString());
+                        d.Add("Exposure offset", () => mCameraDevice.ExposureTargetOffset);
+                        d.Add("Exposure bias", () => mCameraDevice.ExposureTargetBias);
+                        d.Add("Aperture, camera (f-number)", () => mCameraDevice.LensAperture);
+                        d.Add("Aperture, EXIF (f-number)", () => photo.Properties.Exif.Dictionary[ImageIO.CGImageProperties.ExifFNumber]?.ToString());
+                        d.Add("Focal length (mm)", () => photo.Properties.Exif.Dictionary[ImageIO.CGImageProperties.ExifFocalLength]?.ToString());
+                        d.Add("Lens position (0 to 1)", () => mCameraDevice.LensPosition);
+                        d.Add("Zoom factor", () => mCameraDevice.VideoZoomFactor);
+                        d.Add("Noise profile", () => DNGMetadata[ImageIO.CGImageProperties.DNGNoiseProfile]?.ToString());
+                        d.Add("Baseline noise", () => DNGMetadata[ImageIO.CGImageProperties.DNGBaselineNoise]?.ToString());
+
+                        try
+                        {
+                            d.WhiteLevel = ((NSNumber)DNGMetadata[ImageIO.CGImageProperties.DNGWhiteLevel]).DoubleValue;
+                        }
+                        catch
+                        {
+                        }
+
+                        mImageData.Diagnostics = d;
+                    }
+                    catch
+                    {
+                    }
+                }
+
 
                 pixelBuffer.Dispose();
                 photo.Dispose();

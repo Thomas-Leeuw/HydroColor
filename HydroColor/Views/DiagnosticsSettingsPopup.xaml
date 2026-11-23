@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:vm="clr-namespace:HydroColor.ViewModels"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               x:DataType="vm:AboutViewModel"
+               x:Class="HydroColor.Views.DiagnosticsSettingsPopup"
+               BackgroundColor="White">
+
+    <!-- Opened with the Camera Diagnostics button at the bottom of the About page -->
+    <VerticalStackLayout x:Name="PopupFrame" BackgroundColor="White" Padding="15" Spacing="10">
+
+        <Label Text="Camera Diagnostics"
+               HorizontalOptions="Center"
+               FontSize="18"
+               FontAttributes="Bold"
+               TextColor="Black"/>
+
+        <Grid ColumnDefinitions="*,auto">
+            <Label Grid.Column="0" Text="Camera diagnostics" TextColor="Black" VerticalOptions="Center"/>
+            <Switch Grid.Column="1" IsToggled="{Binding DiagnosticsOn}"/>
+        </Grid>
+
+        <Label Text="Shows the camera's values after each image and on the results page, and makes the sensitivity test available."
+               FontSize="12"
+               TextColor="Black"/>
+
+        <Button Text="Sensitivity Test"
+                Background="LightGray"
+                TextColor="Black"
+                HorizontalOptions="Center"
+                IsVisible="{Binding DiagnosticsOn}"
+                Clicked="SensitivityTestButton_Clicked"/>
+
+        <Button Text="Close"
+                Background="LightGray"
+                TextColor="Black"
+                HorizontalOptions="Center"
+                Margin="0,10,0,0"
+                Clicked="CloseButton_Clicked"/>
+
+    </VerticalStackLayout>
+</toolkit:Popup>

@@ -226,6 +226,17 @@
             Margin="5"
             Command="{Binding AnalyzeImagesCommand}"/>
 
+            <!-- Reminder shown only while camera diagnostics mode is on -->
+            <Label Text="Diagnostics on"
+                   Grid.Row="3"
+                   Grid.ColumnSpan="3"
+                   HorizontalOptions="End"
+                   VerticalOptions="Center"
+                   Margin="5"
+                   FontSize="11"
+                   TextColor="Orange"
+                   IsVisible="{Binding DiagnosticsOn}"/>
+
             <Grid Grid.Row="4" Grid.ColumnSpan="3">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" />

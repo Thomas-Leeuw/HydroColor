@@ -30,6 +30,9 @@ namespace HydroColor.Models
         public BayerFilterType BayerFilterPattern { get; set; }
         public ColorChannelData<double> BlackLevel { get; set; } = new();
         public byte[] JpegImage { get; set; }
+
+        // Camera diagnostics for this image; null unless diagnostics mode is on
+        public HydroColor.Services.CaptureDiagnostics Diagnostics { get; set; }
     }
 
 }

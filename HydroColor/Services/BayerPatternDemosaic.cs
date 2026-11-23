@@ -196,6 +196,29 @@ namespace HydroColor.Services
             return BlackLevel;
         }
 
+        // Converts a raw camera image into the median pixel value of each color channel.
+        // Used for every measurement image and by the sensitivity test, so both are processed the same way.
+        public static ColorChannelData<double> GetMedianPixelValues(HydroColorRawImageData rawImage)
+        {
+            BayerPatternDemosaic BPD = new BayerPatternDemosaic();
+
+            // Convert Byte array to Uint16 values (and reshape into 2d array).
+            UInt16[,] reshapedImageData = new UInt16[rawImage.ImageHeight, rawImage.RowStride / 2];
+            Buffer.BlockCopy(rawImage.RawImagePixelData, 0, reshapedImageData, 0, rawImage.ImageHeight * rawImage.RowStride);
+
+            // Demosaic Bayer filter pattern
+            ColorChannelData<UInt16[,]> RGBImages = BPD.Bayer2RGB(reshapedImageData, rawImage.ImageHeight, rawImage.ImageWidth, rawImage.BayerFilterPattern);
+
+            // Only use the center of the image. Take a square at the center 1/4 the size of the smallest dimension.
+            int minDimension = Math.Min(RGBImages.Red.GetLength(0), RGBImages.Red.GetLength(1));
+
+            ColorChannelData<double> medians = new();
+            medians.Red = BPD.GetMedian(RGBImages.Red, minDimension / 4);
+            medians.Green = BPD.GetMedian(RGBImages.Green, minDimension / 4);
+            medians.Blue = BPD.GetMedian(RGBImages.Blue, minDimension / 4);
+            return medians;
+        }
+
         public UInt16 GetMedian(UInt16[,] Data, int PixleSquareSize)
         {
             int startRow = Data.GetLength(0) / 2 - PixleSquareSize / 2;

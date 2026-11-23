@@ -28,7 +28,7 @@ namespace HydroColor.ViewModels
     public partial class CaptureImageViewModel : ObservableObject
     {
         [ObservableProperty]
-        bool showNumericTiltAndHeading = false; // display values for tilt, heading, and sun angles (for debugging only)
+        bool showNumericTiltAndHeading = false; // display values for tilt, heading, and sun angles (shown in camera diagnostics mode)
 
         [ObservableProperty]
         HydroColorImageType imageType;
@@ -185,6 +185,9 @@ namespace HydroColor.ViewModels
         {
             _pageActive = true;
 
+            // In camera diagnostics mode, show the tilt, heading and sun angles as numbers
+            ShowNumericTiltAndHeading = CameraDiagnostics.Enabled;
+
             // Reopen the camera if needed when the app returns to the foreground
             Shell.Current.Window.Resumed -= Window_Resumed;
             Shell.Current.Window.Resumed += Window_Resumed;
@@ -304,21 +307,8 @@ namespace HydroColor.ViewModels
                     CapturedImageData.LocalTimeStamp = DateTime.Now;
                     CapturedImageData.UTCOffset = DateTimeOffset.Now.Offset.TotalHours;
 
-                    // Downsample the raw image as soon as possible to reduce memory usage
-                    BayerPatternDemosaic BPD = new BayerPatternDemosaic();
-
-                    // Convert Byte array to Uint16 values (and reshape into 2d array).
-                    UInt16[,] reshapedImageData = new UInt16[e.ImageData.ImageHeight, e.ImageData.RowStride / 2];
-                    Buffer.BlockCopy(e.ImageData.RawImagePixelData, 0, reshapedImageData, 0, e.ImageData.ImageHeight * e.ImageData.RowStride);
-
-                    // Demosaic Bayer filter pattern
-                    ColorChannelData<UInt16[,]> RGBImages = BPD.Bayer2RGB(reshapedImageData, e.ImageData.ImageHeight, e.ImageData.ImageWidth, e.ImageData.BayerFilterPattern);
-
-                    // Only use the center of the image. Take a square at the center 1/4 the size of the smallest dimension.
-                    int minDimension = Math.Min(RGBImages.Red.GetLength(0), RGBImages.Red.GetLength(1));
-                    CapturedImageData.MedianPixelValue.Red = BPD.GetMedian(RGBImages.Red, minDimension / 4);
-                    CapturedImageData.MedianPixelValue.Green = BPD.GetMedian(RGBImages.Green, minDimension / 4);
-                    CapturedImageData.MedianPixelValue.Blue = BPD.GetMedian(RGBImages.Blue, minDimension / 4);
+                    // Reduce the raw image to the median value of each color as soon as possible, to reduce memory usage
+                    CapturedImageData.MedianPixelValue = BayerPatternDemosaic.GetMedianPixelValues(e.ImageData);
 
                     CapturedImageData.BlackLevel = e.ImageData.BlackLevel;
                     CapturedImageData.SensorSensitivity = e.ImageData.SensorSensitivity;
@@ -329,8 +319,14 @@ namespace HydroColor.ViewModels
                     CapturedImageData.RawImageWidth = e.ImageData.ImageWidth;
                     CapturedImageData.RawImageHeight = e.ImageData.ImageHeight;
 
-                    // clearing out the very large ImageData and RGBImages instances (Should go out of scope and be garbage collected regardless).
-                    RGBImages = null;
+                    // Camera diagnostics (null unless diagnostics mode is on)
+                    CapturedImageData.Diagnostics = e.ImageData.Diagnostics;
+                    if (CapturedImageData.Diagnostics != null)
+                    {
+                        AddProcessingDiagnostics(CapturedImageData);
+                    }
+
+                    // clearing out the very large ImageData instance (Should go out of scope and be garbage collected regardless).
                     e.ImageData = null;
 
                 });
@@ -362,6 +358,57 @@ namespace HydroColor.ViewModels
                 CaptureFailed(ex.Message);
             }
 
+        }
+
+        // Adds the values actually used for processing to the top of the diagnostics list.
+        // They are taken from the stored image data, not read from the camera again.
+        static void AddProcessingDiagnostics(HydroColorImageCaptureModel image)
+        {
+            try
+            {
+                CaptureDiagnostics used = new();
+                ColorChannelData<double> m = image.MedianPixelValue;
+                ColorChannelData<double> b = image.BlackLevel;
+                double? whiteLevel = image.Diagnostics.WhiteLevel;
+
+                used.Add("USED exposure time (s)", () => image.ExposureTime);
+                used.Add("USED sensitivity", () => image.SensorSensitivity);
+                used.Add("USED black level (R G B)", () => new[] { b.Red, b.Green, b.Blue });
+                used.Add("USED median count (R G B)", () => new[] { m.Red, m.Green, m.Blue });
+
+                // The light level of this image, from the same function the measurement uses
+                used.Add("Computed light level (R G B)", () =>
+                {
+                    ColorChannelData<double> level = OpticalPropertiesCalculator.ComputeRelativeLightLevel(image);
+                    return new[] { level.Red, level.Green, level.Blue };
+                });
+                used.Add("Counts above black (R G B)", () => new[] { m.Red - b.Red, m.Green - b.Green, m.Blue - b.Blue });
+                used.Add("Percent of range (R G B)", () =>
+                {
+                    if (whiteLevel == null)
+                    {
+                        return null;
+                    }
+                    double w = whiteLevel.Value;
+                    return new[]
+                    {
+                        Math.Round(100 * (m.Red - b.Red) / (w - b.Red), 1),
+                        Math.Round(100 * (m.Green - b.Green) / (w - b.Green), 1),
+                        Math.Round(100 * (m.Blue - b.Blue) / (w - b.Blue), 1)
+                    };
+                });
+
+                // Lines the camera code marked USED (on iOS, the camera ISO and baseline exposure that give the
+                // sensitivity) are moved up to sit directly under the sensitivity line.
+                List<KeyValuePair<string, string>> cameraUsed = image.Diagnostics.Items.Where(i => i.Key.StartsWith("USED")).ToList();
+                image.Diagnostics.Items.RemoveAll(i => i.Key.StartsWith("USED"));
+                used.Items.InsertRange(2, cameraUsed);
+
+                image.Diagnostics.Items.InsertRange(0, used.Items);
+            }
+            catch
+            {
+            }
         }
 
         // Shows the capture failed message and returns to the previous page
