@@ -20,29 +20,36 @@ namespace HydroColor.Platforms.iOS
     }
 
 
-    // added a custom shell to disable animation when switching tabs
-    // the animation was causing a flicker when switching tabs
+    // A custom shell that switches tabs without animation.
+    // iOS 18 and later fade between tabs. A page shown for the first time is laid out during that
+    // fade, which appears as a black sweep. Animations are switched off for the tab change and back
+    // on shortly after it.
     class CustomShellTabBarAppearanceTracker : ShellTabBarAppearanceTracker
     {
+        // SetAppearance is called more than once; the tab handler is set only the first time
+        bool _handlerSet;
 
         public override void SetAppearance(UITabBarController controller, ShellAppearance appearance)
         {
             base.SetAppearance(controller, appearance);
-            controller.ShouldSelectViewController += (tabBarController, viewController) =>
+
+            if (_handlerSet)
+            {
+                return;
+            }
+            _handlerSet = true;
+
+            controller.ShouldSelectViewController = (tabBarController, viewController) =>
             {
                 if (viewController == null)
-                    return false;
-
-                var fromController = tabBarController.SelectedViewController;
-
-                UIView fromView = fromController?.View;
-                UIView toView = viewController.View;
-
-                if (fromView != toView)
                 {
-                    // turn off animation
-                    UIView.Transition(fromView, toView, 0, UIViewAnimationOptions.TransitionNone, () => { });
+                    return false;
                 }
+
+                UIView.AnimationsEnabled = false;
+                CoreFoundation.DispatchQueue.MainQueue.DispatchAfter(
+                    new CoreFoundation.DispatchTime(CoreFoundation.DispatchTime.Now, TimeSpan.FromMilliseconds(150)),
+                    () => UIView.AnimationsEnabled = true);
 
                 return true;
             };

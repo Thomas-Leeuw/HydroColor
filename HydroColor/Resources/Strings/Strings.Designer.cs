@@ -666,7 +666,52 @@ namespace HydroColor.Resources.Strings {
                 return ResourceManager.GetString("Data_GrayCard", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Backscatter.
+        /// </summary>
+        internal static string Data_CardBackscatterTitle {
+            get {
+                return ResourceManager.GetString("Data_CardBackscatterTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 1/m (red).
+        /// </summary>
+        internal static string Data_CardBackscatterUnits {
+            get {
+                return ResourceManager.GetString("Data_CardBackscatterUnits", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to SPM.
+        /// </summary>
+        internal static string Data_CardSPMTitle {
+            get {
+                return ResourceManager.GetString("Data_CardSPMTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Turbidity.
+        /// </summary>
+        internal static string Data_CardTurbidityTitle {
+            get {
+                return ResourceManager.GetString("Data_CardTurbidityTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Remote sensing reflectance (1/sr).
+        /// </summary>
+        internal static string Data_ReflectanceChartTitle {
+            get {
+                return ResourceManager.GetString("Data_ReflectanceChartTitle", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Blue.
         /// </summary>
@@ -1336,7 +1381,16 @@ namespace HydroColor.Resources.Strings {
                 return ResourceManager.GetString("Library_NoMeasurements", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Swipe a row left to delete.
+        /// </summary>
+        internal static string Library_SwipeToDeleteHint {
+            get {
+                return ResourceManager.GetString("Library_SwipeToDeleteHint", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Sending Email ....
         /// </summary>

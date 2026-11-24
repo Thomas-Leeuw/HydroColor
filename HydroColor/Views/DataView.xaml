@@ -4,10 +4,12 @@
              xmlns:viewmodels="clr-namespace:HydroColor.ViewModels"
              xmlns:converters="clr-namespace:HydroColor.Converters"
              xmlns:strings="clr-namespace:HydroColor.Resources.Strings"
+             xmlns:controls="clr-namespace:HydroColor.Controls"
              x:DataType="viewmodels:DataViewModel"
              x:Class="HydroColor.Views.DataView"
+             BackgroundColor="Black"
              Shell.TabBarIsVisible="false"
-             Shell.NavBarIsVisible="true"
+             Shell.NavBarIsVisible="false"
              Title="{Binding ProcMeas.MeasurementName}">
 
     <Shell.BackButtonBehavior>
@@ -17,262 +19,197 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <converters:CameraBoxOverlayWidthConverter x:Key="CameraBoxOverlayWidthConverter"/>
+            <converters:PhotoHeightConverter x:Key="PhotoHeightConverter"/>
             <converters:ProductStringWithUncertainityConverter x:Key="ProductStringWithUncertainity"/>
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <Grid BackgroundColor="Black">
+    <!-- The page draws its own header (back arrow and title); the system navigation bar is hidden -->
+    <Grid RowDefinitions="auto,*" BackgroundColor="Black">
+    <controls:PageHeader Grid.Row="0"
+                         Title="{Binding ProcMeas.MeasurementName}"
+                         BackCommand="{Binding BackButtonCommand}"/>
 
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
+    <!-- The page scrolls as a whole when it does not fit on the screen -->
+    <ScrollView Grid.Row="1" BackgroundColor="Black">
+        <VerticalStackLayout Padding="12,6,12,12" Spacing="14">
 
-        <BoxView             
-            Grid.Row="0"
-            Grid.ColumnSpan="3"
-            Color="DarkGray"
-            HeightRequest="1"
-            VerticalOptions="End"
-            />
+            <!-- When and where -->
+            <Grid ColumnDefinitions="*,auto">
+                <HorizontalStackLayout Grid.Column="0" Spacing="6">
+                    <Label FontSize="15" FontFamily="OpenSansSemibold" TextColor="White" Text="{Binding ProcMeas.WaterImageData.LocalTimeStamp, StringFormat='{}{0:d}'}"/>
+                    <Label FontSize="15" FontFamily="OpenSansSemibold" TextColor="White" Text="{Binding ProcMeas.WaterImageData.LocalTimeStamp, StringFormat='{}{0:t}'}"/>
+                </HorizontalStackLayout>
+                <HorizontalStackLayout Grid.Column="1" Spacing="4">
+                    <Label FontSize="15" FontFamily="OpenSansSemibold" TextColor="White" Text="{Binding ProcMeas.WaterImageData.ImageLocation.Latitude, StringFormat='{}{0:0.00000},'}"/>
+                    <Label FontSize="15" FontFamily="OpenSansSemibold" TextColor="White" Text="{Binding ProcMeas.WaterImageData.ImageLocation.Longitude, StringFormat='{}{0:0.00000}'}"/>
+                </HorizontalStackLayout>
+            </Grid>
 
-        <Grid Grid.Row="1" Grid.ColumnSpan="3" ColumnDefinitions="40,*,*,*" RowDefinitions="*, auto" HeightRequest="{Binding BarChartHeight}" Margin="0,10,10,0">
+            <!-- The three water quality results -->
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
 
-            <Label Grid.Row="0" 
-                   Grid.Column="0" 
-                   Text="{x:Static strings:Strings.Data_ReflectanceGraphYAxisLabel}" 
-                   Rotation="270" 
-                   FontSize="18" 
-                   VerticalTextAlignment="Center" 
-                   HorizontalOptions="Center"
-                   Margin="-35,0,-35,0">
-            </Label>
+                <Border Grid.Column="0" Background="#1C1C1E" Stroke="#3A3A3C" StrokeThickness="1" Padding="6,10">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="10"/>
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="{x:Static strings:Strings.Data_CardTurbidityTitle}" FontSize="14" FontFamily="OpenSansSemibold" TextColor="White" HorizontalOptions="Center"/>
+                        <Label Text="{Binding TurbidityText}"
+                               FontSize="19" FontAttributes="Bold" HorizontalOptions="Center"/>
+                        <Label Text="{x:Static strings:Strings.Data_TableTurbidityUnits}" FontSize="14" FontFamily="OpenSansSemibold" TextColor="White" HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+                </Border>
 
+                <Border Grid.Column="1" Background="#1C1C1E" Stroke="#3A3A3C" StrokeThickness="1" Padding="6,10">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="10"/>
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="{x:Static strings:Strings.Data_CardSPMTitle}" FontSize="14" FontFamily="OpenSansSemibold" TextColor="White" HorizontalOptions="Center"/>
+                        <Label Text="{Binding SPMText}"
+                               FontSize="19" FontAttributes="Bold" HorizontalOptions="Center"/>
+                        <Label Text="{x:Static strings:Strings.Data_TableSuspendedParticulateMatterUnits}" FontSize="14" FontFamily="OpenSansSemibold" TextColor="White" HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+                </Border>
 
-            <BoxView CornerRadius="5" 
-                     Grid.Row="0" 
-                     Grid.Column="1" 
-                     Color="RoyalBlue" 
-                     HeightRequest="{Binding BlueBarChartHeight}" 
-                     WidthRequest="75" 
-                     Margin="5,0,5,0" 
-                     VerticalOptions="End"/>
-            <BoxView CornerRadius="5" 
-                     Grid.Row="0" 
-                     Grid.Column="2" 
-                     Color="Green" 
-                     HeightRequest="{Binding GreenBarChartHeight}" 
-                     WidthRequest="75" 
-                     Margin="5,0,5,0" 
-                     VerticalOptions="End"/>
-            <BoxView CornerRadius="5" 
-                     Grid.Row="0" 
-                     Grid.Column="3" 
-                     Color="DarkRed" 
-                     HeightRequest="{Binding RedBarChartHeight}"
-                     WidthRequest="75" 
-                     Margin="5,0,5,0" 
-                     VerticalOptions="End"/>
+                <Border Grid.Column="2" Background="#1C1C1E" Stroke="#3A3A3C" StrokeThickness="1" Padding="6,10">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="10"/>
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="{x:Static strings:Strings.Data_CardBackscatterTitle}" FontSize="14" FontFamily="OpenSansSemibold" TextColor="White" HorizontalOptions="Center"/>
+                        <Label Text="{Binding BackscatterText}"
+                               FontSize="19" FontAttributes="Bold" HorizontalOptions="Center"/>
+                        <Label Text="{x:Static strings:Strings.Data_CardBackscatterUnits}" FontSize="14" FontFamily="OpenSansSemibold" TextColor="White" HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
 
-            <BoxView             
-            Grid.Row="0"
-            Grid.Column="1"
-            Grid.ColumnSpan="3"
-            Color="DarkGray"
-            HeightRequest="1"
-            VerticalOptions="End"/>
+            <!-- Reflectance chart -->
+            <VerticalStackLayout Spacing="6">
+                <Label Text="{x:Static strings:Strings.Data_ReflectanceChartTitle}" FontSize="15" FontFamily="OpenSansSemibold" TextColor="White"/>
 
-            <BoxView             
-            Grid.Row="0"
-            Grid.Column="0"
-            Color="DarkGray"
-            WidthRequest="1"
-            HorizontalOptions="End"/>
+                <!-- One column per color: the bar with its value above it. Sized in the view model. -->
+                <Grid ColumnDefinitions="*,*,*" HeightRequest="{Binding BarChartHeight}">
 
-            <Label Grid.Row="1" 
-                   Grid.Column="1" 
-                   Text="{x:Static strings:Strings.Data_ReflectanceGraphBlueLabel}" 
-                   HorizontalOptions="Center" 
-                   FontSize="18" />
-            <Label Grid.Row="1" 
-                       Grid.Column="2"
-                       Text="{x:Static strings:Strings.Data_ReflectanceGraphGreenLabel}"
-                       HorizontalOptions="Center"
-                       FontSize="18"/>
-            <Label Grid.Row="1"
-                       Grid.Column="3"
-                       Text="{x:Static strings:Strings.Data_ReflectanceGraphRedLabel}"
-                       HorizontalOptions="Center"
-                       FontSize="18" />
-        </Grid>
+                    <BoxView Grid.Column="0" Color="#4F8DF7" CornerRadius="6,6,0,0" Margin="18,0"
+                             VerticalOptions="End" HeightRequest="{Binding BlueBar.BarHeight}"/>
+                    <Label Grid.Column="0" Text="{Binding BlueBar.Text}" FontSize="14" FontFamily="OpenSansSemibold" HorizontalOptions="Center"
+                           VerticalOptions="End" Margin="{Binding BlueBar.LabelMargin}"/>
 
-        <!-- Shown only for a measurement just taken in camera diagnostics mode -->
-        <Button Text="Camera Diagnostics"
-                Grid.Row="2"
-                Grid.ColumnSpan="3"
-                FontSize="12"
-                Margin="5"
-                HorizontalOptions="Center"
-                Command="{Binding ShowDiagnosticsCommand}"
-                IsVisible="{Binding HasDiagnostics}"/>
+                    <BoxView Grid.Column="1" Color="#3DBE6B" CornerRadius="6,6,0,0" Margin="18,0"
+                             VerticalOptions="End" HeightRequest="{Binding GreenBar.BarHeight}"/>
+                    <Label Grid.Column="1" Text="{Binding GreenBar.Text}" FontSize="14" FontFamily="OpenSansSemibold" HorizontalOptions="Center"
+                           VerticalOptions="End" Margin="{Binding GreenBar.LabelMargin}"/>
 
-        <Border Grid.Row="3" Grid.ColumnSpan="3" BackgroundColor="DarkGray" Margin="10" StrokeShape="RoundRectangle 10,10,10,10" HorizontalOptions="Center">
-            <ScrollView BackgroundColor="Black" HorizontalOptions="Center" VerticalScrollBarVisibility="Always" Orientation="Vertical" Padding="10">
-                <Grid ColumnSpacing="8" RowSpacing="2" RowDefinitions="auto,auto,auto,auto,auto,auto,auto,auto,auto,auto" ColumnDefinitions="auto,auto,auto" HorizontalOptions="Center">
-
-                    <Grid.Resources>
-                        <Style TargetType="Label">
-                            <Setter Property="FontSize" Value="18"/>
-                            <Setter Property="TextColor" Value="White"/>
-                        </Style>
-                    </Grid.Resources>
-
-                    <Label Text="{x:Static strings:Strings.Data_TableDateLabel}" Grid.Row="0" Grid.Column="0"/>
-                    <Label Text="{Binding ProcMeas.WaterImageData.LocalTimeStamp, StringFormat='{}{0:d}'}" Grid.Row="0" Grid.Column="1" />
-
-                    <Label Text="{x:Static strings:Strings.Data_TableTimeLabel}" Grid.Row="1" Grid.Column="0"/>
-                    <Label Text="{Binding ProcMeas.WaterImageData.LocalTimeStamp, StringFormat='{}{0:T}'}" Grid.Row="1" Grid.Column="1"/>
-                    <Label Text="{x:Static strings:Strings.Data_TableTimeUnits}" Grid.Row="1" Grid.Column="2"/>
-
-                    <Label Text="{x:Static strings:Strings.Data_TableLatitudeLabel}" Grid.Row="2" Grid.Column="0"/>
-                    <Label Text="{Binding ProcMeas.WaterImageData.ImageLocation.Latitude, StringFormat='{}{0:#,0.00000}'}" Grid.Row="2" Grid.Column="1"/>
-                    <Label Text="{x:Static strings:Strings.Data_TableLatitudeUnits}" Grid.Row="2" Grid.Column="2"/>
-
-                    <Label Text="{x:Static strings:Strings.Data_TableLongitudeLabel}" Grid.Row="3" Grid.Column="0"/>
-                    <Label Text="{Binding ProcMeas.WaterImageData.ImageLocation.Longitude, StringFormat='{}{0:#,0.00000}'}" Grid.Row="3" Grid.Column="1"/>
-                    <Label Text="{x:Static strings:Strings.Data_TableLongitudeUnits}" Grid.Row="3" Grid.Column="2"/>
-
-                    <Label Text="{x:Static strings:Strings.Data_TableTurbidityLabel}" Grid.Row="4" Grid.Column="0"/>
-                    <Label Text="{Binding ProcMeas.MeasurementProducts.WaterTurbidity, Converter={StaticResource ProductStringWithUncertainity}, ConverterParameter={x:Static converters:ProductDisplayParameter.TURBIDTY}}" Grid.Row="4" Grid.Column="1"/>
-                    <Label Text="{x:Static strings:Strings.Data_TableTurbidityUnits}" Grid.Row="4" Grid.Column="2"/>
-
-                    <Label Text="{x:Static strings:Strings.Data_TableSuspendedParticulateMatterLabel}" Grid.Row="5" Grid.Column="0"/>
-                    <Label Text="{Binding ProcMeas.MeasurementProducts.SPM, Converter={StaticResource ProductStringWithUncertainity}, ConverterParameter={x:Static converters:ProductDisplayParameter.SPM}}" Grid.Row="5" Grid.Column="1"/>
-                    <Label Text="{x:Static strings:Strings.Data_TableSuspendedParticulateMatterUnits}" Grid.Row="5" Grid.Column="2"/>
-
-                    <Label Grid.Row="6" Grid.Column="0">
-                        <Label.FormattedText>
-                            <FormattedString>
-                                <Span Text="b"/>
-                                <Span Text="b" FontSize="10"/>
-                                <Span Text="{x:Static strings:Strings.Data_TableBackscatterRedLabel}"/>
-                            </FormattedString>
-                        </Label.FormattedText>
-                    </Label>
-                    <Label Text="{Binding ProcMeas.MeasurementProducts.Backscatter_red, Converter={StaticResource ProductStringWithUncertainity}, ConverterParameter={x:Static converters:ProductDisplayParameter.BACKSCATTER}}" Grid.Row="6" Grid.Column="1"/>
-                    <Label Text="{x:Static strings:Strings.Data_TableBackscatterRedUnits}" Grid.Row="6" Grid.Column="2"/>
-
-                    <Label Text="{x:Static strings:Strings.Data_TableReflectanceRedLabel}" Grid.Row="7" Grid.Column="0"/>
-                    <Label Text="{Binding ProcMeas.MeasurementProducts.Reflectance.Red, Converter={StaticResource ProductStringWithUncertainity}, ConverterParameter={x:Static converters:ProductDisplayParameter.REFLECTANCE}}" Grid.Row="7" Grid.Column="1"/>
-                    <Label Text="{x:Static strings:Strings.Data_TableReflectanceUnits}" Grid.Row="7" Grid.Column="2"/>
-
-                    <Label Text="{x:Static strings:Strings.Data_TableReflectanceGreenLabel}" Grid.Row="8" Grid.Column="0"/>
-                    <Label Text="{Binding ProcMeas.MeasurementProducts.Reflectance.Green, Converter={StaticResource ProductStringWithUncertainity}, ConverterParameter={x:Static converters:ProductDisplayParameter.REFLECTANCE}}" Grid.Row="8" Grid.Column="1"/>
-                    <Label Text="{x:Static strings:Strings.Data_TableReflectanceUnits}" Grid.Row="8" Grid.Column="2"/>
-
-                    <Label Text="{x:Static strings:Strings.Data_TableReflectanceBlueLabel}" Grid.Row="9" Grid.Column="0"/>
-                    <Label Text="{Binding ProcMeas.MeasurementProducts.Reflectance.Blue, Converter={StaticResource ProductStringWithUncertainity}, ConverterParameter={x:Static converters:ProductDisplayParameter.REFLECTANCE}}" Grid.Row="9" Grid.Column="1"/>
-                    <Label Text="{x:Static strings:Strings.Data_TableReflectanceUnits}" Grid.Row="9" Grid.Column="2"/>
-
+                    <BoxView Grid.Column="2" Color="#E5534B" CornerRadius="6,6,0,0" Margin="18,0"
+                             VerticalOptions="End" HeightRequest="{Binding RedBar.BarHeight}"/>
+                    <Label Grid.Column="2" Text="{Binding RedBar.Text}" FontSize="14" FontFamily="OpenSansSemibold" HorizontalOptions="Center"
+                           VerticalOptions="End" Margin="{Binding RedBar.LabelMargin}"/>
                 </Grid>
-            </ScrollView>
-        </Border>
 
+                <BoxView Color="#3A3A3C" HeightRequest="1"/>
 
+                <Grid ColumnDefinitions="*,*,*">
+                    <Label Grid.Column="0" Text="{x:Static strings:Strings.Data_ReflectanceGraphBlueLabel}" FontSize="16" FontFamily="OpenSansSemibold" HorizontalOptions="Center"/>
+                    <Label Grid.Column="1" Text="{x:Static strings:Strings.Data_ReflectanceGraphGreenLabel}" FontSize="16" FontFamily="OpenSansSemibold" HorizontalOptions="Center"/>
+                    <Label Grid.Column="2" Text="{x:Static strings:Strings.Data_ReflectanceGraphRedLabel}" FontSize="16" FontFamily="OpenSansSemibold" HorizontalOptions="Center"/>
+                </Grid>
+            </VerticalStackLayout>
 
-        <Label Grid.Row="4"
-               Grid.Column="0"
-               Text="{x:Static strings:Strings.Data_GrayCard}"
-               HorizontalOptions="Center"
-               FontSize="14" />
-        <Label Grid.Row="4"
-               Grid.Column="1"
-               Text="{x:Static strings:Strings.Data_Water}"
-               HorizontalOptions="Center"
-               FontSize="14" />
-        <Label Grid.Row="4"
-               Grid.Column="2"
-               Text="{x:Static strings:Strings.Data_Sky}"
-               HorizontalOptions="Center" 
-               FontSize="14" />
+            <!-- The three images. Each tile has the 3:4 shape of the camera images, so its border sits on the
+                 edge of the photo. The border is green when the image was taken at the correct angles, white otherwise. -->
+            <Grid ColumnDefinitions="*,*,*">
 
+                <Border x:Name="GrayCardTile" Grid.Column="0" Margin="3" Padding="0" Background="Black" StrokeThickness="3"
+                        Stroke="{Binding GrayCardImageSquareColor}"
+                        HeightRequest="{Binding Source={x:Reference GrayCardTile}, Path=Width, Converter={StaticResource PhotoHeightConverter}, x:DataType='Border'}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="8" />
+                    </Border.StrokeShape>
+                    <Grid>
+                        <Image x:Name="GrayCardImage" Aspect="AspectFill" Source="{Binding GrayCardThumbnailImage}"/>
+                        <Label Text="{x:Static strings:Strings.Data_GrayCard}" FontSize="14" FontFamily="OpenSansSemibold" Padding="0,2"
+                               BackgroundColor="#99000000" HorizontalTextAlignment="Center" VerticalOptions="End"/>
+                    </Grid>
+                </Border>
 
+                <!-- The square that was measured -->
+                <Border Grid.Column="0"
+                        StrokeThickness="{OnPlatform 5, iOS=5, Android=3}"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Center"
+                        WidthRequest="{Binding Source={x:Reference GrayCardImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType='Image'}"
+                        HeightRequest="{Binding Source={x:Reference GrayCardImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType='Image'}"
+                        Stroke="{Binding GrayCardImageSquareColor}"
+                        BackgroundColor="Transparent">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="5" />
+                    </Border.StrokeShape>
+                </Border>
 
-        <Image
-            x:Name="GrayCardImage"
-            Grid.Column="0"
-            Grid.Row="5"
-            Margin="4"
-            HeightRequest="160"
-            Aspect="AspectFit"
-            Source="{Binding GrayCardThumbnailImage}"/>
+                <Border x:Name="WaterTile" Grid.Column="1" Margin="3" Padding="0" Background="Black" StrokeThickness="3"
+                        Stroke="{Binding WaterImageSquareColor}"
+                        HeightRequest="{Binding Source={x:Reference WaterTile}, Path=Width, Converter={StaticResource PhotoHeightConverter}, x:DataType='Border'}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="8" />
+                    </Border.StrokeShape>
+                    <Grid>
+                        <Image x:Name="WaterImage" Aspect="AspectFill" Source="{Binding WaterThumbnailImage}"/>
+                        <Label Text="{x:Static strings:Strings.Data_Water}" FontSize="14" FontFamily="OpenSansSemibold" Padding="0,2"
+                               BackgroundColor="#99000000" HorizontalTextAlignment="Center" VerticalOptions="End"/>
+                    </Grid>
+                </Border>
 
-        <Border Grid.Row="5" Grid.Column="0" 
-                StrokeThickness="{OnPlatform 5, iOS=5, Android=3}" 
-                VerticalOptions="Center" 
-                HorizontalOptions="Center"
-                WidthRequest="{Binding Source={x:Reference GrayCardImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType='Image'}"
-                HeightRequest="{Binding Source={x:Reference GrayCardImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType='Image'}"
-                Stroke="{Binding GrayCardImageSquareColor}"
-                BackgroundColor="Transparent">
-            <Border.StrokeShape>
-                <RoundRectangle CornerRadius="5" />
-            </Border.StrokeShape>
-        </Border>
+                <Border Grid.Column="1"
+                        StrokeThickness="{OnPlatform 5, iOS=5, Android=3}"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Center"
+                        WidthRequest="{Binding Source={x:Reference WaterImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType='Image'}"
+                        HeightRequest="{Binding Source={x:Reference WaterImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType='Image'}"
+                        Stroke="{Binding WaterImageSquareColor}"
+                        BackgroundColor="Transparent">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="5" />
+                    </Border.StrokeShape>
+                </Border>
 
-        <Image
-            x:Name="WaterImage"
-            Grid.Column="1"
-            Grid.Row="5"
-            Margin="4"
-            MinimumHeightRequest="150"
-            HeightRequest="160"
-            Aspect="AspectFit"
-            Source="{Binding WaterThumbnailImage}"/>
+                <Border x:Name="SkyTile" Grid.Column="2" Margin="3" Padding="0" Background="Black" StrokeThickness="3"
+                        Stroke="{Binding SkyImageSquareColor}"
+                        HeightRequest="{Binding Source={x:Reference SkyTile}, Path=Width, Converter={StaticResource PhotoHeightConverter}, x:DataType='Border'}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="8" />
+                    </Border.StrokeShape>
+                    <Grid>
+                        <Image x:Name="SkyImage" Aspect="AspectFill" Source="{Binding SkyThumbnailImage}"/>
+                        <Label Text="{x:Static strings:Strings.Data_Sky}" FontSize="14" FontFamily="OpenSansSemibold" Padding="0,2"
+                               BackgroundColor="#99000000" HorizontalTextAlignment="Center" VerticalOptions="End"/>
+                    </Grid>
+                </Border>
 
-        <Border Grid.Row="5" Grid.Column="1" 
-                StrokeThickness="{OnPlatform 5, iOS=5, Android=3}" 
-                VerticalOptions="Center" 
-                HorizontalOptions="Center"
-                WidthRequest="{Binding Source={x:Reference WaterImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType='Image'}"
-                HeightRequest="{Binding Source={x:Reference WaterImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType='Image'}"
-                Stroke="{Binding WaterImageSquareColor}"
-                BackgroundColor="Transparent">
-            <Border.StrokeShape>
-                <RoundRectangle CornerRadius="5" />
-            </Border.StrokeShape>
-        </Border>
+                <Border Grid.Column="2"
+                        StrokeThickness="{OnPlatform 5, iOS=5, Android=3}"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Center"
+                        WidthRequest="{Binding Source={x:Reference SkyImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType='Image'}"
+                        HeightRequest="{Binding Source={x:Reference SkyImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType='Image'}"
+                        Stroke="{Binding SkyImageSquareColor}"
+                        BackgroundColor="Transparent">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="5" />
+                    </Border.StrokeShape>
+                </Border>
+            </Grid>
 
-        <Image
-            x:Name="SkyImage"
-            Grid.Column="2"
-            Grid.Row="5"
-            Margin="4"
-            HeightRequest="160"
-            Aspect="AspectFit"
-            Source="{Binding SkyThumbnailImage}"/>
+            <!-- Shown only for a measurement just taken in camera diagnostics mode -->
+            <Button Text="Camera Diagnostics"
+                    FontSize="12"
+                    HorizontalOptions="Center"
+                    Command="{Binding ShowDiagnosticsCommand}"
+                    IsVisible="{Binding HasDiagnostics}"/>
 
-        <Border Grid.Row="5" Grid.Column="2" 
-                StrokeThickness="{OnPlatform 5, iOS=5, Android=3}" 
-                VerticalOptions="Center" 
-                HorizontalOptions="Center"
-                WidthRequest="{Binding Source={x:Reference SkyImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType='Image'}"
-                HeightRequest="{Binding Source={x:Reference SkyImage}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType='Image'}"
-                Stroke="{Binding SkyImageSquareColor}"
-                BackgroundColor="Transparent">
-            <Border.StrokeShape>
-                <RoundRectangle CornerRadius="5" />
-            </Border.StrokeShape>
-        </Border>
-
+        </VerticalStackLayout>
+    </ScrollView>
     </Grid>
 </ContentPage>

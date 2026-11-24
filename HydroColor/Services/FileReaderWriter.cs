@@ -313,6 +313,9 @@ Your HydroColor data file is attached. Do not reply to this email.";
                 DataRecordItem.MeasurementName = dataRecord[3].Replace('_', ' ');
                 DataRecordItem.WaterImageURI = new Uri(GetImagePath(timestamp, "Water")).AbsolutePath;
 
+                // Turbidity is the twelfth value on the line. A value that cannot be read is left as not-a-number.
+                DataRecordItem.Turbidity = dataRecord.Length > 11 ? ParseNumber(dataRecord[11]) : double.NaN;
+
                 LibraryList.Add(DataRecordItem);
             }
 

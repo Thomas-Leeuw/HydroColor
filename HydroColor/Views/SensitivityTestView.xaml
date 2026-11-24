@@ -8,9 +8,10 @@
              xmlns:controls="clr-namespace:HydroColor.Controls"
              x:DataType="viewmodels:SensitivityTestViewModel"
              x:Class="HydroColor.Views.SensitivityTestView"
+             BackgroundColor="Black"
              Title="Sensitivity Test"
              Shell.TabBarIsVisible="false"
-             Shell.NavBarIsVisible="true"
+             Shell.NavBarIsVisible="false"
              x:Name="SensitivityTestContentPage"
              Unloaded="SensitivityTestContentPage_Unloaded">
 
@@ -33,7 +34,11 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <Grid BackgroundColor="Black" RowDefinitions="240,auto,auto,*" RowSpacing="8" Padding="10">
+    <!-- The page draws its own header (back arrow and title); the system navigation bar is hidden -->
+    <Grid RowDefinitions="auto,*" BackgroundColor="Black">
+    <controls:PageHeader Grid.Row="0" Title="Sensitivity Test"/>
+
+    <Grid Grid.Row="1" BackgroundColor="Black" RowDefinitions="240,auto,auto,*" RowSpacing="8" Padding="10">
 
         <controls:CameraPreview
             x:Name="cameraPreview"
@@ -72,5 +77,6 @@
                    LineBreakMode="WordWrap"/>
         </ScrollView>
 
+    </Grid>
     </Grid>
 </ContentPage>

@@ -6,7 +6,8 @@
              xmlns:models="clr-namespace:HydroColor.Models"
              xmlns:strings="clr-namespace:HydroColor.Resources.Strings"
              xmlns:views="clr-namespace:HydroColor.Views"
-             x:Class="HydroColor.Views.LibraryView"                         
+             x:Class="HydroColor.Views.LibraryView"
+             BackgroundColor="Black"                         
              x:DataType="viewmodels:LibraryViewModel"
              Shell.NavBarIsVisible="False"
              Title=""
@@ -26,6 +27,16 @@
     </ContentPage.Resources>
 
     <Grid RowDefinitions="auto,*,auto,auto" BackgroundColor="Black">
+
+        <!-- Hint shown only when there are measurements in the list -->
+        <Label Grid.Row="0"
+               Text="{x:Static strings:Strings.Library_SwipeToDeleteHint}"
+               FontSize="14"
+               TextColor="LightGray"
+               VerticalOptions="Center"
+               HorizontalOptions="Start"
+               Margin="10,5"
+               IsVisible="{Binding MeasurementsExist}"/>
 
         <Button Grid.Row="0"
                 Text="{x:Static strings:Strings.Library_EmailDataFileButton}"
@@ -51,7 +62,7 @@
                             </SwipeItems>
                         </SwipeView.RightItems>
 
-                        <!-- One row: 74 for the content plus a 1 pixel white separator line -->
+                        <!-- One row: 74 for the content plus a 1 pixel separator line -->
                         <Grid RowDefinitions="74,1" BackgroundColor="Black">
                             <Grid.GestureRecognizers>
                                 <TapGestureRecognizer
@@ -59,20 +70,31 @@
                                     CommandParameter="{Binding}"/>
                             </Grid.GestureRecognizers>
 
-                            <Grid Grid.Row="0" RowDefinitions="*,*" ColumnDefinitions="75,*" Padding="5">
-                                <Image Grid.Column="0" Grid.RowSpan="2" Source="{Binding WaterImageURI}"/>
-                                <Label Grid.Column="1" Grid.Row="0" Text="{Binding MeasurementName}" TextColor="White" FontSize="18"/>
-                                <Label Grid.Column="1" Grid.Row="1" Text="{Binding LocalTimestamp}" TextColor="White" FontSize="16"/>
-                                <Image Source="right_arrow.png"
-                                       Grid.Column="1"
-                                       Grid.RowSpan="2"
-                                       VerticalOptions="Center"
-                                       HorizontalOptions="End"
-                                       Aspect="AspectFit"
-                                       HeightRequest="15"/>
+                            <Grid Grid.Row="0" ColumnDefinitions="auto,*,auto,auto" ColumnSpacing="10" Padding="10,6">
+
+                                <!-- The water photo, with rounded corners -->
+                                <Border Grid.Column="0" WidthRequest="47" HeightRequest="62" StrokeThickness="0" Padding="0"
+                                        Background="#1C1C1E" VerticalOptions="Center">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="6"/>
+                                    </Border.StrokeShape>
+                                    <Image Source="{Binding WaterImageURI}" Aspect="AspectFill"/>
+                                </Border>
+
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                    <Label Text="{Binding MeasurementName}" FontFamily="OpenSansSemibold" FontSize="17"
+                                           TextColor="White" LineBreakMode="TailTruncation"/>
+                                    <Label Text="{Binding LocalTimestamp, StringFormat='{}{0:g}'}" FontSize="14" TextColor="LightGray"/>
+                                </VerticalStackLayout>
+
+                                <!-- Turbidity of the measurement; empty if it could not be read -->
+                                <Label Grid.Column="2" Text="{Binding TurbidityText}" FontFamily="OpenSansSemibold" FontSize="16"
+                                       TextColor="White" VerticalOptions="Center"/>
+
+                                <Image Grid.Column="3" Source="right_arrow.png" HeightRequest="15" Aspect="AspectFit" VerticalOptions="Center"/>
                             </Grid>
 
-                            <BoxView Grid.Row="1" Color="White"/>
+                            <BoxView Grid.Row="1" Color="#3A3A3C" Margin="10,0"/>
                         </Grid>
                     </SwipeView>
                 </DataTemplate>

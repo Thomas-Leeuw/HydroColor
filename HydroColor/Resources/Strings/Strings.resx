@@ -319,8 +319,23 @@ The calibration procedure is simple. With the compass open on the screen (in Hyd
   <data name="CompassCalibrationHelp_Title" xml:space="preserve">
     <value>Compass Calibration</value>
   </data>
+  <data name="Data_CardBackscatterTitle" xml:space="preserve">
+    <value>Backscatter</value>
+  </data>
+  <data name="Data_CardBackscatterUnits" xml:space="preserve">
+    <value>1/m (red)</value>
+  </data>
+  <data name="Data_CardSPMTitle" xml:space="preserve">
+    <value>SPM</value>
+  </data>
+  <data name="Data_CardTurbidityTitle" xml:space="preserve">
+    <value>Turbidity</value>
+  </data>
   <data name="Data_GrayCard" xml:space="preserve">
     <value>Gray Card</value>
+  </data>
+  <data name="Data_ReflectanceChartTitle" xml:space="preserve">
+    <value>Remote sensing reflectance (1/sr)</value>
   </data>
   <data name="Data_ReflectanceGraphBlueLabel" xml:space="preserve">
     <value>Blue</value>
@@ -535,6 +550,9 @@ You can download the datafile containing your past measurements by connecting yo
   </data>
   <data name="Library_NoMeasurements" xml:space="preserve">
     <value>No Measurements to Display</value>
+  </data>
+  <data name="Library_SwipeToDeleteHint" xml:space="preserve">
+    <value>Swipe a row left to delete</value>
   </data>
   <data name="Library_UnreadableMeasurementsDismissButton" xml:space="preserve">
     <value>OK</value>

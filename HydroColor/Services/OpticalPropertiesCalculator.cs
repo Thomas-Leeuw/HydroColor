@@ -7,6 +7,9 @@ namespace HydroColor.Services
         const double GrayCardReflectance = 0.18; // Assumes user is using 18% reflectance photographers gray card
         const double WaterSurfaceReflectanceFactor = 0.028; // From Mobley 1999 for viewing angle 135 deg from sun and 40 degrees from nadir, no wind.
 
+        // The turbidity calculation stops at this value; a result equal to it means "this much or more"
+        public const double MaxTurbidity = 80;
+
         public static HydroColorMeasurementProducts ComputeOpticalProperties(HydroColorImageCaptureModel GrayCardImageData,
             HydroColorImageCaptureModel SkyImageData,
             HydroColorImageCaptureModel WaterImageData)
@@ -82,7 +85,7 @@ namespace HydroColor.Services
             if (RedReflectance >= 0.0344)
             {
                 // Red reflectace approches asymptote for trubidity over 80 NTU or Rrs over 0.0344
-                Turbidity = 80;
+                Turbidity = MaxTurbidity;
             }
             else
             {

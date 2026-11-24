@@ -1,10 +1,19 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using HydroColor.Converters;
 using HydroColor.Models;
 using HydroColor.Services;
 
 namespace HydroColor.ViewModels
 {
+    // What is drawn for one color in the reflectance chart
+    public class ReflectanceBar
+    {
+        public double BarHeight { get; set; }
+        public Thickness LabelMargin { get; set; }      // lifts the value text above the bar
+        public string Text { get; set; }
+    }
+
     [QueryProperty(nameof(ProcMeas), "MeasurementData")]
     public partial class DataViewModel : ObservableObject
     {
@@ -21,14 +30,15 @@ namespace HydroColor.ViewModels
         ImageSource skyThumbnailImage;
 
         [ObservableProperty]
-        int blueBarChartHeight;
+        ReflectanceBar blueBar = new();
 
         [ObservableProperty]
-        int greenBarChartHeight;
+        ReflectanceBar greenBar = new();
 
         [ObservableProperty]
-        int redBarChartHeight;
+        ReflectanceBar redBar = new();
 
+        // Height of the reflectance chart
         [ObservableProperty]
         int barChartHeight = 175;
 
@@ -43,7 +53,7 @@ namespace HydroColor.ViewModels
 
         partial void OnProcMeasChanged(HydroColorProcessedMeasurement value)
         {
-            
+
             if (ProcMeas.GrayCardImageData.JpegImage != null)
             {
                 GrayCardThumbnailImage = ImageSource.FromStream(() => new MemoryStream(ProcMeas.GrayCardImageData.JpegImage));
@@ -61,21 +71,62 @@ namespace HydroColor.ViewModels
             double reflecGreen = Math.Round(ProcMeas.MeasurementProducts.Reflectance.Green, 3);
             double reflecRed = Math.Round(ProcMeas.MeasurementProducts.Reflectance.Red, 3);
 
+            // The chart is scaled so that the tallest bar, with the value text above it, just fits in the chart's height.
+            double[] values = { reflecBlue, reflecGreen, reflecRed };
+            double[] uncertainties = values.Select(OpticalPropertiesCalculator.ReflectanceUncertainty).ToArray();
+            double plotHeight = BarChartHeight - 26;
+            double top = values.Max();
+            double scale = top > 0 && double.IsFinite(top) ? plotHeight / top : 0;
 
-            double maxReflec = new[] {  reflecBlue,
-                                        reflecGreen,
-                                        reflecRed
-                                        }.Max();
-
-            BlueBarChartHeight = ScaleBarHeight(reflecBlue, maxReflec);
-            GreenBarChartHeight = ScaleBarHeight(reflecGreen, maxReflec);
-            RedBarChartHeight = ScaleBarHeight(reflecRed, maxReflec);
+            BlueBar = MakeBar(values[0], uncertainties[0], scale);
+            GreenBar = MakeBar(values[1], uncertainties[1], scale);
+            RedBar = MakeBar(values[2], uncertainties[2], scale);
 
             GrayCardImageSquareColor = ProcMeas.GrayCardImageData.ImageCapturedAtCorrectAngles ? Colors.LimeGreen : Colors.White;
             SkyImageSquareColor = ProcMeas.SkyImageData.ImageCapturedAtCorrectAngles ? Colors.LimeGreen : Colors.White;
             WaterImageSquareColor = ProcMeas.WaterImageData.ImageCapturedAtCorrectAngles ? Colors.LimeGreen : Colors.White;
 
+            OnPropertyChanged(nameof(TurbidityText));
+            OnPropertyChanged(nameof(SPMText));
+            OnPropertyChanged(nameof(BackscatterText));
             OnPropertyChanged(nameof(HasDiagnostics));
+        }
+
+        // True when the turbidity is at the limit of the calculation, so it and the two results
+        // derived from it (SPM and backscatter) are lower limits
+        bool AtTurbidityLimit => ProcMeas?.MeasurementProducts.WaterTurbidity >= OpticalPropertiesCalculator.MaxTurbidity;
+
+        // The main values of the three result cards
+        public string TurbidityText => ProductText(ProcMeas?.MeasurementProducts.WaterTurbidity, ProductDisplayParameter.TURBIDTY, "F0");
+        public string SPMText => ProductText(ProcMeas?.MeasurementProducts.SPM, ProductDisplayParameter.SPM, "F0");
+        public string BackscatterText => ProductText(ProcMeas?.MeasurementProducts.Backscatter_red, ProductDisplayParameter.BACKSCATTER, "F2");
+
+        // "value ± uncertainty", or "value+" when the turbidity is at its limit
+        string ProductText(double? value, ProductDisplayParameter product, string format)
+        {
+            if (value == null)
+            {
+                return "";
+            }
+            if (AtTurbidityLimit)
+            {
+                return value.Value.ToString(format) + "+";
+            }
+            return (string)new ProductStringWithUncertainityConverter().Convert(value.Value, typeof(string), product, System.Globalization.CultureInfo.CurrentCulture);
+        }
+
+        // Sizes one bar of the reflectance chart and its value text (shown with its uncertainty).
+        // A value of zero or not-a-number gives no bar.
+        static ReflectanceBar MakeBar(double value, double uncertainty, double scale)
+        {
+            double barHeight = double.IsFinite(value) && value > 0 ? value * scale : 0;
+
+            return new ReflectanceBar
+            {
+                BarHeight = barHeight,
+                LabelMargin = new Thickness(0, 0, 0, barHeight + 2),
+                Text = $"{value.ToString("F3")} ± {uncertainty}"
+            };
         }
 
         // True when the measurement was just taken in camera diagnostics mode
@@ -103,24 +154,10 @@ namespace HydroColor.ViewModels
             }
         }
 
-
-        // Height of a bar relative to the largest reflectance.
-        // Returns 0 when there is nothing to scale against (all reflectances zero) or a value is not a number.
-        int ScaleBarHeight(double reflectance, double maxReflectance)
-        {
-            if (!(maxReflectance > 0))
-            {
-                return 0;
-            }
-
-            double height = reflectance / maxReflectance * (BarChartHeight - 30);
-            return double.IsFinite(height) && height > 0 ? (int)height : 0;
-        }
-
         [RelayCommand]
         public void BackButton()
         {
-            
+
             // Passing null for the Query Properties is a workaround for a known issue (https://github.com/dotnet/maui/issues/10294)
             // If null is not sent, it will resend the old data again, even if the local parameters have been set to null
             Shell.Current.GoToAsync($"..", true, new Dictionary<string, object>
@@ -129,7 +166,7 @@ namespace HydroColor.ViewModels
                 [nameof(HydroColorImageTag.Water)] = null,
                 [nameof(HydroColorImageTag.Sky)] = null
             });
-            
+
         }
 
 

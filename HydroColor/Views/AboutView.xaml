@@ -5,6 +5,7 @@
              xmlns:vm="clr-namespace:HydroColor.ViewModels"
              x:DataType="vm:AboutViewModel"
              x:Class="HydroColor.Views.AboutView"
+             BackgroundColor="Black"
              Shell.NavBarIsVisible="false"
              Title="">
     <Grid RowDefinitions="auto, *" BackgroundColor="Black">
@@ -30,22 +31,26 @@
 
         <ScrollView Grid.Row="1" VerticalOptions="Fill">
             <VerticalStackLayout>
-                <Label Text="{x:Static strings:Strings.About_HydroColorTitle}" 
-                       FontSize="18"
-                       Margin="0,5"/>
-                <Label Text="{x:Static strings:Strings.About_HowToUseHydroColorBody}" 
-                       Margin="20,5,5,5"/>
+                <!-- Opens the introduction (Welcome) screens again -->
                 <Label Text="{x:Static strings:Strings.About_IntroScreenLink}"
-                        TextColor="LightGray"
-                        TextDecorations="Underline"
-                        Margin="20,5,5,5">
+                       FontFamily="OpenSansSemibold"
+                       TextColor="White"
+                       TextDecorations="Underline"
+                       Margin="5,10,5,6">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding ShowWelcomeScreenCommand}"/>
                     </Label.GestureRecognizers>
                 </Label>
-                <Label Text="{x:Static strings:Strings.About_HowDoesHydroColorWorkTitle}" 
+                <Label Text="{x:Static strings:Strings.About_HydroColorTitle}" 
+                       FontFamily="OpenSansSemibold"
                        FontSize="18"
-                       Margin="0,5"/>
+                       Margin="5,10,5,2"/>
+                <Label Text="{x:Static strings:Strings.About_HowToUseHydroColorBody}" 
+                       Margin="20,5,5,5"/>
+                <Label Text="{x:Static strings:Strings.About_HowDoesHydroColorWorkTitle}" 
+                       FontFamily="OpenSansSemibold"
+                       FontSize="18"
+                       Margin="5,22,5,2"/>
                 <Label Text="{x:Static strings:Strings.About_HowDoesHydroColorWorkBody}" 
                        Margin="20,5,5,5"/>
                 <Label Text="{x:Static strings:Strings.About_LearnMore}" 

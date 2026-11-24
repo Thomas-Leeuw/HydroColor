@@ -9,9 +9,10 @@
              xmlns:controls="clr-namespace:HydroColor.Controls"
              x:DataType="viewmodels:CaptureImageViewModel"
              x:Class="HydroColor.Views.CaptureImageView"
+             BackgroundColor="Black"
              Title="{Binding ImageType.DisplayName}"
              Shell.TabBarIsVisible="false"
-             Shell.NavBarIsVisible="true"
+             Shell.NavBarIsVisible="false"
              x:Name="CaptureImageContentPage"
              Unloaded="CaptureImageContentPage_Unloaded">
 
@@ -34,194 +35,151 @@
     </ContentPage.Resources>
 
 
-    <Grid BackgroundColor="Black">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*" />
-            <ColumnDefinition Width="4*" />
-        </Grid.ColumnDefinitions>
+    <!-- The page draws its own header (back arrow and title); the system navigation bar is hidden -->
+    <Grid RowDefinitions="auto,*" BackgroundColor="Black">
+    <controls:PageHeader Grid.Row="0" Title="{Binding ImageType.DisplayName}"/>
 
+    <!-- Everything below the header is layered in one cell: the camera picture at the top, with the
+         tilt indicator over its left edge, and the compass and Capture button along the bottom. -->
+    <Grid x:Name="PreviewArea" Grid.Row="1" BackgroundColor="Black" SizeChanged="PreviewArea_SizeChanged">
 
-        <!-- The 'Image' control does not clip to bounds, so the inclinometer
-              image needs to be wrapped in a grid that does clip the image.-->
-        <Grid
-            Grid.Row="0"
-            Grid.Column="0" 
-            BackgroundColor="Black"
-            IsEnabled="False"
-            IsClippedToBounds="True">
+        <!-- The visible part of the camera picture. On a short screen its height is reduced so that the
+             compass and Capture button fit below it on plain black; the picture inside keeps its full size. -->
+        <Grid x:Name="PictureFrame" HorizontalOptions="Center" VerticalOptions="Start" IsClippedToBounds="True">
 
-            <Image 
-            Source="inclinometer_arrows.png"
-            Aspect="AspectFit"
-            VerticalOptions="Center"/>
+            <!-- The whole picture, 3 wide by 4 tall (the shape of the camera picture). Sized in the page's code. -->
+            <Grid x:Name="PictureContent" VerticalOptions="Start">
 
-            <Image 
-            Source="inclinometer_icon.png"
-            VerticalOptions="Center"
-            Aspect="Center"
-            TranslationY="{Binding InclinometerYPosition}"/>
+            <controls:CameraPreview
+                x:Name="cameraPreview"
+                LayoutFinished="{Binding CameraPreviewLayoutFinished}"
+                CameraControl="{Binding CamControl}"/>
+
+            <!-- Dims the picture everywhere except inside the measured square. Its shape is set in the page's code. -->
+            <Path x:Name="DimOverlay"
+                  Fill="#66000000"
+                  InputTransparent="True"/>
+
+            <!-- Tilt indicator, over the left edge of the picture.
+                 The 'Image' control does not clip to bounds, so it is wrapped in a grid that does. -->
+            <Grid x:Name="TiltStrip"
+                  WidthRequest="100"
+                  HorizontalOptions="Start"
+                  BackgroundColor="Transparent"
+                  IsEnabled="False"
+                  IsClippedToBounds="True">
+                <Image Source="inclinometer_arrows.png" Aspect="AspectFit" VerticalOptions="Center"/>
+                <Image Source="inclinometer_icon.png" VerticalOptions="Center" Aspect="Center"
+                       TranslationY="{Binding InclinometerYPosition}"/>
+            </Grid>
+
+            <!-- The square that is measured -->
+            <Border StrokeThickness="{OnPlatform 8, iOS=8, Android=4}"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"
+                    WidthRequest="{Binding Source={x:Reference cameraPreview}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType=controls:CameraPreview}"
+                    HeightRequest="{Binding Source={x:Reference cameraPreview}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType=controls:CameraPreview}"
+                    BackgroundColor="Transparent"
+                    InputTransparent="True"
+                    Stroke="{Binding CaptureButtonColor}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="20"/>
+                </Border.StrokeShape>
+            </Border>
+
+            </Grid>
+
+            <!-- Outline on the edge of the visible picture -->
+            <Border StrokeThickness="3"
+                    BackgroundColor="Transparent"
+                    InputTransparent="True"
+                    Stroke="{Binding CaptureButtonColor}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="4" />
+                </Border.StrokeShape>
+            </Border>
+
+            <!-- Numbers shown in camera diagnostics mode -->
+            <VerticalStackLayout HorizontalOptions="End" VerticalOptions="Start" Margin="8"
+                                 BackgroundColor="#80000000" Padding="4"
+                                 IsVisible="{Binding ShowNumericTiltAndHeading}">
+                <Label FontSize="13" Text="{Binding DeviceOffNadirAngle, StringFormat='Tilt {0:#,0.000}'}"/>
+                <Label FontSize="13" Text="{Binding TrueNorthHeading, StringFormat='Heading {0:#,0.00}'}"/>
+                <Label FontSize="13" Text="{Binding SunAzimuth, StringFormat='Sun az {0:#,0.00}'}"/>
+                <Label FontSize="13" Text="{Binding SunElevationAngle, StringFormat='Sun el {0:#,0.00}'}"/>
+            </VerticalStackLayout>
         </Grid>
 
+        <!-- Compass (or the no-GPS help text) and its help link, bottom left -->
+        <VerticalStackLayout HorizontalOptions="Start" VerticalOptions="End" Margin="10,0,0,2" Spacing="0">
 
+            <Grid WidthRequest="186" HeightRequest="186" HorizontalOptions="Start"
+                  IsVisible="{Binding CompassVisible}">
+                <!-- The images turn with the heading, so their corners swing outside this square.
+                     They ignore touches so that they cannot take a tap meant for the link below. -->
+                <Image Source="compass.png" Margin="3" Aspect="Fill" AnchorX="0.5" AnchorY="0.5"
+                       InputTransparent="True"
+                       Rotation="{Binding CompassDisplayRotation}"/>
+                <Image Source="compassarrows.png" Margin="3" Aspect="Fill"
+                       InputTransparent="True"
+                       Rotation="{Binding TargetAzimuthArrowRotation}"/>
+            </Grid>
 
-        <Label
-            Grid.Row="0"
-            Grid.Column="0"
-            Margin="10"
-            Text="{Binding DeviceOffNadirAngle, StringFormat='Tilt {0:#,0.000}'}"
-            FontSize="13"
-            IsVisible="{Binding ShowNumericTiltAndHeading}"/>
+            <Label FontSize="12"
+                   WidthRequest="130"
+                   BackgroundColor="#99000000"
+                   Padding="4"
+                   Text="{Binding ImageCollectionHelpText}"
+                   IsVisible="{Binding CompassVisible, Converter={StaticResource InvertedBoolConverter}}"/>
 
-        <controls:CameraPreview
-            x:Name="cameraPreview"
-            Grid.Row="0" 
-            Grid.Column="1" 
-            Margin="20"
-            LayoutFinished="{Binding CameraPreviewLayoutFinished}"
-            CameraControl="{Binding CamControl}">
-        </controls:CameraPreview>
-
-        <Border Grid.Row="0" Grid.Column="1" 
-                StrokeThickness="{OnPlatform 8, iOS=8, Android=4}" 
-                VerticalOptions="Center" 
-                HorizontalOptions="Center"
-                WidthRequest="{Binding Source={x:Reference cameraPreview}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType=controls:CameraPreview}"
-                HeightRequest="{Binding Source={x:Reference cameraPreview}, Path=Width, Converter={StaticResource CameraBoxOverlayWidthConverter}, x:DataType=controls:CameraPreview}"
-                BackgroundColor="Transparent"
-                Stroke="{Binding CaptureButtonColor}">
-            <Border.StrokeShape>
-                <RoundRectangle CornerRadius="20"/>
-            </Border.StrokeShape>
-        </Border>
-
-        <VerticalStackLayout
-            Grid.Row="1"
-            Grid.Column="1"
-            Margin="50,5,0,0"
-            VerticalOptions="Center"
-            HorizontalOptions="Center"
-            IsVisible="{Binding WaitingForImageResults}">
-
-            <Label Text="{x:Static strings:Strings.CaptureImage_ImageProcessingInProgress}"
-                   FontAttributes="Italic"
-                   FontSize="20"
-                   Margin="0,20"
-                   WidthRequest="120"
-                   HorizontalTextAlignment="Center"
-                   HorizontalOptions="Center"/>
-
-            <ActivityIndicator IsRunning="{Binding WaitingForImageResults}"
-                HorizontalOptions="Center"
-                Color="White"/>
-
+            <Label Text="{x:Static strings:Strings.CaptureImage_CompassNotWorkingLink}"
+                   FontSize="13"
+                   Padding="4,8"
+                   TextColor="LightGray"
+                   TextDecorations="Underline"
+                   IsVisible="{Binding CompassVisible}">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding CompassHelpCommand}"/>
+                </Label.GestureRecognizers>
+            </Label>
         </VerticalStackLayout>
 
-        <Image 
-            Source="compass.png"
-            Grid.Row="1"
-            Grid.ColumnSpan="2"
-            HeightRequest="180"
-            WidthRequest="180"
-            VerticalOptions="Center"
-            HorizontalOptions="Start"
-            Aspect="Fill"
-            AnchorX="0.5"
-            AnchorY="0.5"
-            Rotation="{Binding CompassDisplayRotation}"
-            IsVisible="{Binding CompassVisible}"
-            />
+        <!-- Capture button, bottom right, level with the middle of the compass -->
+        <Button Text="{x:Static strings:Strings.CaptureImage_CaptureButton}"
+                Background="{x:Null}"
+                BackgroundColor="{Binding CaptureButtonColor}"
+                FontSize="20"
+                HeightRequest="140"
+                WidthRequest="140"
+                CornerRadius="70"
+                BorderColor="Black"
+                BorderWidth="2"
+                HorizontalOptions="End"
+                VerticalOptions="End"
+                Margin="0,0,20,50"
+                IsVisible="{Binding WaitingForImageResults, Converter={StaticResource InvertedBoolConverter}}"
+                Command="{Binding CaptureButtonCommand}">
+            <!-- The app's button style forces a white background through its visual states. They are
+                 switched off for this button so that its colour can follow the aiming state. -->
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroupList/>
+            </VisualStateManager.VisualStateGroups>
+        </Button>
 
-        <Image 
-            Source="compassarrows.png"
-            Grid.Row="1"
-            Grid.ColumnSpan="2"
-            HeightRequest="180"
-            WidthRequest="180"
-            VerticalOptions="Center"
-            HorizontalOptions="Start"
-            Aspect="Fill"
-            Rotation="{Binding TargetAzimuthArrowRotation}"
-            IsVisible="{Binding CompassVisible}"
-            />
+        <!-- Shown in place of the button while an image is being processed -->
+        <VerticalStackLayout HorizontalOptions="End" VerticalOptions="End" Margin="0,0,20,75"
+                             BackgroundColor="#99000000" Padding="8"
+                             Spacing="10"
+                             IsVisible="{Binding WaitingForImageResults}">
+            <Label Text="{x:Static strings:Strings.CaptureImage_ImageProcessingInProgress}"
+                   FontAttributes="Italic"
+                   FontSize="16"
+                   LineBreakMode="NoWrap"
+                   HorizontalTextAlignment="Center"/>
+            <ActivityIndicator IsRunning="{Binding WaitingForImageResults}" HorizontalOptions="Center" Color="White"/>
+        </VerticalStackLayout>
 
-        <Label             
-            Grid.Row="1"
-            Grid.RowSpan="2"
-            Grid.ColumnSpan="2"
-            FontSize="12"
-            WidthRequest="200"
-            HeightRequest="120"
-            Text="{Binding ImageCollectionHelpText}"
-            VerticalOptions="Center"
-            HorizontalOptions="Start"
-            IsVisible="{Binding CompassVisible, Converter={StaticResource InvertedBoolConverter}}"
-            />
-
-        <Label
-            Grid.Row="1"
-            Grid.ColumnSpan="2"
-            Margin="10"
-            Text="{Binding TrueNorthHeading, StringFormat='Heading {0:#,0.00}'}"
-            FontSize="13"
-            IsVisible="{Binding ShowNumericTiltAndHeading}"
-            />
-
-        <Label
-            Grid.Row="1"
-            Grid.ColumnSpan="2"
-            Margin="10"
-            Text="{Binding SunAzimuth, StringFormat='Sun az {0:#,0.00}'}"
-            FontSize="13"
-            VerticalOptions="End"
-            IsVisible="{Binding ShowNumericTiltAndHeading}"
-            />
-
-        <Label
-            Grid.Row="1"
-            Grid.ColumnSpan="2"
-            Margin="10"
-            Text="{Binding SunElevationAngle, StringFormat='Sun el {0:#,0.00}'}"
-            FontSize="13"
-            VerticalOptions="End"
-            HorizontalOptions="Center"
-            IsVisible="{Binding ShowNumericTiltAndHeading}"
-            />
-
-        <Button
-            Text="{x:Static strings:Strings.CaptureImage_CaptureButton}"
-            BackgroundColor="{Binding CaptureButtonColor}"
-            Grid.Row="1"
-            FontSize="20"
-            Grid.Column="1"
-            HeightRequest="140"
-            WidthRequest="140"
-            HorizontalOptions="End"
-            VerticalOptions="Center"
-            Margin="0,0,15,0"
-            IsVisible="{Binding WaitingForImageResults, Converter={StaticResource InvertedBoolConverter}}"
-            Command="{Binding CaptureButtonCommand}"/>
-
-        <Label 
-            Text="{x:Static strings:Strings.CaptureImage_CompassNotWorkingLink}"
-            VerticalOptions="Center" 
-            HorizontalOptions="Start" 
-            Grid.Row="2"
-            Grid.Column="0"
-            Grid.ColumnSpan="2"
-            TextColor="LightGray"
-            TextDecorations="Underline"
-            Margin="5"
-            IsVisible="{Binding CompassVisible}">
-            <Label.GestureRecognizers>
-                <TapGestureRecognizer Command="{Binding CompassHelpCommand}"/>
-            </Label.GestureRecognizers>
-        </Label>
-
+    </Grid>
     </Grid>
 
 </ContentPage>

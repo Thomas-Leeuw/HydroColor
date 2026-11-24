@@ -24,8 +24,7 @@ public static class MauiProgram
                 handlers.AddHandler<CameraPreview, Handlers.CameraPreviewHandler>();
 
 #if IOS
-                // Added a custom shell to disable animation when switching tabs.
-                // The animation was causing a flicker when switching tabs on iOS.
+                // A custom shell that switches tabs without animation on iOS (see CustomShell.cs).
                 handlers.AddHandler<Shell, Platforms.iOS.CustomShell>();
 #endif
             });

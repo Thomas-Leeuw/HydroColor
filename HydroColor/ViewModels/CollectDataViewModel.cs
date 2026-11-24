@@ -31,13 +31,20 @@ namespace HydroColor.ViewModels
         ImageSource skyThumbnailImage;
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(AnalyzeButtonOpacity))]
         HydroColorImageCaptureModel grayCardImageData;
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(AnalyzeButtonOpacity))]
         HydroColorImageCaptureModel waterImageData;
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(AnalyzeButtonOpacity))]
         HydroColorImageCaptureModel skyImageData;
+
+        // The Analyze Images button is drawn faint until all three images have been taken.
+        // It is not disabled: disabling it caused a crash on an older Android phone (see AnalyzeImages).
+        public double AnalyzeButtonOpacity => GrayCardImageData != null && SkyImageData != null && WaterImageData != null ? 1.0 : 0.4;
 
         [ObservableProperty]
         HydroColorImageType grayCardImageType = new()
